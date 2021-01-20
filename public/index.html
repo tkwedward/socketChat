@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name= "viewport" content="width=device-width, initial-scaler=1" charset="utf-8">
+    <title></title>
+
+  </head>
+  <body>
+
+  </body>
+  <script src="/socket.io/socket.io.js" charset="utf-8">
+  </script>
+
+  <script>
+      const socket = io.connect("http://localhost:3000")
+      socket.on("message", data => {
+          console.log(data);
+          socket.emit("another event", {jermemy: "I am great, thank you."})
+      })
+  </script>
+</html>
