@@ -40,8 +40,6 @@ function checkTouchType(event){
 }
 
 let drawObject = {
-
-    "createObject": function(){},
     "draw": function(){}
 }
 
@@ -52,22 +50,18 @@ function createRect(status){
 
 // polyline functions
 
-function createPolyLine(strokeColor = "blue", strokeWidth = "20", fill = "none"){
+function createPolyLine(status, strokeColor = "blue", strokeWidth = "20", fill = "none"){
     let polyline = svgSoul.polyline().attr({
       "stroke": strokeColor,
       "stroke-width": strokeWidth,
       "fill": fill
     })
-
-    currentStatus.pathArray = []
-    currentStatus.objectToBeDrawn = polyline
-    console.log(currentStatus, polyline);
+    status.pathArray = []
     return polyline
 }
 
-function drawPolyLine(){
-    // console.log(monitor);
-    currentStatus.objectToBeDrawn.plot(currentStatus.pathArray)
+function drawPolyLine(item, array){
+    item.plot(array)
 }
 
 
@@ -82,36 +76,31 @@ class MainController {
         this.updatePositionOnScreen()
     }
 
-    obtainCurrentStatus(){
-        return this.currentStatus
-    }
-
     updatePositionOnScreen(){
-        svgHtmlObject.addEventListener("touchstart", async function(e){
+        // let drawObject = this.drawObject
+        svgHtmlObject.addEventListener("touchstart", function(e){
             // e.preventDefault()
-            let status = obtainCurrentStatus()
             let touchType = checkTouchType(e)
             console.log(touchType);
             if (touchType == "pen"){
 
               e.preventDefault()
 
-              status.startTouchX = e.touches[0].pageX - status.svgOffsetLeft
-              status.startTouchY = e.touches[0].pageY -
-              status.svgOffsetTop
+              currentStatus.startTouchX = e.touches[0].pageX - currentStatus.svgOffsetLeft
+              currentStatus.startTouchY = e.touches[0].pageY -
+              currentStatus.svgOffsetTop
 
               // touch X and Y
-              status.touchX = e.touches[0].pageX - status.svgOffsetLeft
-              status.touchY = e.touches[0].pageY -
-              status.svgOffsetTop
+              currentStatus.touchX = e.touches[0].pageX - currentStatus.svgOffsetLeft
+              currentStatus.touchY = e.touches[0].pageY -
+              currentStatus.svgOffsetTop
 
               // draw a testing rectangle
               // currentStatus.objectToBeDrawn = svgSoul.rect(100, 100)
               // currentStatus.objectToBeDrawn.x(currentStatus.startTouchX)
               // currentStatus.objectToBeDrawn.y(currentStatus.startTouchY)
 
-              status.objectToBeDrawn = await drawObject.createObject(status)
-
+              currentStatus.objectToBeDrawn = createPolyLine(currentStatus)
             }
 
         })
@@ -143,30 +132,11 @@ let monitor = new MainController(svgSoul, currentStatus)
 // console.log(img);
 let pdfBaseLayer = svgSoul.image()
 // svgHtmlObject.append(img)
-// drawObject.draw = function(){
-//     drawPolyLine(currentStatus.objectToBeDrawn, currentStatus.pathArray)
-// }
+drawObject.draw = function(){
+    drawPolyLine(currentStatus.objectToBeDrawn, currentStatus.pathArray)
+}
 
 
-let penButton = document.querySelector("#pen")
-penButton.addEventListener("click", function(e){
-    drawObject.draw = function(){
-        drawPolyLine(currentStatus.objectToBeDrawn, currentStatus.pathArray)
-    }
-})
-
-let eraserButton = document.querySelector("#eraser")
-penButton.addEventListener("click", function(e){
-    drawObject.createObject = function(){
-        currentStatus.objectToBeDrawn = createPolyLine(currentStatus)
-        console.log(currentStatus);
-    }
-
-    drawObject.draw = function(){
-      console.log(currentStatus);
-        drawPolyLine()
-    }
-})
 
 // drawObject.draw = function(){
 //     let rect = svgSoul.rect(10, 10)
