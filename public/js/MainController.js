@@ -32,7 +32,7 @@ let currentStatus = {
 
 function checkTouchType(event){
     let radius = event.targetTouches[0].radiusX
-    if (radius < 25){
+    if (radius < 5){
       return "pen"
     } else {
       return "finger"
@@ -49,20 +49,6 @@ function createRect(status){
 }
 
 // polyline functions
-
-function createPolyLine(status, strokeColor = "blue", strokeWidth = "20", fill = "none"){
-    let polyline = svgSoul.polyline().attr({
-      "stroke": strokeColor,
-      "stroke-width": strokeWidth,
-      "fill": fill
-    })
-    status.pathArray = []
-    return polyline
-}
-
-function drawPolyLine(item, array){
-    item.plot(array)
-}
 
 
 class MainController {
@@ -95,12 +81,11 @@ class MainController {
               currentStatus.touchY = e.touches[0].pageY -
               currentStatus.svgOffsetTop
 
-              // draw a testing rectangle
-              // currentStatus.objectToBeDrawn = svgSoul.rect(100, 100)
-              // currentStatus.objectToBeDrawn.x(currentStatus.startTouchX)
-              // currentStatus.objectToBeDrawn.y(currentStatus.startTouchY)
 
-              currentStatus.objectToBeDrawn = createPolyLine(currentStatus)
+
+              currentStatus.drawObject.create()
+
+
             }
 
         })
@@ -119,8 +104,8 @@ class MainController {
 
                 // draw path
                 currentStatus.pathArray.push([currentStatus.touchX, currentStatus.touchY])
-                drawObject.draw()
-                currentStatus.saveSvg()
+
+                currentStatus.drawObject.draw()
             }
         })
 
@@ -129,12 +114,27 @@ class MainController {
 
 let monitor = new MainController(svgSoul, currentStatus)
 
+currentStatus.objectToBeDrawnAttribute = {
+    strokeColor: "blue",
+    strokeWidth: "20",
+    fill: "none",
+}
+
 // console.log(img);
 let pdfBaseLayer = svgSoul.image()
 // svgHtmlObject.append(img)
-drawObject.draw = function(){
-    drawPolyLine(currentStatus.objectToBeDrawn, currentStatus.pathArray)
-}
+
+
+let penButton = document.querySelector("#pen")
+penButton.addEventListener("click", function(){
+    currentStatus.drawObject = getDrawFunctionObject(currentStatus, "polyline")
+})
+
+
+let rectButton = document.querySelector("#rect")
+rectButton.addEventListener("click", function(){
+    currentStatus.drawObject = getDrawFunctionObject(currentStatus, "rect")
+})
 
 
 

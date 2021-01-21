@@ -1,21 +1,49 @@
+function getDrawFunctionObject(status, shape){
+    let attribute = status.objectToBeDrawnAttribute
+    console.log(attribute);
+    if (shape == "polyline"){
+        function createPolyLine(){
+            let polyline = svgSoul.polyline().attr({
+              "stroke": attribute.strokeColor,
+              "stroke-width": attribute.strokeWidth,
+              "fill": attribute.fill
+            })
+            status.objectToBeDrawn = polyline
+            status.pathArray = []
+            return polyline
+        }
 
-function createRect(status){
-    let rect = status.layer
+        function drawPolyLine(){
+            status.objectToBeDrawn.plot(status.pathArray)
+        }
+
+        return {
+            "create": createPolyLine,
+            "draw": drawPolyLine
+        }
+    }
+
+
+
+    if (shape == "rect"){
+      function createRect(){
+        status.objectToBeDrawn = svgSoul.rect(100, 100)
+      }
+
+      function drawRect(){
+
+      }
+
+      return {
+          "create": createRect,
+          "draw": drawRect
+      }
+    }
+
+
+
 }
-
-// polyline functions
-
-function createPolyLine(status, strokeColor = "blue", strokeWidth = "20", fill = "none"){
-    let polyline = svgSoul.polyline().attr({
-      "stroke": strokeColor,
-      "stroke-width": strokeWidth,
-      "fill": fill
-    })
-    status.pathArray = []
-    return polyline
-}
-
-function drawPolyLine(item, array){
-    item.plot(array)
-    plot(currentStatus.pathArray)
-}
+// draw a testing rectangle
+// currentStatus.objectToBeDrawn =
+// currentStatus.objectToBeDrawn.x(currentStatus.startTouchX)
+// currentStatus.objectToBeDrawn.y(currentStatus.startTouchY)

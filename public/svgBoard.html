@@ -29,14 +29,22 @@
 
     <span class="cake">fsdfsdfsd</span>
     <div id="functionButtonSet">
-      <button id="go_previous">Previous</button>
-      <input type="number" value="1" id="current_page">
-      <button id="go_next"> Next </button>
-      <button id="zoom_in"> + </button>
-      <button id="zoom_out"> - </button>
-      <button id="addLayer"> addLayer </button>
-      <button id="color"> color </button>
-      <button id="pen"> pen </button>
+      <div class="defaultButton">
+          <button id="go_previous">Previous</button>
+          <input type="number" value="1" id="current_page">
+          <button id="go_next"> Next </button>
+          <button id="zoom_in"> + </button>
+          <button id="zoom_out"> - </button>
+          <button id="addLayer"> addLayer </button>
+          <button id="color"> color </button>
+          <button id="pen"> pen </button>
+          <button id="rect"> rect </button>
+      </div>
+      <div class="buttonDetailFunction">
+            <button id="strokeSizeIncreasee" value=5> +5 </button>
+            <button id="strokeSizeDecrease" value=-5> -5 </button>
+      </div>
+
     </div>
     <div id="noteContainer">
       <canvas class="pdfCanvas"></canvas>
