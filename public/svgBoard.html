@@ -5,18 +5,55 @@
     <title> Simple Rich Text Editor </title>
 
     <link href="css/board.css" rel="stylesheet">
+    <style media="screen">
+      body{
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
   </head>
 
   <body>
 
+    <span class="cake">fsdfsdfsd</span>
+    <div id="functionButtonSet"></div>
     <div id="create"></div>
-    
+
   </body>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.16/svg.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+
+  let draw = SVG().addTo("#create").size("100vw", "100vh")
+  // let functionButtonSet = document.querySelector("#functionButtonSet")
+  let svgDim = draw.node.getClientRects()[0]
+  console.log(svgDim);
+  let currentStatus = {
+      typeOfEvent: null,
+      svgOffsetLeft: svgDim.x,
+      svgOffsetTop: svgDim.y,
+
+      // mouse positions
+      startX: 0, startY: 0, lastX: 0, lastY: 0,
+      mouseX: 0, mouseY: 0,
+
+      // touch positions
+      startTouchX: 0, startTouchY: 0, lastTouchX: 0,
+      lastTouchY: 0, touchX: 0, touchY: 0,
+
+      object: null,
+      currentButton: null,
+      paintFunction: null
+  }
+
+
+  </script>
+
 
   <script src="/socket.io/socket.io.js" charset="utf-8">
   </script>
+  <script src="js/ButtonClass.js" charset="utf-8"></script>
   <script src="js/svgBoard.js" charset="utf-8"></script>
   <!-- { command: "italic", type: "button", innerHTML: "italic" }, -->
+
 </html>
