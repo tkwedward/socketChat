@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> Simple Rich Text Editor </title>
+
+    <link href="css/board.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <textarea id="testTextArea"></textarea>
+  </body>
+
+
+  <script src="/socket.io/socket.io.js" charset="utf-8">
+  </script>
+  <script src="js/editorPrototypeExtension.js" charset="utf-8"></script>
+  <script src="js/editor.js" charset="utf-8"></script>
+  <script>
+      let testTextArea = document.querySelector("#testTextArea")
+      let editor = new myRichTestEditor({
+          selector: testTextArea,
+          bold: false
+      })
+
+  </script>
+  <!-- { command: "italic", type: "button", innerHTML: "italic" }, -->
+</html>
