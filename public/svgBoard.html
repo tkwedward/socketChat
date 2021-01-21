@@ -10,41 +10,50 @@
         width: 100vw;
         height: 100vh;
       }
+
+      .pdfCanvas, .baseSvg {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #noteContainer{
+        position: relative;
+      }
+
+
     </style>
   </head>
 
   <body>
 
     <span class="cake">fsdfsdfsd</span>
-    <div id="functionButtonSet"></div>
-    <div id="create"></div>
+    <div id="functionButtonSet">
+      <button id="go_previous">Previous</button>
+      <input type="number" value="1" id="current_page">
+      <button id="go_next"> Next </button>
+      <button id="zoom_in"> + </button>
+      <button id="zoom_out"> - </button>
+      <button id="addLayer"> addLayer </button>
+      <button id="color"> color </button>
+      <button id="pen"> pen </button>
+      <button id="eraser"> eraser </button>
+    </div>
+    <div id="noteContainer">
+      <canvas class="pdfCanvas"></canvas>
+      <div id="create">
+      </div>
+
+    </div>
 
   </body>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.16/svg.min.js" charset="utf-8"></script>
+
+  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <script src="http://vivin.net/pub/pdfjs/textlayerbuilder.js"></script>
   <script type="text/javascript">
 
-  let draw = SVG().addTo("#create").size("100vw", "100vh")
-  // let functionButtonSet = document.querySelector("#functionButtonSet")
-  let svgDim = draw.node.getClientRects()[0]
-  console.log(svgDim);
-  let currentStatus = {
-      typeOfEvent: null,
-      svgOffsetLeft: svgDim.x,
-      svgOffsetTop: svgDim.y,
-
-      // mouse positions
-      startX: 0, startY: 0, lastX: 0, lastY: 0,
-      mouseX: 0, mouseY: 0,
-
-      // touch positions
-      startTouchX: 0, startTouchY: 0, lastTouchX: 0,
-      lastTouchY: 0, touchX: 0, touchY: 0,
-
-      object: null,
-      currentButton: null,
-      paintFunction: null
-  }
 
 
   </script>
@@ -53,7 +62,10 @@
   <script src="/socket.io/socket.io.js" charset="utf-8">
   </script>
   <script src="js/ButtonClass.js" charset="utf-8"></script>
-  <script src="js/svgBoard.js" charset="utf-8"></script>
+  <script src="js/MainController.js" charset="utf-8"></script>
+  <script src="js/pdfRender.js" charset="utf-8"></script>
+
+  <!-- <script src="js/svgBoard.js" charset="utf-8"></script> -->
   <!-- { command: "italic", type: "button", innerHTML: "italic" }, -->
 
 </html>
