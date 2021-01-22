@@ -1,17 +1,42 @@
-function getDrawFunctionObject(status, shape){
+function broadcastGenerator(status, shape){
+    // to send the data of the new added object to all clients
+    let objectAttribute = status.objectToBeDrawn.attr()
+    objectAttribute.shape = shape
+    // console.log(objectAttribute);
+    socket.emit("newObject", {
+        objectAttribute: objectAttribute
+    })
+}
+
+
+socket.on("newObject", function(data){
+    currentStatus.socketData = data.objectAttribute
+    console.log(currentStatus);
+    let shape = data.objectAttribute.shape
+    let drawObject = getDrawFunctionObject(currentStatus, shape, true)
+    drawObject.create()
+    // console.log(data);
+
+})
+
+
+function getDrawFunctionObject(status, shape, fromSocket){
     // draw polyline
     let attribute
-    let createPolyLine, movePolyLine
+    let createPolyLine, movePolyLine, upPolyLine
     // @auto-fold here
     if (shape == "polyline"){
+
+
         attribute = {
             strokeColor: "blue",
-            strokeWidth: 20,
+            strokeWidth: 5,
             fill: "none",
             strokeLinecap: "round"
         }
         status.objectToBeDrawnAttribute = attribute
 
+        // create object when touchstart
         createPolyLine = function(){
             let polyline = svgSoul.polyline().attr({
               "stroke": attribute.strokeColor,
@@ -20,15 +45,39 @@ function getDrawFunctionObject(status, shape){
               "stroke-linecap": attribute.strokeLinecap
             })
             status.objectToBeDrawn = polyline
-            status.pathArray = []
+
+            if (fromSocket){
+                let points = status.socketData.points.split(" ")
+                points = points.map(p=>{
+                     let pointStr = p.split(",")
+                     return [parseFloat(pointStr[0]), parseFloat(pointStr[1])]
+                })
+                // console.log(currentStatus.socketData);
+                console.log(points);
+                polyline.plot(points)
+            } else {
+                status.pathArray = []
+            }
+
             return polyline
         }
 
+        // event of touchmove
         movePolyLine = function(){
-            status.objectToBeDrawn.plot(status.pathArray)
+
+            let shiftedArray = status.pathArray.map(point=>[point[0], point[1] - 30])
+
+
+
+            status.objectToBeDrawn.plot(shiftedArray)
         }
 
-        return { "create": createPolyLine, "draw": movePolyLine}
+        // to upload the change to the broadcast
+        upPolyLine = function(){
+            broadcastGenerator(status, "polyline")
+        }
+
+        return { "create": createPolyLine, "draw": movePolyLine, "up": upPolyLine}
     }
 
     // draw rectangle
@@ -181,6 +230,8 @@ function getDrawFunctionObject(status, shape){
               lastSelector.remove()
           }
 
+
+
           let polyline = svgSoul.polyline().attr({
             "stroke": attribute.strokeColor,
             "stroke-width": attribute.strokeWidth,
@@ -188,6 +239,8 @@ function getDrawFunctionObject(status, shape){
             "stroke-dasharray": "5,5",
             "class": "selectorLine"
           })
+
+          console.log(polyline.attr());
           status.objectToBeDrawn = polyline
           status.pathArray = []
           return polyline

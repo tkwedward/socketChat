@@ -30,6 +30,14 @@ io.on("connection", socket=>{
         socket.broadcast.emit("canvas-data", data)
     })
 
+    socket.on("newObject", data=>{
+      console.log(data);
+        // let the clients to create the new object
+        socket.broadcast.emit("newObject", data)
+    })
+
+
+
 
     // if the server receive a message
     socket.on("message", data => {

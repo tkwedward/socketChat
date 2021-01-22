@@ -12,6 +12,7 @@ selectorButton.addEventListener("click", function(){
     currentStatus.drawObject = getDrawFunctionObject(currentStatus, "selector")
 })
 
+
 class CommentController {
     constructor(){
         this.commentType = ["question", "comment", "important"]
@@ -20,8 +21,6 @@ class CommentController {
 
         this.createComment()
         this.createComment()
-
-
     }
 
     createCommentSideBar(){
@@ -38,6 +37,7 @@ class CommentController {
     createCommentContainer(){
       this.commentsContainer = document.createElement("div")
       this.commentsContainer.classList.add("commentSideBar")
+
       this.commentsContainer.style.width = "90%"
       this.commentsContainer.style.minHeight = "100px"
       this.commentsContainer.style.marginLeft = "auto"
@@ -49,25 +49,30 @@ class CommentController {
 
     createComment(innerHTML){
         let commentItem = document.createElement("div")
-
-
         commentItem.classList.add("comment")
         commentItem.style.height = "200px"
         commentItem.style.padding = "10px"
         commentItem.style.margin = "15px 0px"
+        commentItem.style.overflow = "scroll"
         commentItem.style.background = "yellow"
-        commentItem.innerHTML = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+
+        let commentItemContent = document.createElement("div")
+        commentItemContent.innerHTML = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+
+        let commentTyepSelector = document.createElement("select")
+        this.commentType.forEach(p=>{
+            let option = document.createElement("option")
+            option.value = p
+            option.innerText = p
+            commentTyepSelector.append(option)
+        })
+
+        commentItem.append(commentTyepSelector, commentItemContent)
         this.commentsContainer.append(commentItem)
-
-
-
-        // if (innerHTML){
-        //
-        // }
 
     }
 }
-let commentController = new CommentController()
+
 
 
 class SelectorButtonSubFunction {
@@ -154,5 +159,3 @@ class LineButtonSubFunction {
         })
     }
 }
-let lineButtonSubFunction = new LineButtonSubFunction()
-let selectorButtonSubFunction = new SelectorButtonSubFunction()
