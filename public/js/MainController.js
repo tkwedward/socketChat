@@ -1,3 +1,5 @@
+
+
 // create Rectangle
 let svgSoul = SVG().addTo("#create").size("100vw", "100vh")
 let svgHtmlObject = svgSoul.node
@@ -20,24 +22,47 @@ let currentStatus = {
     // touch positions
     startTouchX: 0, startTouchY: 0, lastTouchX: 0,
     lastTouchY: 0, touchX: 0, touchY: 0,
-    pathArray: [],
 
+    // usedForCreating Object
+    // objectToBeDrawn = e.g. polyline, circle, ...
+    // paintFunction = addObject
     objectToBeDrawn: null,
-    currentButton: null,
     paintFunction: null,
+    objectToBeDrawnAttribute: null,
+          // used for plotting a polyline
+          pathArray: [],
+    currentButton: null,
+
+    // used for adding comments
+    selectedObject: null,
+    
+
     saveSvg: function(){
       // console.log(svgHtmlObject.innerHTML);
+
+
+    }
+}
+
+function getTouchPosition(e){
+    return {
+      mouseX: e.targetTouches[0].pageX - currentStatus.svgOffsetLeft,
+      mouseY: e.targetTouches[0].pageY - currentStatus.svgOffsetTop
     }
 }
 
 function checkTouchType(event){
     let radius = event.targetTouches[0].radiusX
-    if (radius < 5){
+    if (radius < 25){
       return "pen"
     } else {
       return "finger"
     }
 }
+
+// function getCurrentStatus(){
+//     return currentStatus
+// }
 
 let drawObject = {
     "draw": function(){}
@@ -67,7 +92,6 @@ class MainController {
         svgHtmlObject.addEventListener("touchstart", function(e){
             // e.preventDefault()
             let touchType = checkTouchType(e)
-            console.log(touchType);
             if (touchType == "pen"){
 
               e.preventDefault()
@@ -81,7 +105,7 @@ class MainController {
               currentStatus.touchY = e.touches[0].pageY -
               currentStatus.svgOffsetTop
 
-
+              console.log(currentStatus);
 
               currentStatus.drawObject.create()
 
@@ -105,7 +129,15 @@ class MainController {
                 // draw path
                 currentStatus.pathArray.push([currentStatus.touchX, currentStatus.touchY])
 
-                currentStatus.drawObject.draw()
+                currentStatus.drawObject.draw(e)
+            }
+        })
+
+        svgHtmlObject.addEventListener("touchend", function(e){
+
+            if (currentStatus.drawObject.up){
+              console.log("touchleave");
+                currentStatus.drawObject.up()
             }
         })
 
@@ -114,26 +146,21 @@ class MainController {
 
 let monitor = new MainController(svgSoul, currentStatus)
 
-currentStatus.objectToBeDrawnAttribute = {
-    strokeColor: "blue",
-    strokeWidth: "20",
-    fill: "none",
-}
-
 // console.log(img);
-let pdfBaseLayer = svgSoul.image()
+// let circle = svgSoul.circle(20)
+// circle.attr({ cx: 100, cy: 100})
 // svgHtmlObject.append(img)
 
-
-let penButton = document.querySelector("#pen")
-penButton.addEventListener("click", function(){
-    currentStatus.drawObject = getDrawFunctionObject(currentStatus, "polyline")
-})
 
 
 let rectButton = document.querySelector("#rect")
 rectButton.addEventListener("click", function(){
     currentStatus.drawObject = getDrawFunctionObject(currentStatus, "rect")
+})
+
+let eraserButton = document.querySelector("#eraser")
+eraserButton.addEventListener("click", function(){
+    currentStatus.drawObject = getDrawFunctionObject(currentStatus, "eraser")
 })
 
 
