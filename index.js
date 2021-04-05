@@ -73,8 +73,16 @@ io.on("connection", socket=>{
     let changeList = []
     // a promise to get all the changes from all clients
     let clientsArray = Array.from(io.sockets.sockets.keys())
+    var clientsSockets = io.allSockets();
+    clientsSockets.then(p=>{
+      p.forEach(c=>{
+        console.log(io.sockets.to(p));
+      })
+    })
+
     let promiseArray = clientsArray.map((p=>{
       return new Promise(res=>{
+        // io.sockets.to(p).on("clientSendChangesToServer", data =>{
         socket.on("clientSendChangesToServer", data =>{
           changeList.push({
             "changeData": data.changeData,
@@ -85,11 +93,17 @@ io.on("connection", socket=>{
         })// event of clientSendChangesToServer
       })// promise
     }))// map
+
     Promise.all(promiseArray).then(p=>{
       // socket.off('clientSendChangesToServer');
       console.log(changeList);
-        io.emit("deliverSynchronizeDataFromServer", changeList);
+      clientsArray.forEach(client_id=>{
+        let filteredChangeList = changeList.filter(p=>p!=p.id)
+        io.sockets.to(client_id)
+          .emit("deliverSynchronizeDataFromServer", changeList);
+      })
     })
+
     io.emit("serverInitiatesSynchronization")
   })
 
