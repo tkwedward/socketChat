@@ -78,7 +78,8 @@ io.on("connection", socket=>{
         socket.on("clientSendChangesToServer", data =>{
           changeList.push({
             "changeData": data.changeData,
-            "id": p
+            "id": p,
+            "origin_id": socket.id
           })
           res(true)
         })// event of clientSendChangesToServer
@@ -86,6 +87,7 @@ io.on("connection", socket=>{
     }))// map
     Promise.all(promiseArray).then(p=>{
       // socket.off('clientSendChangesToServer');
+      console.log(changeList);
         io.emit("deliverSynchronizeDataFromServer", changeList);
     })
     io.emit("serverInitiatesSynchronization")

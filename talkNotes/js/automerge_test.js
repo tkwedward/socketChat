@@ -1,3 +1,13 @@
+var dataArray
+fetch("data/pokemon.json")
+  .then(response => response.json())
+  .then(data => {
+    dataArray = data
+  })
+
+
+
+
 const socket = io()
 let change
 
@@ -11,20 +21,28 @@ let updateDataButton = document.querySelector(".updateData")
 let loadDataButton = document.querySelector(".loadData")
 let notecardDisplay =  document.querySelector(".notecardDisplay")
 
-function createCard(cardData){
+function createCard(cardData, position){
+
     let cardContainer = document.createElement("div")
     cardContainer.classList.add("card")
 
-    let card_title = document.createElement("div")
-    card_title.innerText = cardData.title
+    let card_name = document.createElement("div")
+    card_name.innerText = cardData.pkm_name
 
-    let card_longVersion = document.createElement("div")
-    card_longVersion.innerText = cardData.longVersion
+    let card_no = document.createElement("div")
+    card_no.innerText = cardData.pkm_no
 
-    let card_shortVersion = document.createElement("div")
-    card_shortVersion.innerText = cardData.shortVersion
+    let card_type = document.createElement("div")
+    card_type.innerText = cardData.pkm_type
 
-    cardContainer.append(card_title, card_longVersion, card_shortVersion)
+    let card_image = document.createElement("img")
+    card_image.src = cardData.pkm_image
+    card_image.style.width = "80%"
+
+    cardContainer.style.display = "grid"
+    cardContainer.style.gridTemplateColumns = "1fr 1fr 1fr 1fr"
+
+    cardContainer.append(card_name, card_no, card_type, card_image)
 
     notecardDisplay.append(cardContainer)
 
@@ -37,21 +55,27 @@ function updateCardDisplay(newData){
 }
 
 submitButton.addEventListener("click", (e)=>{
-  let title = document.querySelector(".title")
-  let longVersion = document.querySelector(".longVersion")
-  let shortVersion = document.querySelector(".shortVersion")
+  let number = Math.floor(Math.random() * dataArray.length)
+  let randomPosition = Math.floor(Math.random() * newDoc.cards.length)
+
+  let pkm =  dataArray[number]
+  let pkm_no = pkm["number"]
+  let pkm_name = pkm["name"]
+  let pkm_type = pkm["type"]
+  let pkm_image = pkm["image"]
 
   let cardData = {
-    "title": title.value,
-    "longVersion": longVersion.value,
-    "shortVersion": shortVersion.value
+    "pkm_no": pkm_no,
+    "pkm_name": pkm_name,
+    "pkm_type": pkm_type,
+    "pkm_image": pkm_image
   }
 
   newDoc = Automerge.change(newDoc, "change value", doc=>{
     doc.cards.push(cardData)
   })
-
-  let newCard = createCard(cardData)
+  console.log(randomPosition);
+  let newCard = createCard(cardData, randomPosition)
 
 })
 
@@ -91,7 +115,7 @@ socket.on("processInitialData", data=>{
 // server ask all clients to give it the changes. client reply the server's request for synchronization
 socket.on("serverInitiatesSynchronization", ()=>{
   let changes = Automerge.getChanges(previousDoc, newDoc)
-
+  console.log(changes);
   socket.emit('clientSendChangesToServer', {
       "changeData": JSON.stringify(changes),
       "clientId": socket.id
@@ -103,12 +127,28 @@ socket.on("deliverSynchronizeDataFromServer", changeList=>{
     // sender: the guy who initiate a synchronize data request
     // action: to synchronize the changes with the current data
     console.log("get deliverSynchronizeDataFromServer");
-    previousDoc = newDoc
-    console.log(changeList);
 
+    previousDoc = newDoc
     changeList.forEach(change=>{
-      if (change.id != socket.id && change.changeData != "[]"){
-           newDoc = Automerge.applyChanges(newDoc, JSON.parse(change.changeData))
-      }
+       changeJSON = JSON.parse(change.changeData)
+       newDoc = Automerge.applyChanges(newDoc, changeJSON)
     })
+
+
+    let newChanges = Automerge.getChanges(previousDoc, newDoc)
+    newChanges.forEach(_change=>{
+         let position = _change["ops"][0].elem-1
+         let data = {}
+         _change["ops"].filter(p=>p.action == "set")
+             .forEach(p=>{
+                 data[p.key] = p.value
+             })
+         createCard(data, position)
+    })
+
+
+    console.log(newChanges);
+    previousDoc = newDoc
+
+
 })

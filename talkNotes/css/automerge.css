@@ -9,6 +9,8 @@
 
 .notecardDisplay {
   padding: 10px;
+  overflow-y: scroll;
+
 }
 
 .card {
