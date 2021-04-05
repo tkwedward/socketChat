@@ -1,0 +1,16 @@
+.cardContainer{
+  position: fixed;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+}
+
+.notecardDisplay {
+  padding: 10px;
+}
+
+.card {
+  margin: 15px;
+}
