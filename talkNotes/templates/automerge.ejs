@@ -8,28 +8,34 @@
     </script>
     <link href="css/automerge.css" rel="stylesheet">
 
+
   </head>
   <body>
     <div class="cardContainer">
+      <div class="notecardDisplay"></div>
       <div class="cardInput">
         title: <br>
-        <input class="title" name="name" rows="10" cols="100" value="Testing"></input><br><br>
+        <input class="title" name="name" rows="10" cols="30" value="0"></input><br><br>
         longVersion: <br>
-        <textarea class="longVersion" name="name" rows="5" cols="100">1232</textarea><br>
+        <textarea class="longVersion" name="name" rows="5" cols="30">1232</textarea><br>
         shortVersion: <br><br>
-        <textarea class="shortVersion"  name="name" rows="5" cols="100">12312</textarea>
+        <textarea class="shortVersion"  name="name" rows="5" cols="30">12312</textarea>
         <br>
         <input class="submitData" type="submit" name="submitData" value="submitData">
         <input class="updateData" type="submit" name="updateData" value="updateData">
         <input class="loadData" type="submit" name="loadData" value="loadData">
+        <input class="deleteData" type="submit" name="deleteData" value="deleteData">
+        <input class="deleteAtXButton" type="submit" name="deleteAtXButton" value="deleteAtXButton">
       </div>
-      <div class="notecardDisplay">
 
-      </div>
+
+
     </div>
 
   </body>
   <script src="https://cdn.jsdelivr.net/npm/automerge@0.14.2/dist/automerge.min.js" charset="utf-8"></script>
+  <script src="js/automerge_helper.js" charset="utf-8"></script>
   <script src="js/automerge_test.js" charset="utf-8"></script>
+  <script src="js/automerge_socket.js" charset="utf-8"></script>
 
 </html>

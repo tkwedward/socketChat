@@ -15,6 +15,7 @@ app.use("/talkNotes", talkNotes)
 const server = require("http").Server(app);
 const io = require("socket.io")(server)
 
+
 app.get("/", (req, res)=>{
   res.sendFile(__dirname + "/public/index.html")
 })
@@ -31,10 +32,52 @@ app.get("/editor", (req, res)=>{
   res.sendFile(__dirname + "/public/editor.html")
 })
 
+socketArray = []
 
+// io.on("connection", socket=>{
+//     socketArray.push(socket)
+//     socket.on("message", data=>{
+//       console.log(new Date());
+//       console.log(data);
+//       console.log(socket.id);
+//     })
+//
+//     socket.on("_clientAskServerToInitiateSynchronization", ()=>{
+//       console.log("server received a call from " + socket.id + " to initiate synchronization");
+//
+//       let allChanges = []
+//
+//       let promiseArray = socketArray.map(_s=>{
+//           return new Promise(res=>{
+//             _s.once("_clientSendChangesToServer", data=>{
+//               console.log("======================")
+//               console.log("received change data from " + _s.id)
+//               allChanges.push(data)
+//               res(true)
+//             })
+//           })// promise
+//       })// map
+//
+//       Promise.all(promiseArray).then(p=>{
+//         console.log(allChanges);
+//         io.emit("_deliverSynchronizeDataFromServer", allChanges)
+//       })
+//       io.emit("_serverInitiatesSynchronization")
+//     })
+//
+//
+//
+//     socket.on("disconnect", ()=>{
+//       console.log(socket.id + " disconnected");
+//       console.log(socketArray.map(p=>p.id));
+//       socketArray = socketArray.filter(s=>s.id!=socket.id)
+//       console.log(socketArray.map(p=>p.id));
+//
+//     })
+// })
 
 io.on("connection", socket=>{
-
+    socketArray.push(socket)
     socket.on("message", data => {
         console.log(new Date());
         console.log(data);
@@ -64,46 +107,45 @@ io.on("connection", socket=>{
         // console.log(data);
     })
 
-//     socket.on("disconnect", ()=>{
-//       console.log("user disconnected");
-//       io.emit("message", "user disconnected")
-//     })
+  socket.on("disconnect", ()=>{
+    console.log("user disconnected");
+    console.log(socketArray.map(_s=>_s.id));
+    io.emit("message", "user disconnected")
+  })
 
   socket.on("clientAskServerToInitiateSynchronization", ()=>{
     let changeList = []
-    // a promise to get all the changes from all clients
-    let clientsArray = Array.from(io.sockets.sockets.keys())
-    var clientsSockets = io.allSockets();
-    clientsSockets.then(p=>{
-      p.forEach(c=>{
-        console.log(io.sockets.to(p));
-      })
-    })
+    let promiseArray = []
+    let connectedUserList =  Array.from(io.sockets.sockets.keys())
 
-    let promiseArray = clientsArray.map((p=>{
-      return new Promise(res=>{
-        // io.sockets.to(p).on("clientSendChangesToServer", data =>{
-        socket.on("clientSendChangesToServer", data =>{
-          changeList.push({
-            "changeData": data.changeData,
-            "id": p,
-            "origin_id": socket.id
-          })
-          res(true)
-        })// event of clientSendChangesToServer
-      })// promise
-    }))// map
+    // to update the socket list so that the disconnected socket will not block the promise chain
+    socketArray = socketArray.filter(_s=>connectedUserList.includes(_s.id))
+    // console.log(socketArray.map(_s=>_s.id));
 
+    // to create an array of promises so that after getting all changes from clients, the server will send the changes to the clients
+    socketArray.forEach(_s=>{
+        let promise =  new Promise(res=>{
+          _s.once("clientSendChangesToServer", data =>{
+            changeList.push({
+              "changeData": data.changeData,
+              "id": _s.id
+            })
+            res(true)
+          })// event of clientSendChangesToServer
+        })// promise
+        promiseArray.push(promise)
+  })// forEach
+    // console.log(connectedUserList);
+    // console.log(socketArray.map(_s=>_s.id));
+
+    // send the combined changes to all the clients
     Promise.all(promiseArray).then(p=>{
       // socket.off('clientSendChangesToServer');
-      console.log(changeList);
-      clientsArray.forEach(client_id=>{
-        let filteredChangeList = changeList.filter(p=>p!=p.id)
-        io.sockets.to(client_id)
-          .emit("deliverSynchronizeDataFromServer", changeList);
-      })
+      // console.log(changeList);
+        io.emit("deliverSynchronizeDataFromServer", changeList);
     })
 
+    // to ask all the clients to send data to the server
     io.emit("serverInitiatesSynchronization")
   })
 
