@@ -2,6 +2,17 @@
     "compilerOptions": {
         "target": "es6",
         "outDir": "public/DIRECTORY",
+        "moduleResolution": "node",
+        "module": "es6",
+        "target": "es5",
+        "allowSyntheticDefaultImports": true,
         "declaration": true,
-    }
+        "esModuleInterop": true,
+        "lib": [
+            "es2016",
+            "dom",
+            "es5"
+        ]
+    },
+    "type": "module"
 }

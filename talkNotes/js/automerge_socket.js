@@ -1,4 +1,3 @@
-
 socket.on("connect", ()=>{
     // ask the server for initial data
     socket.emit("message", "user connected")
@@ -9,27 +8,25 @@ socket.on("connect", ()=>{
 socket.on("askRootUserForInitialData", data=>{
   // sender: server ask the root user to get the initial data
   // action: root user will save the automerge document and then send back to the server the required initial data
-  data.initialData = Automerge.save(newDoc)
+  data.initialData = Automerge.save(rootDocument.doc)
   socket.emit("sendInitialDataToServer", data)
 })
 
 socket.on("processInitialData", data=>{
-    console.log("processing initial data");
-    console.log(data);
-    newDoc = Automerge.load(data.initialData)
-    previousDoc = newDoc
-    newDoc[container].forEach((p, i)=>{
-        elemIndex = searchElemIDFromIndex(newDoc[container], i)
+    rootDocument.doc = Automerge.load(data.initialData)
+    this.previousDoc = rootDocument.doc
+    let _container = cardsContainerObject.getObjectInDoc()
+    console.log(_container);
+    _container.forEach((p, i)=>{
+        elemIndex = searchElemIDFromIndex(_container, i)
         createCard(p, -1, elemIndex)
     })
 })
 
 
-// synchronize with other nodes
-
 // server ask all clients to give it the changes. client reply the server's request for synchronization
 socket.on("serverInitiatesSynchronization", ()=>{
-  let changes = Automerge.getChanges(previousDoc, newDoc)
+  let changes = Automerge.getChanges(this.previousDoc, rootDocument.doc)
   socket.emit('clientSendChangesToServer', {
       "changeData": JSON.stringify(changes),
       "clientId": socket.id
@@ -40,25 +37,25 @@ socket.on("deliverSynchronizeDataFromServer", changeList=>{
 
     // sender: the guy who initiate a synchronize data request
     // action: to synchronize the changes with the current data
-    console.log("get deliverSynchronizeDataFromServer");
-    previousDoc = newDoc
+    // console.log("get deliverSynchronizeDataFromServer");
+    this.previousDoc = rootDocument.doc
     changeList.forEach(change=>{
        changeJSON = JSON.parse(change.changeData)
-       console.log(changeJSON);
-       newDoc = Automerge.applyChanges(newDoc, changeJSON)
+       // console.log(changeJSON);
+       rootDocument.doc = Automerge.applyChanges(rootDocument.doc, changeJSON)
     })
 
-    let newChanges = Automerge.getChanges(previousDoc, newDoc)
+    let newChanges = Automerge.getChanges(this.previousDoc, rootDocument.doc)
 
-    elemContainer = newDoc[container]
+    elemContainer = cardsContainerObject.getObjectInDoc()
 
     let batchChangeObject = {
       "ins": [],
-      "del": []
+      "del": [],
+      "set": []
     }
 
     newChanges.forEach(_change=>{
-      console.log("Is it a delete operator? ", _change["ops"][0].action == "del");
       if (_change["ops"][0].action == "ins"){
           // pattern of insert = [ins, makeMap, set, ..., link]
           // get the link action
@@ -87,26 +84,44 @@ socket.on("deliverSynchronizeDataFromServer", changeList=>{
             "deleteObjectId": deleteObjectId
           })
       }
+      else if (_change["ops"][0].action == "set")
+      {
+          let changedObject = _change["ops"][0]
+          let setObjectId = changedObject.obj
+          let key = changedObject.key
+          let value = changedObject.value
+
+          batchChangeObject["set"].push({
+            "setObjectId": setObjectId,
+            "className": key,
+            "setValue": value
+          })
+      }
     })
 
     // to process the insert operation
-
+    // console.log("The batch object is: ", batchChangeObject);
     batchChangeObject["ins"]
       .sort((a, b)=> a.position - b.position)
       .forEach(p=>{
-          console.log(p);
           createCard(p.data, p.position, p.elemID)
       })
 
     batchChangeObject["del"].forEach(delObject=>{
-          let convertedClassID = convertIdToHtmlReadableId(delObject.deleteObjectId, true)
-          let delObjectHTML = document.querySelector(convertedClassID)
-          delObjectHTML.remove()
-      })
+        let convertedClassID = convertIdToHtmlReadableId(delObject.deleteObjectId, true)
+        let delObjectHTML = document.querySelector(convertedClassID)
+        delObjectHTML.remove()
+    })
 
+    batchChangeObject["set"].forEach(setObject=>{
+        let elemID = getElemIDFromObjectID(rootDocument.doc[cardContainer.containerObjectName], setObject.setObjectId)
+        let convertedClassID = convertIdToHtmlReadableId(elemID)
+        let setObjectHTML = document.querySelector(`.${convertedClassID} .${setObject.className}`)
+        setObjectHTML.innerHTML = setObject.setValue
+    })
     // newChanges.forEach(p=>{
     //   console.log(p);
     // })
 
-    previousDoc = newDoc
+    this.previousDoc = rootDocument.doc
 })
