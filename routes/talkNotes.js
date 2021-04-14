@@ -7,6 +7,11 @@ router.get("/", (req, res) => {
   res.render("automerge.ejs")
 })
 
+router.get("/board", (req, res) => {
+  res.render("board.ejs")
+})
+
+
 router.get("/get/", (req, res) => {
   res.render("thingsGet.ejs")
 })
@@ -25,3 +30,27 @@ router.post("/saveTalkNotes/", (req, res) => {
 })
 
 module.exports = router
+
+//
+// f = Automerge.init()
+// f = Automerge.change(f, p=>{
+//    p["king"] = [
+//      {"name": "King", "number": 123},
+//      {"name": "Queen", "number": 430},
+//    ]
+// })
+
+// {"name": "Jack", "number": 430},
+// {"name": "Rashida", "number":510}
+// {"name": "Kotaro", "number": 250, "friend": ["Dio"]},
+
+
+// problem: cannot reorder objects
+
+// function convertBackToNormalObejct(ob){
+//     if (typeof(ob)=="array" || typeof(ob)=="object"){
+//         return
+//     } else {
+//         return oo
+//     }
+// }

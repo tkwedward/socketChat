@@ -11,7 +11,8 @@
         "lib": [
             "es2016",
             "dom",
-            "es5"
+            "es5",
+            "es2017"
         ]
     },
     "type": "module"

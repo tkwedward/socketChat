@@ -1,7 +1,8 @@
 import SVG from "svg.js";
-
-export function parseSVGElement(elem: HTMLElement){
+import * as ExtendSVGELement from "./extendSVGElement"
+export function parseSVGElement(elem: HTMLElement|SVGCircleElement|SVGLineElement|SVGRect|SVGPoint|SVGPolylineElement){
     // a function to parse an elem into a json file so that it can be push to thhe svgArray of automerge. The new information can be used to create the same object in other nodes
+    console.log(5, elem)
     let result
     let elemAttribute = elem.attributes
     let tagName = elem.tagName
@@ -107,7 +108,7 @@ interface GroupElemData{
     groupElements: any[],
 }
 
-function createGroupHTMLObject(groupData, svgBoard:SVG.G){
+function createGroupHTMLObject(groupData, svgBoard:SVG.Doc|SVG.G){
     // to create group HTML object from the GroupElemData defined
     groupData.forEach(p=>{
       // console.log("The tagName is : ", p.tagName )
@@ -115,6 +116,7 @@ function createGroupHTMLObject(groupData, svgBoard:SVG.G){
             createElement(p, svgBoard)
         } else {
             let _svgBoard = svgBoard.group()
+
             let _groupData: GroupElemData = p
             // console.log(_groupData["groupElements"])
             createGroupHTMLObject(_groupData, _svgBoard)
@@ -124,42 +126,43 @@ function createGroupHTMLObject(groupData, svgBoard:SVG.G){
 
 export function createElement(elemData, svgBoard:SVG.Doc|SVG.G){
     // to create simple object such as rects, circles, lines and polylines
-
     switch (elemData.tagName) {
         case "rect":
             let rect = svgBoard.rect().attr(elemData.styleList)
+            rect.node = ExtendSVGELement.SuperRect(rect.node)
             return rect
             break;
 
         case "circle":
             let circle =  svgBoard.circle().attr(elemData.styleList)
+            circle.node = ExtendSVGELement.SuperCircle(circle.node)
             return circle
             break;
 
         case "line":
             let line = svgBoard.line([0, 0, 0, 0])
                             .attr(elemData.styleList)
+            line.node = ExtendSVGELement.SuperLine(line.node)
             return line
             break;
 
         case "polyline":
-            let polyline = svgBoard.polyline([0, 0, 0, 0])
-                            .attr(elemData.styleList)
+            let polyline = svgBoard.polyline([0, 0, 0, 0]).attr(elemData.styleList)
+            polyline.node = ExtendSVGELement.SuperPolyline(polyline.node)
             return polyline
             break;
 
         case "image":
             let image = svgBoard.image(elemData.src)
                     .attr(elemData.styleList)
+            image.node = ExtendSVGELement.SuperPolyline(image.node)
             return image
             break;
 
         case "g":
-            let _group = svgBoard.group()
-            console.log("create group elements", _group)
             let groupData:GroupElemData = elemData
-            createGroupHTMLObject(groupData["groupElements"], _group)
-            return _group
+            createGroupHTMLObject(groupData["groupElements"], svgBoard)
+            return svgBoard
             break;
     }
 

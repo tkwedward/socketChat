@@ -1,8 +1,29 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 exports.__esModule = true;
 exports.createElement = exports.parseSVGElement = void 0;
+var ExtendSVGELement = __importStar(require("./extendSVGElement"));
 function parseSVGElement(elem) {
     // a function to parse an elem into a json file so that it can be push to thhe svgArray of automerge. The new information can be used to create the same object in other nodes
+    console.log(5, elem);
     var result;
     var elemAttribute = elem.attributes;
     var tagName = elem.tagName;
@@ -114,33 +135,35 @@ function createElement(elemData, svgBoard) {
     switch (elemData.tagName) {
         case "rect":
             var rect = svgBoard.rect().attr(elemData.styleList);
+            rect.node = ExtendSVGELement.SuperRect(rect.node);
             return rect;
             break;
         case "circle":
             var circle = svgBoard.circle().attr(elemData.styleList);
+            circle.node = ExtendSVGELement.SuperCircle(circle.node);
             return circle;
             break;
         case "line":
             var line = svgBoard.line([0, 0, 0, 0])
                 .attr(elemData.styleList);
+            line.node = ExtendSVGELement.SuperLine(line.node);
             return line;
             break;
         case "polyline":
-            var polyline = svgBoard.polyline([0, 0, 0, 0])
-                .attr(elemData.styleList);
+            var polyline = svgBoard.polyline([0, 0, 0, 0]).attr(elemData.styleList);
+            polyline.node = ExtendSVGELement.SuperPolyline(polyline.node);
             return polyline;
             break;
         case "image":
             var image = svgBoard.image(elemData.src)
                 .attr(elemData.styleList);
+            image.node = ExtendSVGELement.SuperPolyline(image.node);
             return image;
             break;
         case "g":
-            var _group = svgBoard.group();
-            console.log("create group elements", _group);
             var groupData = elemData;
-            createGroupHTMLObject(groupData["groupElements"], _group);
-            return _group;
+            createGroupHTMLObject(groupData["groupElements"], svgBoard);
+            return svgBoard;
             break;
     }
 }
