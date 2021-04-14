@@ -2,71 +2,158 @@ import * as Automerge from 'automerge'
 import * as DatabaseHelperFunction from "./databaseHelperFunction"
 
 let f = Automerge.init()
-f = Automerge.change(f, p=>{
-   p["page"] = []
-   p["bookmark"] = []
-   p["page"].push([
-     {"name": "page", "number": 123},
-     {"name": "Queen", "number": 430},
-   ])
-   p["page"].push({"name": "Jack", "number": 430})
-   p["page"].push({"name": "Rashida", "number":510})
-   p["page"].push({"name": "Kotaro", "number": 250})
-   p["page"].push({"friend": ["Dio", {"joan": "Chris"}]})
-
-})
-
 f = Automerge.change(f, doc=>{
-   let temp1 = DatabaseHelperFunction.copyObject(doc["page"][1])
-   let temp2 = DatabaseHelperFunction.copyObject(doc["page"][2])
-   doc["page"][1] = temp2
-   doc["page"][2] = temp1
+   doc["page"] = []
+   doc["bookmark"] = []
+   // doc["page"].push([
+   //   {"name": "page", "number": 123},
+   //   {"name": "Queen", "number": 430},
+   // ])
+   doc["page"].push({"name": "Jack", "number": 430})
+   doc["page"].push({"name": "Rashida", "number":510})
+   doc["page"].push({"name": "Kotaro", "number": 250})
+   doc["page"].push({"friend": ["Dio", {"joan": "Chris"}]})
+
 })
 
 
-
-function mainObject(f){
-  return {"mainDoc": f, "arrayID": {
-  }}
+interface MainController{
+  mainDoc: any,
+  arrayID: {
+    "page"?: string,
+    "bookmark"?: string
+  }
 }
 
+class MainController {
+    constructor(){
+        this.mainDoc = Automerge.init()
+        this.mainDoc = Automerge.change(f, doc=>{
+          doc["page"] = []
+          doc["bookmark"] = []
+          // doc["page"].push([
+          //   {"name": "page", "number": 123},
+          //   {"name": "Queen", "number": 430},
+          // ])
+          doc["page"].push({"name": "Jack", "number": 430})
+          doc["page"].push({"name": "Rashida", "number":510})
+          doc["page"].push({"name": "Kotaro", "number": 250})
+          doc["page"].push({"friend": ["Dio", {"joan": "Chris"}]})
 
-let mainController = mainObject(f)
-window.mainController = mainController
+       })
+
+       this.arrayID = {
+         "page": Automerge.getObjectId(this.mainDoc.page),
+         "bookmark": Automerge.getObjectId(this.mainDoc.bookmark)
+       }
+       console.log(this.mainDoc)
+    }
+}
+
+let mainController = new MainController()
 export default mainController;
 
-mainController["arrayID"]["page"] =  Automerge.getObjectId(mainController.mainDoc.page)
-mainController["arrayID"]["bookmark"] =  Automerge.getObjectId(mainController.mainDoc.bookmark)
 
-let s = document.createElement("div")
-let dataS = {
-  "name": "s",
-  "identity":{}
+interface HTMLElementSoul {
+  "identity": {
+    "accessPointer"?:string,
+    "dataPointer"?:string
+  }
 }
 
-let t = document.createElement("div")
-
-let masterObjectSoul = {
+let masterObjectSoul:HTMLElementSoul = {
     "identity": {
         "accessPointer": Automerge.getObjectId(mainController.mainDoc.page[1]),
         "dataPointer": Automerge.getObjectId(mainController.mainDoc.page[1])
     }
 }
 
-let masterObject = document.createElement("div")
-masterObject.style.width = "50%";
-masterObject.style.height = "200px";
-masterObject.style.background = "grey"
-masterObject.soul = masterObjectSoul
+function applyCSS(htmlObject, stylesheet){
+    Object.entries(stylesheet).forEach(([key, value], index)=>{
+        htmlObject.style[key] = value
+    })
+}
 
+interface MasterObjectDataInterface {
+  "name": string,
+  "identity": object,
+  "linkObjectArray": any,
+  "stylesheet": object
+}
+
+let masterObjectData:MasterObjectDataInterface = {
+  "name": "s",
+  "identity":{},
+  "linkObjectArray": [],
+  "stylesheet": {
+    "width": "50%",
+    "height": "200px",
+    "background": "grey",
+    "margin": "5px"
+  }
+}
+
+/** a color input */
+function colorControllerCreater(controlledObject){
+  let colorArray = ["red", "blue", "green"]
+
+  let colorInput = document.createElement("select")
+  colorArray.forEach(p=>{
+      let option = document.createElement("option")
+      option.value = p
+      option.innerHTML = p
+      colorInput.append(option)
+  })
+
+  colorInput.addEventListener("change", e=>{
+      controlledObject.style.background = colorInput.value
+
+      // access the linkObjectArray
+      let masterObjectID = controlledObject.soul.identity.dataPointer
+      // let linkObjectArray = Automerge.getObjectById(mainController.mainDoc, masterObjectID)
+
+      // console.log(115, mainController.mainDoc)
+      // console.log(116, linkObjectArray["linkObjectArray"], masterObjectID)
+      // controlledObject
+  })
+
+  return colorInput
+}
+
+let masterObject = document.createElement("div")
+applyCSS(masterObject, masterObjectData["stylesheet"])
+masterObject.soul = masterObjectSoul
+DatabaseHelperFunction.createNewItem(masterObject, masterObjectData, mainController["arrayID"]["page"])
+let masterObejctContainer = document.createElement("div")
+masterObejctContainer.style.display = "grid"
+masterObejctContainer.style.gridTemplateColumns = "1fr 1fr"
+
+
+let controllerContainer = document.createElement("div")
+let colorInput = colorControllerCreater(masterObject)
+controllerContainer.append(colorInput)
+masterObejctContainer.append(masterObject)
+masterObejctContainer.append(controllerContainer)
+
+let linkObjectSoul:HTMLElementSoul = {
+    "identity": {
+    }
+}
 
 let createLinkObjectButton = document.createElement("button")
 createLinkObjectButton.innerText = "createLinkObjectButton"
 createLinkObjectButton.addEventListener("click", (e)=>{
-    // createLinkObject(mainController["arrayID"]["bookmark"], masterObject.soul)
+    let linkObject = document.createElement("div")
+    linkObject.classList.add("linkObject")
+    linkObject.soul = linkObjectSoul
+
+    DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
+    // [_, mainController.mainDoc] = DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
+    let masterObjectData = DatabaseHelperFunction.accessDataFromDatabase(masterObject.soul.identity.dataPointer)
+
+    Object.entries(masterObjectData["stylesheet"]).forEach(([key, value], index)=>linkObject.style[key] = value)
+
+    document.body.append(linkObject)
 })
-document.body.append(masterObject, createLinkObjectButton)
 
-
-DatabaseHelperFunction.createNewItem(s, dataS, mainController["arrayID"]["page"])
-console.log(mainController.mainDoc["page"])
+document.body.append(masterObejctContainer, createLinkObjectButton)

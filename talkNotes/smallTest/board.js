@@ -22,54 +22,115 @@ exports.__esModule = true;
 var Automerge = __importStar(require("automerge"));
 var DatabaseHelperFunction = __importStar(require("./databaseHelperFunction"));
 var f = Automerge.init();
-f = Automerge.change(f, function (p) {
-    p["page"] = [];
-    p["bookmark"] = [];
-    p["page"].push([
-        { "name": "page", "number": 123 },
-        { "name": "Queen", "number": 430 },
-    ]);
-    p["page"].push({ "name": "Jack", "number": 430 });
-    p["page"].push({ "name": "Rashida", "number": 510 });
-    p["page"].push({ "name": "Kotaro", "number": 250 });
-    p["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
-});
 f = Automerge.change(f, function (doc) {
-    var temp1 = DatabaseHelperFunction.copyObject(doc["page"][1]);
-    var temp2 = DatabaseHelperFunction.copyObject(doc["page"][2]);
-    doc["page"][1] = temp2;
-    doc["page"][2] = temp1;
+    doc["page"] = [];
+    doc["bookmark"] = [];
+    // doc["page"].push([
+    //   {"name": "page", "number": 123},
+    //   {"name": "Queen", "number": 430},
+    // ])
+    doc["page"].push({ "name": "Jack", "number": 430 });
+    doc["page"].push({ "name": "Rashida", "number": 510 });
+    doc["page"].push({ "name": "Kotaro", "number": 250 });
+    doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
 });
-function mainObject(f) {
-    return { "mainDoc": f, "arrayID": {} };
-}
-var mainController = mainObject(f);
-window.mainController = mainController;
+var MainController = /** @class */ (function () {
+    function MainController() {
+        this.mainDoc = Automerge.init();
+        this.mainDoc = Automerge.change(f, function (doc) {
+            doc["page"] = [];
+            doc["bookmark"] = [];
+            // doc["page"].push([
+            //   {"name": "page", "number": 123},
+            //   {"name": "Queen", "number": 430},
+            // ])
+            doc["page"].push({ "name": "Jack", "number": 430 });
+            doc["page"].push({ "name": "Rashida", "number": 510 });
+            doc["page"].push({ "name": "Kotaro", "number": 250 });
+            doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
+        });
+        this.arrayID = {
+            "page": Automerge.getObjectId(this.mainDoc.page),
+            "bookmark": Automerge.getObjectId(this.mainDoc.bookmark)
+        };
+        console.log(this.mainDoc);
+    }
+    return MainController;
+}());
+var mainController = new MainController();
 exports["default"] = mainController;
-mainController["arrayID"]["page"] = Automerge.getObjectId(mainController.mainDoc.page);
-mainController["arrayID"]["bookmark"] = Automerge.getObjectId(mainController.mainDoc.bookmark);
-var s = document.createElement("div");
-var dataS = {
-    "name": "s",
-    "identity": {}
-};
-var t = document.createElement("div");
 var masterObjectSoul = {
     "identity": {
         "accessPointer": Automerge.getObjectId(mainController.mainDoc.page[1]),
         "dataPointer": Automerge.getObjectId(mainController.mainDoc.page[1])
     }
 };
+function applyCSS(htmlObject, stylesheet) {
+    Object.entries(stylesheet).forEach(function (_a, index) {
+        var key = _a[0], value = _a[1];
+        htmlObject.style[key] = value;
+    });
+}
+var masterObjectData = {
+    "name": "s",
+    "identity": {},
+    "linkObjectArray": [],
+    "stylesheet": {
+        "width": "50%",
+        "height": "200px",
+        "background": "grey",
+        "margin": "5px"
+    }
+};
+/** a color input */
+function colorControllerCreater(controlledObject) {
+    var colorArray = ["red", "blue", "green"];
+    var colorInput = document.createElement("select");
+    colorArray.forEach(function (p) {
+        var option = document.createElement("option");
+        option.value = p;
+        option.innerHTML = p;
+        colorInput.append(option);
+    });
+    colorInput.addEventListener("change", function (e) {
+        controlledObject.style.background = colorInput.value;
+        // access the linkObjectArray
+        var masterObjectID = controlledObject.soul.identity.dataPointer;
+        // let linkObjectArray = Automerge.getObjectById(mainController.mainDoc, masterObjectID)
+        // console.log(115, mainController.mainDoc)
+        // console.log(116, linkObjectArray["linkObjectArray"], masterObjectID)
+        // controlledObject
+    });
+    return colorInput;
+}
 var masterObject = document.createElement("div");
-masterObject.style.width = "50%";
-masterObject.style.height = "200px";
-masterObject.style.background = "grey";
+applyCSS(masterObject, masterObjectData["stylesheet"]);
 masterObject.soul = masterObjectSoul;
+DatabaseHelperFunction.createNewItem(masterObject, masterObjectData, mainController["arrayID"]["page"]);
+var masterObejctContainer = document.createElement("div");
+masterObejctContainer.style.display = "grid";
+masterObejctContainer.style.gridTemplateColumns = "1fr 1fr";
+var controllerContainer = document.createElement("div");
+var colorInput = colorControllerCreater(masterObject);
+controllerContainer.append(colorInput);
+masterObejctContainer.append(masterObject);
+masterObejctContainer.append(controllerContainer);
+var linkObjectSoul = {
+    "identity": {}
+};
 var createLinkObjectButton = document.createElement("button");
 createLinkObjectButton.innerText = "createLinkObjectButton";
 createLinkObjectButton.addEventListener("click", function (e) {
-    // createLinkObject(mainController["arrayID"]["bookmark"], masterObject.soul)
+    var linkObject = document.createElement("div");
+    linkObject.classList.add("linkObject");
+    linkObject.soul = linkObjectSoul;
+    DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul);
+    // [_, mainController.mainDoc] = DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
+    var masterObjectData = DatabaseHelperFunction.accessDataFromDatabase(masterObject.soul.identity.dataPointer);
+    Object.entries(masterObjectData["stylesheet"]).forEach(function (_a, index) {
+        var key = _a[0], value = _a[1];
+        return linkObject.style[key] = value;
+    });
+    document.body.append(linkObject);
 });
-document.body.append(masterObject, createLinkObjectButton);
-DatabaseHelperFunction.createNewItem(s, dataS, mainController["arrayID"]["page"]);
-console.log(mainController.mainDoc["page"]);
+document.body.append(masterObejctContainer, createLinkObjectButton);

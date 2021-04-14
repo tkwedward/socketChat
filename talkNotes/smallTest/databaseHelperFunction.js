@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createNewItem = exports.addOjectToArrayInDataBase = exports.copyObject = void 0;
+exports.createLinkObject = exports.createNewItem = exports.addOjectToArrayInDataBase = exports.accessDataFromDatabase = exports.exchangeObjects = void 0;
 var Automerge = __importStar(require("automerge"));
 // declare var mainController: any;
 var board_1 = __importDefault(require("./board"));
@@ -44,6 +44,7 @@ function copyObjectHelper(value) {
         return value;
     }
 }
+/** to copy an object stored in database to a normal object!*/
 function copyObject(targetObject) {
     // to copy the data in an object to a new object
     var new_oo = {};
@@ -53,33 +54,64 @@ function copyObject(targetObject) {
     });
     return new_oo;
 }
-exports.copyObject = copyObject;
-// a helper function to add object to array
+/** to exchnage the position of two items in an array*/
+function exchangeObjects(objectID1, objectID2) {
+    f = Automerge.change(f, function (doc) {
+        var temp1 = copyObject(doc["page"][1]);
+        var temp2 = copyObject(doc["page"][2]);
+        doc["page"][1] = temp2;
+        doc["page"][2] = temp1;
+    });
+}
+exports.exchangeObjects = exchangeObjects;
+/**
+input: the object's ID that you waant to access
+output: clean version of the data stored in the database.
+*/
+function accessDataFromDatabase(objectID) {
+    var objectInDatabase = Automerge.getObjectById(board_1["default"].mainDoc, objectID);
+    return copyObject(objectInDatabase);
+}
+exports.accessDataFromDatabase = accessDataFromDatabase;
+/** a helper function to add object to array */
 function addOjectToArrayInDataBase(mainDoc, containerID, objectData, insertPosition, masterDataPointer) {
     var array = Automerge.getObjectById(mainDoc, containerID);
+    if (insertPosition == false) {
+        insertPosition = array.length - 1;
+    }
+    else {
+        insertPosition = insertPosition;
+    }
     var objectSymbolArray = Object.getOwnPropertySymbols(array[insertPosition]);
     var elementID = array[insertPosition][objectSymbolArray[1]];
-    objectData["identity"]["addressPointer"] = elementID;
+    objectData["identity"]["accessPointer"] = elementID;
     if (!masterDataPointer) {
         // do something if it is a link object
         objectData["identity"]["dataPointer"] = elementID;
     }
     else {
+        // if the object is a masterObject, then create a linkObjectArray and put itself into the array
+        // objectData["linkObjectArray"].push(masterDataPointer)
         objectData["identity"]["dataPointer"] = masterDataPointer;
     }
+    console.log(75, masterDataPointer, elementID);
     mainDoc = Automerge.change(mainDoc, function (doc) {
         var array = Automerge.getObjectById(doc, containerID);
+        Object.entries(objectData).forEach(function (_a, index) {
+            var key = _a[0], value = _a[1];
+            array[insertPosition][key] = value;
+        });
         array[insertPosition] = objectData;
         // insertPosition = array.length
     });
-    return mainDoc;
+    return [mainDoc, elementID];
 }
 exports.addOjectToArrayInDataBase = addOjectToArrayInDataBase;
 // createNewItem
-function createNewItem(s /*object*/, s_data /*objectData*/, containerID, insertPosition /*position want to insert*/, masterDataPointer) {
+function createNewItem(htmlObject /*object*/, s_data /*objectData*/, containerID, insertPosition /*position want to insert*/, masterDataPointer) {
+    var _a;
     if (insertPosition === void 0) { insertPosition = false; }
     if (masterDataPointer === void 0) { masterDataPointer = false; }
-    console.log(s);
     // Step 1: put an empty object to get objectID
     board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
         var array = Automerge.getObjectById(doc, containerID);
@@ -91,23 +123,30 @@ function createNewItem(s /*object*/, s_data /*objectData*/, containerID, insertP
             array.insertAt(insertPosition, {});
         }
     }); // 1st contact
-    // Step 2: getElementID and then put it into the identity card
+    // Step 2: getElementID and then put it into thse identity card
     // return the mainDoc
-    board_1["default"].mainDoc = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer);
-    // let array = Automerge.getObjectById(mainController.mainDoc, dataPointer)
-    // Step 3: put data into the database
+    var elementID;
+    _a = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer), board_1["default"].mainDoc = _a[0], elementID = _a[1];
+    // the function can differentiate the difference between a link object and a master object
+    htmlObject.soul.identity = s_data.identity;
+    return htmlObject;
 }
 exports.createNewItem = createNewItem;
-function createLinkObject(containerID, masterObject) {
+function createLinkObject(linkObject, containerID, masterObjectSoul) {
     var linkObjectData = {
         "stylesheet": {},
         "identity": {
             "accessPointer": "",
-            "dataPointer": masterObject.identity.dataPointer
+            "dataPointer": masterObjectSoul.identity.dataPointer
         }
     };
-    Automerge.change(board_1["default"].mainDoc, function (doc) {
-        var container = Automerge.getObjectById(doc, containerID);
-        container.push({});
+    linkObject = createNewItem(linkObject, linkObjectData, containerID, false, masterObjectSoul.identity.dataPointer);
+    var linkObjectAccessPointer = linkObjectData["identity"]["accessPointer"];
+    // add the linkObject to masterObject's linkObjectArray
+    board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
+        var masterObjectData = Automerge.getObjectById(doc, masterObjectSoul.identity.dataPointer);
+        masterObjectData.linkObjectArray.push(linkObjectAccessPointer);
     });
+    return linkObject;
 }
+exports.createLinkObject = createLinkObject;

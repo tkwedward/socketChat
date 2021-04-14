@@ -15095,57 +15095,118 @@ exports.__esModule = true;
 var Automerge = __importStar(require("automerge"));
 var DatabaseHelperFunction = __importStar(require("./databaseHelperFunction"));
 var f = Automerge.init();
-f = Automerge.change(f, function (p) {
-    p["page"] = [];
-    p["bookmark"] = [];
-    p["page"].push([
-        { "name": "page", "number": 123 },
-        { "name": "Queen", "number": 430 },
-    ]);
-    p["page"].push({ "name": "Jack", "number": 430 });
-    p["page"].push({ "name": "Rashida", "number": 510 });
-    p["page"].push({ "name": "Kotaro", "number": 250 });
-    p["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
-});
 f = Automerge.change(f, function (doc) {
-    var temp1 = DatabaseHelperFunction.copyObject(doc["page"][1]);
-    var temp2 = DatabaseHelperFunction.copyObject(doc["page"][2]);
-    doc["page"][1] = temp2;
-    doc["page"][2] = temp1;
+    doc["page"] = [];
+    doc["bookmark"] = [];
+    // doc["page"].push([
+    //   {"name": "page", "number": 123},
+    //   {"name": "Queen", "number": 430},
+    // ])
+    doc["page"].push({ "name": "Jack", "number": 430 });
+    doc["page"].push({ "name": "Rashida", "number": 510 });
+    doc["page"].push({ "name": "Kotaro", "number": 250 });
+    doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
 });
-function mainObject(f) {
-    return { "mainDoc": f, "arrayID": {} };
-}
-var mainController = mainObject(f);
-window.mainController = mainController;
+var MainController = /** @class */ (function () {
+    function MainController() {
+        this.mainDoc = Automerge.init();
+        this.mainDoc = Automerge.change(f, function (doc) {
+            doc["page"] = [];
+            doc["bookmark"] = [];
+            // doc["page"].push([
+            //   {"name": "page", "number": 123},
+            //   {"name": "Queen", "number": 430},
+            // ])
+            doc["page"].push({ "name": "Jack", "number": 430 });
+            doc["page"].push({ "name": "Rashida", "number": 510 });
+            doc["page"].push({ "name": "Kotaro", "number": 250 });
+            doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
+        });
+        this.arrayID = {
+            "page": Automerge.getObjectId(this.mainDoc.page),
+            "bookmark": Automerge.getObjectId(this.mainDoc.bookmark)
+        };
+        console.log(this.mainDoc);
+    }
+    return MainController;
+}());
+var mainController = new MainController();
 exports["default"] = mainController;
-mainController["arrayID"]["page"] = Automerge.getObjectId(mainController.mainDoc.page);
-mainController["arrayID"]["bookmark"] = Automerge.getObjectId(mainController.mainDoc.bookmark);
-var s = document.createElement("div");
-var dataS = {
-    "name": "s",
-    "identity": {}
-};
-var t = document.createElement("div");
 var masterObjectSoul = {
     "identity": {
         "accessPointer": Automerge.getObjectId(mainController.mainDoc.page[1]),
         "dataPointer": Automerge.getObjectId(mainController.mainDoc.page[1])
     }
 };
+function applyCSS(htmlObject, stylesheet) {
+    Object.entries(stylesheet).forEach(function (_a, index) {
+        var key = _a[0], value = _a[1];
+        htmlObject.style[key] = value;
+    });
+}
+var masterObjectData = {
+    "name": "s",
+    "identity": {},
+    "linkObjectArray": [],
+    "stylesheet": {
+        "width": "50%",
+        "height": "200px",
+        "background": "grey",
+        "margin": "5px"
+    }
+};
+/** a color input */
+function colorControllerCreater(controlledObject) {
+    var colorArray = ["red", "blue", "green"];
+    var colorInput = document.createElement("select");
+    colorArray.forEach(function (p) {
+        var option = document.createElement("option");
+        option.value = p;
+        option.innerHTML = p;
+        colorInput.append(option);
+    });
+    colorInput.addEventListener("change", function (e) {
+        controlledObject.style.background = colorInput.value;
+        // access the linkObjectArray
+        var masterObjectID = controlledObject.soul.identity.dataPointer;
+        // let linkObjectArray = Automerge.getObjectById(mainController.mainDoc, masterObjectID)
+        // console.log(115, mainController.mainDoc)
+        // console.log(116, linkObjectArray["linkObjectArray"], masterObjectID)
+        // controlledObject
+    });
+    return colorInput;
+}
 var masterObject = document.createElement("div");
-masterObject.style.width = "50%";
-masterObject.style.height = "200px";
-masterObject.style.background = "grey";
+applyCSS(masterObject, masterObjectData["stylesheet"]);
 masterObject.soul = masterObjectSoul;
+DatabaseHelperFunction.createNewItem(masterObject, masterObjectData, mainController["arrayID"]["page"]);
+var masterObejctContainer = document.createElement("div");
+masterObejctContainer.style.display = "grid";
+masterObejctContainer.style.gridTemplateColumns = "1fr 1fr";
+var controllerContainer = document.createElement("div");
+var colorInput = colorControllerCreater(masterObject);
+controllerContainer.append(colorInput);
+masterObejctContainer.append(masterObject);
+masterObejctContainer.append(controllerContainer);
+var linkObjectSoul = {
+    "identity": {}
+};
 var createLinkObjectButton = document.createElement("button");
 createLinkObjectButton.innerText = "createLinkObjectButton";
 createLinkObjectButton.addEventListener("click", function (e) {
-    // createLinkObject(mainController["arrayID"]["bookmark"], masterObject.soul)
+    var linkObject = document.createElement("div");
+    linkObject.classList.add("linkObject");
+    linkObject.soul = linkObjectSoul;
+    DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul);
+    // [_, mainController.mainDoc] = DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
+    var masterObjectData = DatabaseHelperFunction.accessDataFromDatabase(masterObject.soul.identity.dataPointer);
+    Object.entries(masterObjectData["stylesheet"]).forEach(function (_a, index) {
+        var key = _a[0], value = _a[1];
+        return linkObject.style[key] = value;
+    });
+    document.body.append(linkObject);
 });
-document.body.append(masterObject, createLinkObjectButton);
-DatabaseHelperFunction.createNewItem(s, dataS, mainController["arrayID"]["page"]);
-console.log(mainController.mainDoc["page"]);
+document.body.append(masterObejctContainer, createLinkObjectButton);
 
 },{"./databaseHelperFunction":3,"automerge":1}],3:[function(require,module,exports){
 "use strict";
@@ -15172,7 +15233,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createNewItem = exports.addOjectToArrayInDataBase = exports.copyObject = void 0;
+exports.createLinkObject = exports.createNewItem = exports.addOjectToArrayInDataBase = exports.accessDataFromDatabase = exports.exchangeObjects = void 0;
 var Automerge = __importStar(require("automerge"));
 // declare var mainController: any;
 var board_1 = __importDefault(require("./board"));
@@ -15194,6 +15255,7 @@ function copyObjectHelper(value) {
         return value;
     }
 }
+/** to copy an object stored in database to a normal object!*/
 function copyObject(targetObject) {
     // to copy the data in an object to a new object
     var new_oo = {};
@@ -15203,33 +15265,64 @@ function copyObject(targetObject) {
     });
     return new_oo;
 }
-exports.copyObject = copyObject;
-// a helper function to add object to array
+/** to exchnage the position of two items in an array*/
+function exchangeObjects(objectID1, objectID2) {
+    f = Automerge.change(f, function (doc) {
+        var temp1 = copyObject(doc["page"][1]);
+        var temp2 = copyObject(doc["page"][2]);
+        doc["page"][1] = temp2;
+        doc["page"][2] = temp1;
+    });
+}
+exports.exchangeObjects = exchangeObjects;
+/**
+input: the object's ID that you waant to access
+output: clean version of the data stored in the database.
+*/
+function accessDataFromDatabase(objectID) {
+    var objectInDatabase = Automerge.getObjectById(board_1["default"].mainDoc, objectID);
+    return copyObject(objectInDatabase);
+}
+exports.accessDataFromDatabase = accessDataFromDatabase;
+/** a helper function to add object to array */
 function addOjectToArrayInDataBase(mainDoc, containerID, objectData, insertPosition, masterDataPointer) {
     var array = Automerge.getObjectById(mainDoc, containerID);
+    if (insertPosition == false) {
+        insertPosition = array.length - 1;
+    }
+    else {
+        insertPosition = insertPosition;
+    }
     var objectSymbolArray = Object.getOwnPropertySymbols(array[insertPosition]);
     var elementID = array[insertPosition][objectSymbolArray[1]];
-    objectData["identity"]["addressPointer"] = elementID;
+    objectData["identity"]["accessPointer"] = elementID;
     if (!masterDataPointer) {
         // do something if it is a link object
         objectData["identity"]["dataPointer"] = elementID;
     }
     else {
+        // if the object is a masterObject, then create a linkObjectArray and put itself into the array
+        // objectData["linkObjectArray"].push(masterDataPointer)
         objectData["identity"]["dataPointer"] = masterDataPointer;
     }
+    console.log(75, masterDataPointer, elementID);
     mainDoc = Automerge.change(mainDoc, function (doc) {
         var array = Automerge.getObjectById(doc, containerID);
+        Object.entries(objectData).forEach(function (_a, index) {
+            var key = _a[0], value = _a[1];
+            array[insertPosition][key] = value;
+        });
         array[insertPosition] = objectData;
         // insertPosition = array.length
     });
-    return mainDoc;
+    return [mainDoc, elementID];
 }
 exports.addOjectToArrayInDataBase = addOjectToArrayInDataBase;
 // createNewItem
-function createNewItem(s /*object*/, s_data /*objectData*/, containerID, insertPosition /*position want to insert*/, masterDataPointer) {
+function createNewItem(htmlObject /*object*/, s_data /*objectData*/, containerID, insertPosition /*position want to insert*/, masterDataPointer) {
+    var _a;
     if (insertPosition === void 0) { insertPosition = false; }
     if (masterDataPointer === void 0) { masterDataPointer = false; }
-    console.log(s);
     // Step 1: put an empty object to get objectID
     board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
         var array = Automerge.getObjectById(doc, containerID);
@@ -15241,25 +15334,32 @@ function createNewItem(s /*object*/, s_data /*objectData*/, containerID, insertP
             array.insertAt(insertPosition, {});
         }
     }); // 1st contact
-    // Step 2: getElementID and then put it into the identity card
+    // Step 2: getElementID and then put it into thse identity card
     // return the mainDoc
-    board_1["default"].mainDoc = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer);
-    // let array = Automerge.getObjectById(mainController.mainDoc, dataPointer)
-    // Step 3: put data into the database
+    var elementID;
+    _a = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer), board_1["default"].mainDoc = _a[0], elementID = _a[1];
+    // the function can differentiate the difference between a link object and a master object
+    htmlObject.soul.identity = s_data.identity;
+    return htmlObject;
 }
 exports.createNewItem = createNewItem;
-function createLinkObject(containerID, masterObject) {
+function createLinkObject(linkObject, containerID, masterObjectSoul) {
     var linkObjectData = {
         "stylesheet": {},
         "identity": {
             "accessPointer": "",
-            "dataPointer": masterObject.identity.dataPointer
+            "dataPointer": masterObjectSoul.identity.dataPointer
         }
     };
-    Automerge.change(board_1["default"].mainDoc, function (doc) {
-        var container = Automerge.getObjectById(doc, containerID);
-        container.push({});
+    linkObject = createNewItem(linkObject, linkObjectData, containerID, false, masterObjectSoul.identity.dataPointer);
+    var linkObjectAccessPointer = linkObjectData["identity"]["accessPointer"];
+    // add the linkObject to masterObject's linkObjectArray
+    board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
+        var masterObjectData = Automerge.getObjectById(doc, masterObjectSoul.identity.dataPointer);
+        masterObjectData.linkObjectArray.push(linkObjectAccessPointer);
     });
+    return linkObject;
 }
+exports.createLinkObject = createLinkObject;
 
 },{"./board":2,"automerge":1}]},{},[2,3]);
