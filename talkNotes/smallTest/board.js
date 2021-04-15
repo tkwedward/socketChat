@@ -96,9 +96,20 @@ function colorControllerCreater(controlledObject) {
         controlledObject.style.background = colorInput.value;
         // access the linkObjectArray
         var masterObjectID = controlledObject.soul.identity.dataPointer;
-        // let linkObjectArray = Automerge.getObjectById(mainController.mainDoc, masterObjectID)
-        // console.log(115, mainController.mainDoc)
-        // console.log(116, linkObjectArray["linkObjectArray"], masterObjectID)
+        var masterObjectData = Automerge.getObjectById(mainController.mainDoc, masterObjectID);
+        var linkObjectArray = masterObjectData["linkObjectArray"];
+        var stylesheet = masterObjectData["stylesheet"];
+        stylesheet.background = colorInput.value;
+        linkObjectArray.forEach(function (p) {
+            var targetObject = document.querySelector("*[accessPointer='" + p + "']");
+            if (targetObject) {
+                Object.entries(stylesheet).forEach(function (_a, index) {
+                    var key = _a[0], value = _a[1];
+                    console.log(115, targetObject, targetObject.style[key]);
+                    targetObject.style[key] = value;
+                });
+            }
+        });
         // controlledObject
     });
     return colorInput;
@@ -131,6 +142,15 @@ createLinkObjectButton.addEventListener("click", function (e) {
         var key = _a[0], value = _a[1];
         return linkObject.style[key] = value;
     });
-    document.body.append(linkObject);
+    console.log(masterObjectData);
+    // create a container to hold the data
+    var linkObjectContainer = document.createElement("div");
+    linkObjectContainer.style.display = "grid";
+    linkObjectContainer.style.gridTemplateColumns = "1fr 1fr";
+    var controllerContainer = document.createElement("div");
+    var colorInput = colorControllerCreater(linkObject);
+    controllerContainer.append(colorInput);
+    linkObjectContainer.append(linkObject, controllerContainer);
+    document.body.append(linkObjectContainer);
 });
-document.body.append(masterObejctContainer, createLinkObjectButton);
+// document.body.append(masterObejctContainer, createLinkObjectButton)

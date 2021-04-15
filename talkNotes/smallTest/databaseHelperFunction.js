@@ -22,10 +22,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-exports.createLinkObject = exports.createNewItem = exports.addOjectToArrayInDataBase = exports.accessDataFromDatabase = exports.exchangeObjects = void 0;
+exports.createLinkObject = exports.createNewItem = exports.addOjectToArrayInDataBase = exports.accessDataFromDatabase = exports.exchangeObjects = exports.traceObjectLocation = void 0;
 var Automerge = __importStar(require("automerge"));
 // declare var mainController: any;
 var board_1 = __importDefault(require("./board"));
+function getObjectbyId(id, doc) {
+    if (doc === void 0) { doc = board_1["default"].mainDoc; }
+    return Automerge.getObjectById(doc, id);
+}
+/** A function to trace the location of an object*/
+function traceObjectLocation(leafID, doc) {
+    // [0: Symbol(_conflicts), 1: Symbol(_objectId), 2: Symbol(_options), 3: Symbol(_cache), 4: Symbol(_inbound), 5: Symbol(_state)]
+    if (doc === void 0) { doc = board_1["default"].mainDoc; }
+    var symbolArray = Object.getOwnPropertySymbols(doc);
+    var inboundSymbol = symbolArray[4];
+    //
+    //
+    // console.log(9, getObjectbyId(leafID), mainController.mainDoc[inboundSymbol])
+}
+exports.traceObjectLocation = traceObjectLocation;
 function copyObjectHelper(value) {
     // to copy the data in an object to a new object
     if (Array.isArray(value)) {
@@ -86,15 +101,15 @@ function addOjectToArrayInDataBase(mainDoc, containerID, objectData, insertPosit
     var elementID = array[insertPosition][objectSymbolArray[1]];
     objectData["identity"]["accessPointer"] = elementID;
     if (!masterDataPointer) {
-        // do something if it is a link object
+        // if the object is a masterObject, then create a linkObjectArray and put itself into the array
+        objectData["linkObjectArray"].push(elementID);
         objectData["identity"]["dataPointer"] = elementID;
     }
     else {
-        // if the object is a masterObject, then create a linkObjectArray and put itself into the array
-        // objectData["linkObjectArray"].push(masterDataPointer)
+        // do something if it is a link object
         objectData["identity"]["dataPointer"] = masterDataPointer;
     }
-    console.log(75, masterDataPointer, elementID);
+    console.log(75, masterDataPointer, elementID, objectData);
     mainDoc = Automerge.change(mainDoc, function (doc) {
         var array = Automerge.getObjectById(doc, containerID);
         Object.entries(objectData).forEach(function (_a, index) {
@@ -128,10 +143,15 @@ function createNewItem(htmlObject /*object*/, s_data /*objectData*/, containerID
     var elementID;
     _a = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer), board_1["default"].mainDoc = _a[0], elementID = _a[1];
     // the function can differentiate the difference between a link object and a master object
+    htmlObject.setAttribute("accessPointer", elementID);
     htmlObject.soul.identity = s_data.identity;
     return htmlObject;
 }
 exports.createNewItem = createNewItem;
+/** This function is to create a link object and relate it with the master object
+Step 1: Add empty linkObjectData into the database
+Step 2: add the link object to the masterObject's linkObjectArray
+*/
 function createLinkObject(linkObject, containerID, masterObjectSoul) {
     var linkObjectData = {
         "stylesheet": {},
@@ -143,10 +163,14 @@ function createLinkObject(linkObject, containerID, masterObjectSoul) {
     linkObject = createNewItem(linkObject, linkObjectData, containerID, false, masterObjectSoul.identity.dataPointer);
     var linkObjectAccessPointer = linkObjectData["identity"]["accessPointer"];
     // add the linkObject to masterObject's linkObjectArray
-    board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
-        var masterObjectData = Automerge.getObjectById(doc, masterObjectSoul.identity.dataPointer);
-        masterObjectData.linkObjectArray.push(linkObjectAccessPointer);
-    });
+    var masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer);
+    // if not in the linkObjectArray, then add it into the array
+    if (!masterObjectData.linkObjectArray.find(function (p) { return p == linkObjectAccessPointer; })) {
+        board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
+            var masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer, doc);
+            masterObjectData.linkObjectArray.push(linkObjectAccessPointer);
+        });
+    }
     return linkObject;
 }
 exports.createLinkObject = createLinkObject;

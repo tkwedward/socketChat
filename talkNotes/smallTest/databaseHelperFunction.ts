@@ -2,6 +2,22 @@ import * as Automerge from 'automerge'
 // declare var mainController: any;
 import mainController from "./board"
 
+function getObjectbyId(id:string, doc = mainController.mainDoc){
+  return Automerge.getObjectById(doc, id)
+}
+
+/** A function to trace the location of an object*/
+export function traceObjectLocation(leafID:string, doc = mainController.mainDoc){
+  // [0: Symbol(_conflicts), 1: Symbol(_objectId), 2: Symbol(_options), 3: Symbol(_cache), 4: Symbol(_inbound), 5: Symbol(_state)]
+
+
+  let symbolArray = Object.getOwnPropertySymbols(doc)
+  let inboundSymbol = symbolArray[4]
+  //
+  //
+  // console.log(9, getObjectbyId(leafID), mainController.mainDoc[inboundSymbol])
+}
+
 function copyObjectHelper(value){
   // to copy the data in an object to a new object
     if (Array.isArray(value)){
@@ -64,15 +80,16 @@ export function addOjectToArrayInDataBase(mainDoc, containerID:string, objectDat
     objectData["identity"]["accessPointer"] = elementID
 
     if (!masterDataPointer){
-      // do something if it is a link object
+      // if the object is a masterObject, then create a linkObjectArray and put itself into the array
+      objectData["linkObjectArray"].push(elementID)
       objectData["identity"]["dataPointer"] = elementID
     } else {
-      // if the object is a masterObject, then create a linkObjectArray and put itself into the array
-      // objectData["linkObjectArray"].push(masterDataPointer)
+
+      // do something if it is a link object
       objectData["identity"]["dataPointer"] = masterDataPointer
     }
 
-    console.log(75, masterDataPointer, elementID)
+    console.log(75, masterDataPointer, elementID, objectData)
 
     mainDoc = Automerge.change(mainDoc, doc=>{
       let array = Automerge.getObjectById(doc, containerID)
@@ -108,10 +125,15 @@ export function createNewItem(htmlObject:HTMLElement/*object*/, s_data/*objectDa
  addOjectToArrayInDataBase(mainController.mainDoc, containerID, s_data, insertPosition, masterDataPointer)
 
    // the function can differentiate the difference between a link object and a master object
+  htmlObject.setAttribute("accessPointer", elementID)
   htmlObject.soul.identity = s_data.identity
   return htmlObject
 }
 
+/** This function is to create a link object and relate it with the master object
+Step 1: Add empty linkObjectData into the database
+Step 2: add the link object to the masterObject's linkObjectArray
+*/
 export function createLinkObject(linkObject:HTMLElement, containerID: string, masterObjectSoul:any):HTMLElement{
     let linkObjectData = {
         "stylesheet": {},
@@ -123,11 +145,17 @@ export function createLinkObject(linkObject:HTMLElement, containerID: string, ma
     linkObject = createNewItem(linkObject, linkObjectData, containerID, false, masterObjectSoul.identity.dataPointer)
     let linkObjectAccessPointer = linkObjectData["identity"]["accessPointer"]
     // add the linkObject to masterObject's linkObjectArray
+    let masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer)
 
-    mainController.mainDoc = Automerge.change(mainController.mainDoc, doc=>{
-        let masterObjectData = Automerge.getObjectById(doc, masterObjectSoul.identity.dataPointer)
-        masterObjectData.linkObjectArray.push(linkObjectAccessPointer)
-    })
+    // if not in the linkObjectArray, then add it into the array
+    if (!masterObjectData.linkObjectArray.find(p=>p==linkObjectAccessPointer)){
+      mainController.mainDoc = Automerge.change(mainController.mainDoc, doc=>{
+          let masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer, doc)
+          masterObjectData.linkObjectArray.push(linkObjectAccessPointer)
+      })
+    }
+
+
 
     return linkObject
 }

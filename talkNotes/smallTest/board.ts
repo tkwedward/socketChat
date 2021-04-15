@@ -110,10 +110,24 @@ function colorControllerCreater(controlledObject){
 
       // access the linkObjectArray
       let masterObjectID = controlledObject.soul.identity.dataPointer
-      // let linkObjectArray = Automerge.getObjectById(mainController.mainDoc, masterObjectID)
+      let masterObjectData = Automerge.getObjectById(mainController.mainDoc, masterObjectID)
+      let linkObjectArray = masterObjectData["linkObjectArray"]
+      let stylesheet = masterObjectData["stylesheet"]
+      stylesheet.background = colorInput.value
 
-      // console.log(115, mainController.mainDoc)
-      // console.log(116, linkObjectArray["linkObjectArray"], masterObjectID)
+      linkObjectArray.forEach(p=>{
+
+        let targetObject:HTMLElement = document.querySelector(`*[accessPointer='${p}']`)
+
+        if (targetObject){
+            Object.entries(stylesheet).forEach(([key, value], index)=>{
+                console.log(115, targetObject, targetObject.style[key])
+                targetObject.style[key] = value
+            })
+        }
+
+
+      })
       // controlledObject
   })
 
@@ -135,6 +149,8 @@ controllerContainer.append(colorInput)
 masterObejctContainer.append(masterObject)
 masterObejctContainer.append(controllerContainer)
 
+
+
 let linkObjectSoul:HTMLElementSoul = {
     "identity": {
     }
@@ -147,13 +163,25 @@ createLinkObjectButton.addEventListener("click", (e)=>{
     linkObject.classList.add("linkObject")
     linkObject.soul = linkObjectSoul
 
+
     DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
     // [_, mainController.mainDoc] = DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
     let masterObjectData = DatabaseHelperFunction.accessDataFromDatabase(masterObject.soul.identity.dataPointer)
 
     Object.entries(masterObjectData["stylesheet"]).forEach(([key, value], index)=>linkObject.style[key] = value)
+    console.log(masterObjectData)
 
-    document.body.append(linkObject)
+
+    // create a container to hold the data
+    let linkObjectContainer = document.createElement("div")
+    linkObjectContainer.style.display = "grid"
+    linkObjectContainer.style.gridTemplateColumns = "1fr 1fr"
+
+    let controllerContainer = document.createElement("div")
+    let colorInput = colorControllerCreater(linkObject)
+    controllerContainer.append(colorInput)
+    linkObjectContainer.append(linkObject, controllerContainer)
+    document.body.append(linkObjectContainer)
 })
 
-document.body.append(masterObejctContainer, createLinkObjectButton)
+// document.body.append(masterObejctContainer, createLinkObjectButton)
