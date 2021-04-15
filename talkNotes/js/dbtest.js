@@ -15072,335 +15072,6 @@ module.exports = WatchableDoc;
 
 },{}],2:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
-exports.GNTemplate = exports.GNImageController = exports.GNTextController = exports.GNController = exports.GNControllerItem = void 0;
-var GreatNoteDataClass_1 = require("./GreatNoteDataClass");
-function GNControllerItem(controllerObject, eventType, controlledObject) {
-    controllerObject.addEventListener(eventType, controllerObject.controllerEvent);
-    controllerObject.controlledObject = controlledObject;
-    return controllerObject;
-}
-exports.GNControllerItem = GNControllerItem;
-function GNController(_name, _parent) {
-    var _object = document.createElement("div");
-    _object.classList.add(_name);
-    // internal properties
-    _object._name = _name;
-    _object._type = GNController.name;
-    _object._styleList = {
-        "height": "150px",
-        "background": "silver",
-        "margin": "10px"
-    };
-    _object.appendElements = function () {
-        var childrenList = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            childrenList[_i] = arguments[_i];
-        }
-        childrenList.forEach(function (p) {
-            p._parent = _object;
-            _object.appendChild(p);
-        });
-    };
-    // functions
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.receiveDataFromChild = function (data) {
-        console.log(data);
-    };
-    // events
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    // do something before return
-    GreatNoteDataClass_1.applyStyleHelperFunction(_object, _object._styleList);
-    return _object;
-}
-exports.GNController = GNController;
-/** to creat Text controller*/
-function GNTextController(_name, _parent) {
-    var _object = GNController(_name);
-    // internal properties
-    _object._name = _name;
-    _object._type = GNTextController.name;
-    // functions
-    _object.getControlledObject = function (target) {
-        _object.controlledObject = target;
-    };
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    /* part 2: controllers
-        textSizeController?: any,
-        textBoldController?: any,
-        textItalicController?: any,
-        textColorController: any,
-        textHighlightController?:any
-    */
-    // a)  create width controller
-    _object.textSizeController = GreatNoteDataClass_1.GNInputField("textSizeController");
-    _object.textSizeController.placeholder = "fontSize...";
-    _object.textSizeController.controllerEvent = function (e) {
-        if (_object.controlledObject) {
-            _object.controlledObject.style.fontSize = textSizeControllerItem.value + "px";
-        }
-        else {
-            console.log("please select an item");
-        }
-    };
-    var textSizeControllerItem = GNControllerItem(_object.textSizeController, "input");
-    // =========================================//
-    // a)  create text color  controller        //
-    // =========================================//
-    _object.textColorController = GreatNoteDataClass_1.GNInputField("textColorController");
-    _object.textColorController.placeholder = "color...";
-    _object.textColorController.controllerEvent = function (e) {
-        if (_object.controlledObject) {
-            _object.controlledObject.style.color = textColorControllerItem.value;
-        }
-        else {
-            console.log("please select an item");
-        }
-    };
-    var textColorControllerItem = GNControllerItem(_object.textColorController, "input");
-    _object.appendElements(_object.textSizeController, _object.textColorController);
-    return _object;
-}
-exports.GNTextController = GNTextController;
-/** to create GNImageController*/
-function GNImageController(_name, _parent) {
-    var _object = GNController(_name);
-    // internal properties
-    _object._name = _name;
-    _object._type = GNImageController.name;
-    // functions
-    _object.getControlledObject = function (target) {
-        _object.controlledObject = target;
-    };
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    /* part 2: controllers
-        // a)  create width controller
-        // b)  create height controller
-        // c) create transparency controller
-        // d) creatte rotation controller
-    */
-    // a)  create width controller
-    _object.imgWidthController = GreatNoteDataClass_1.GNInputField("imgWidthController");
-    _object.imgWidthController.controllerEvent = function (e) {
-        if (_object.controlledObject) {
-            _object.controlledObject.style.width = imgWidthInputControllerItem.value + "px";
-        }
-        else {
-            console.log("please select an item");
-        }
-    };
-    var imgWidthInputControllerItem = GNControllerItem(_object.imgWidthController, "input");
-    // b)  create height controller
-    // c) create transparency controller
-    // d) creatte rotation controller
-    // add item to the controller
-    _object.appendElements(imgWidthInputControllerItem);
-    return _object;
-}
-exports.GNImageController = GNImageController;
-function GNTemplate(_name, _parent) {
-    var _object = document.createElement("div");
-    // internal properties
-    _object._name = _name;
-    _object._type = GNTemplate.name;
-    // functions
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    return _object;
-}
-exports.GNTemplate = GNTemplate;
-
-},{"./GreatNoteDataClass":3}],3:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNContainerDiv = exports.GNEditableDiv = exports.GNButton = exports.GNInputField = exports.applyStyleHelperFunction = void 0;
-function applyStyleHelperFunction(_object, styleList, stylechoice) {
-    if (stylechoice) {
-        Object.entries(styleList[stylechoice]).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            _object.style[key] = value;
-        });
-    }
-    else {
-        Object.entries(styleList).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            _object.style[key] = value;
-        });
-    }
-}
-exports.applyStyleHelperFunction = applyStyleHelperFunction;
-function GNInputField(_name) {
-    var _object = document.createElement("input");
-    _object._type = GNInputField.name;
-    console.log(_object._type);
-    _object._name = _name;
-    _object.update = function (data) { _object.value = data; };
-    _object.extract = function () { return _object.value; };
-    _object.addEventListener("input", function (e) {
-        var newData = _object.extract();
-        _object._parent.receiveDataFromChild(newData);
-    });
-    return _object;
-}
-exports.GNInputField = GNInputField;
-function GNButton(_name, statusList, event, _parent) {
-    var _object = document.createElement("button");
-    _object._name = _name;
-    _object._type = GNButton.name;
-    _object.statusList = statusList;
-    _object.innerHTML = statusList[0];
-    _object.event = event;
-    _object.update = function (data) { _object.innerHTML = data; };
-    _object.extract = function () { return _object.innerHTML; };
-    // a user define array
-    _object.addEventListener("click", _object.event);
-    _object.addEventListener("click", function () {
-        var newData = _object.extract();
-        console.log(newData);
-        _object._parent.receiveDataFromChild(newData);
-    });
-    return _object;
-}
-exports.GNButton = GNButton;
-function GNEditableDiv(_name, _parent) {
-    var _object = document.createElement("div");
-    _object.contentEditable = "true";
-    _object._name = _name;
-    _object._parent = _parent;
-    _object._type = GNEditableDiv.name;
-    _object.update = function (data) { _object.innerHTML = data; };
-    _object.extract = function () { return _object.innerHTML; };
-    _object.addEventListener("input", function (e) {
-        _object._parent.extract();
-    });
-    return _object;
-}
-exports.GNEditableDiv = GNEditableDiv;
-function GNContainerDiv(_parent) {
-    var _object = document.createElement("div");
-    _object.childrenList = {};
-    _object._type = GNContainerDiv.name;
-    _object.appendElements = function () {
-        var childrenArray = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            childrenArray[_i] = arguments[_i];
-        }
-        childrenArray.forEach(function (p) {
-            _object.appendChild(p);
-            _object.childrenList[p._name] = p;
-            p._parent = _object;
-        });
-        console.log(Object.entries(_object.childrenList));
-    };
-    _object.update = function (data) {
-        Object.values(_object.childrenList).forEach(function (p) { return p.update(data[p._name]); });
-    };
-    _object.extract = function () {
-        var dataObject = {};
-        Object.entries(_object.childrenList).forEach(function (_a, index) {
-            var key = _a[0], value = _a[1];
-            // let _value = <GNObjectInterface>value
-            dataObject[key] = value.extract();
-        });
-        _object.style.background = dataObject["colorInputField"];
-        console.log(dataObject);
-    };
-    return _object;
-}
-exports.GNContainerDiv = GNContainerDiv;
-function GNImage(_name, imgsrc) {
-    var _object = document.createElement("img");
-    _object._name = _name;
-    _object.src = imgsrc;
-    _object._type = GNImage.name;
-    _object.style.width = "60%";
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    return _object;
-}
-exports.GNImage = GNImage;
-function GNDivPage(_name, _parent) {
-    var _object = GNContainerDiv();
-    // internal properties
-    _object._name = _name;
-    _object._type = GNImage.name;
-    _object.styleList = [];
-    _object.styleList[0] = {
-        "height": "400px",
-        "background": "lightgreen"
-    };
-    _object.styleList[1] = {
-        "height": "50vh",
-        "display": "grid",
-        "gridTemplateColumns": "1fr 1fr 1fr",
-        "gridGap": "10px",
-        "gridBorder": "1px black solid"
-    };
-    _object.appendElements = function () {
-        var childrenList = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            childrenList[_i] = arguments[_i];
-        }
-        childrenList.forEach(function (p) {
-            var gridItem = document.createElement("div");
-            gridItem.style.border = "1px black solid";
-            gridItem.style.width = "100%";
-            gridItem.style.height = "100%";
-            gridItem.appendChild(p);
-            _object.appendChild(gridItem);
-            _object.childrenList[p._name] = p;
-            p._parent = _object;
-            p.classList.add("page_item_" + _object._name + "_" + p._type);
-        });
-        console.log(Object.entries(_object.childrenList));
-    };
-    /** apply the styleList to the HTMLObject */
-    _object.applyStyle = function (stylechoice) {
-        Object.entries(_object.styleList[stylechoice]).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            _object.style[key] = value;
-        });
-    };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    // do something before the object is returned
-    _object.applyStyle(1);
-    console.log(_object);
-    return _object;
-}
-exports.GNDivPage = GNDivPage;
-function GNTemplate(_name, _parent) {
-    var _object = document.createElement("div");
-    // internal properties
-    _object._name = _name;
-    _object._type = GNImage.name;
-    // functions
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    return _object;
-}
-exports.GNTemplate = GNTemplate;
-
-},{}],4:[function(require,module,exports){
-"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -15421,531 +15092,302 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
+exports.MainControlle2r = exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
-var DatabaseHelperFunction = __importStar(require("./databaseHelperFunction"));
-var f = Automerge.init();
-f = Automerge.change(f, function (doc) {
-    doc["page"] = [];
-    doc["bookmark"] = [];
-    // doc["page"].push([
-    //   {"name": "page", "number": 123},
-    //   {"name": "Queen", "number": 430},
-    // ])
-    doc["page"].push({ "name": "Jack", "number": 430 });
-    doc["page"].push({ "name": "Rashida", "number": 510 });
-    doc["page"].push({ "name": "Kotaro", "number": 250 });
-    doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
-});
-var MainController = /** @class */ (function () {
-    function MainController() {
-        this.mainDoc = Automerge.init();
-        this.mainDoc = Automerge.change(f, function (doc) {
-            doc["page"] = [];
-            doc["bookmark"] = [];
-            // doc["page"].push([
-            //   {"name": "page", "number": 123},
-            //   {"name": "Queen", "number": 430},
-            // ])
-            doc["page"].push({ "name": "Jack", "number": 430 });
-            doc["page"].push({ "name": "Rashida", "number": 510 });
-            doc["page"].push({ "name": "Kotaro", "number": 250 });
-            doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
-        });
-        this.arrayID = {
-            "page": Automerge.getObjectId(this.mainDoc.page),
-            "bookmark": Automerge.getObjectId(this.mainDoc.bookmark)
-        };
-        console.log(this.mainDoc);
-    }
-    return MainController;
-}());
-var mainController = new MainController();
-exports["default"] = mainController;
-var masterObjectSoul = {
-    "identity": {
-        "accessPointer": Automerge.getObjectId(mainController.mainDoc.page[1]),
-        "dataPointer": Automerge.getObjectId(mainController.mainDoc.page[1])
-    }
-};
-function applyCSS(htmlObject, stylesheet) {
-    Object.entries(stylesheet).forEach(function (_a, index) {
-        var key = _a[0], value = _a[1];
-        htmlObject.style[key] = value;
-    });
-}
-var masterObjectData = {
-    "name": "s",
-    "identity": {},
-    "linkObjectArray": [],
-    "stylesheet": {
-        "width": "50%",
-        "height": "200px",
-        "background": "grey",
-        "margin": "5px"
-    }
-};
-/** a color input */
-function colorControllerCreater(controlledObject) {
-    var colorArray = ["red", "blue", "green"];
-    var colorInput = document.createElement("select");
-    colorArray.forEach(function (p) {
-        var option = document.createElement("option");
-        option.value = p;
-        option.innerHTML = p;
-        colorInput.append(option);
-    });
-    colorInput.addEventListener("change", function (e) {
-        controlledObject.style.background = colorInput.value;
-        // access the linkObjectArray
-        var masterObjectID = controlledObject.soul.identity.dataPointer;
-        var masterObjectData = Automerge.getObjectById(mainController.mainDoc, masterObjectID);
-        var linkObjectArray = masterObjectData["linkObjectArray"];
-        var stylesheet = masterObjectData["stylesheet"];
-        stylesheet.background = colorInput.value;
-        linkObjectArray.forEach(function (p) {
-            var targetObject = document.querySelector("*[accessPointer='" + p + "']");
-            if (targetObject) {
-                Object.entries(stylesheet).forEach(function (_a, index) {
-                    var key = _a[0], value = _a[1];
-                    console.log(115, targetObject, targetObject.style[key]);
-                    targetObject.style[key] = value;
-                });
-            }
-        });
-        // controlledObject
-    });
-    return colorInput;
-}
-var masterObject = document.createElement("div");
-applyCSS(masterObject, masterObjectData["stylesheet"]);
-masterObject.soul = masterObjectSoul;
-DatabaseHelperFunction.createNewItem(masterObject, masterObjectData, mainController["arrayID"]["page"]);
-var masterObejctContainer = document.createElement("div");
-masterObejctContainer.style.display = "grid";
-masterObejctContainer.style.gridTemplateColumns = "1fr 1fr";
-var controllerContainer = document.createElement("div");
-var colorInput = colorControllerCreater(masterObject);
-controllerContainer.append(colorInput);
-masterObejctContainer.append(masterObject);
-masterObejctContainer.append(controllerContainer);
-var linkObjectSoul = {
-    "identity": {}
-};
-var createLinkObjectButton = document.createElement("button");
-createLinkObjectButton.innerText = "createLinkObjectButton";
-createLinkObjectButton.addEventListener("click", function (e) {
-    var linkObject = document.createElement("div");
-    linkObject.classList.add("linkObject");
-    linkObject.soul = linkObjectSoul;
-    DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul);
-    // [_, mainController.mainDoc] = DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
-    var masterObjectData = DatabaseHelperFunction.accessDataFromDatabase(masterObject.soul.identity.dataPointer);
-    Object.entries(masterObjectData["stylesheet"]).forEach(function (_a, index) {
-        var key = _a[0], value = _a[1];
-        return linkObject.style[key] = value;
-    });
-    console.log(masterObjectData);
-    // create a container to hold the data
-    var linkObjectContainer = document.createElement("div");
-    linkObjectContainer.style.display = "grid";
-    linkObjectContainer.style.gridTemplateColumns = "1fr 1fr";
-    var controllerContainer = document.createElement("div");
-    var colorInput = colorControllerCreater(linkObject);
-    controllerContainer.append(colorInput);
-    linkObjectContainer.append(linkObject, controllerContainer);
-    document.body.append(linkObjectContainer);
-});
-// document.body.append(masterObejctContainer, createLinkObjectButton)
-
-},{"./databaseHelperFunction":5,"automerge":1}],5:[function(require,module,exports){
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-exports.createLinkObject = exports.createNewItem = exports.addOjectToArrayInDataBase = exports.accessDataFromDatabase = exports.exchangeObjects = exports.traceObjectLocation = void 0;
-var Automerge = __importStar(require("automerge"));
-// declare var mainController: any;
-var board_1 = __importDefault(require("./board"));
-function getObjectbyId(id, doc) {
-    if (doc === void 0) { doc = board_1["default"].mainDoc; }
-    return Automerge.getObjectById(doc, id);
-}
-/** A function to trace the location of an object*/
-function traceObjectLocation(leafID, doc) {
-    // [0: Symbol(_conflicts), 1: Symbol(_objectId), 2: Symbol(_options), 3: Symbol(_cache), 4: Symbol(_inbound), 5: Symbol(_state)]
-    if (doc === void 0) { doc = board_1["default"].mainDoc; }
-    var symbolArray = Object.getOwnPropertySymbols(doc);
-    var inboundSymbol = symbolArray[4];
-    //
-    //
-    // console.log(9, getObjectbyId(leafID), mainController.mainDoc[inboundSymbol])
-}
-exports.traceObjectLocation = traceObjectLocation;
-function copyObjectHelper(value) {
-    // to copy the data in an object to a new object
-    if (Array.isArray(value)) {
-        var newArray = value.map(function (p) { return copyObjectHelper(p); });
-        return newArray;
-    }
-    else if (value === Object(value)) {
-        var newObject_1 = {};
-        Object.entries(value).forEach(function (_a, index) {
-            var _key = _a[0], _value = _a[1];
-            newObject_1[_key] = copyObjectHelper(_value);
-        });
-        return newObject_1;
-    }
-    else {
-        return value;
-    }
-}
-/** to copy an object stored in database to a normal object!*/
-function copyObject(targetObject) {
-    // to copy the data in an object to a new object
-    var new_oo = {};
-    Object.entries(targetObject).forEach(function (_a, index) {
-        var key = _a[0], value = _a[1];
-        new_oo[key] = copyObjectHelper(value);
-    });
-    return new_oo;
-}
-/** to exchnage the position of two items in an array*/
-function exchangeObjects(objectID1, objectID2) {
-    f = Automerge.change(f, function (doc) {
-        var temp1 = copyObject(doc["page"][1]);
-        var temp2 = copyObject(doc["page"][2]);
-        doc["page"][1] = temp2;
-        doc["page"][2] = temp1;
-    });
-}
-exports.exchangeObjects = exchangeObjects;
-/**
-input: the object's ID that you waant to access
-output: clean version of the data stored in the database.
-*/
-function accessDataFromDatabase(objectID) {
-    var objectInDatabase = Automerge.getObjectById(board_1["default"].mainDoc, objectID);
-    return copyObject(objectInDatabase);
-}
-exports.accessDataFromDatabase = accessDataFromDatabase;
-/** a helper function to add object to array */
-function addOjectToArrayInDataBase(mainDoc, containerID, objectData, insertPosition, masterDataPointer) {
-    var array = Automerge.getObjectById(mainDoc, containerID);
-    if (insertPosition == false) {
-        insertPosition = array.length - 1;
-    }
-    else {
-        insertPosition = insertPosition;
-    }
-    var objectSymbolArray = Object.getOwnPropertySymbols(array[insertPosition]);
-    var elementID = array[insertPosition][objectSymbolArray[1]];
-    objectData["identity"]["accessPointer"] = elementID;
-    if (!masterDataPointer) {
-        // if the object is a masterObject, then create a linkObjectArray and put itself into the array
-        objectData["linkObjectArray"].push(elementID);
-        objectData["identity"]["dataPointer"] = elementID;
-    }
-    else {
-        // do something if it is a link object
-        objectData["identity"]["dataPointer"] = masterDataPointer;
-    }
-    console.log(75, masterDataPointer, elementID, objectData);
-    mainDoc = Automerge.change(mainDoc, function (doc) {
-        var array = Automerge.getObjectById(doc, containerID);
-        Object.entries(objectData).forEach(function (_a, index) {
-            var key = _a[0], value = _a[1];
-            array[insertPosition][key] = value;
-        });
-        array[insertPosition] = objectData;
-        // insertPosition = array.length
-    });
-    return [mainDoc, elementID];
-}
-exports.addOjectToArrayInDataBase = addOjectToArrayInDataBase;
-// createNewItem
-function createNewItem(htmlObject /*object*/, s_data /*objectData*/, containerID, insertPosition /*position want to insert*/, masterDataPointer) {
-    var _a;
-    if (insertPosition === void 0) { insertPosition = false; }
-    if (masterDataPointer === void 0) { masterDataPointer = false; }
-    // Step 1: put an empty object to get objectID
-    board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
-        var array = Automerge.getObjectById(doc, containerID);
-        if (!insertPosition) {
-            array.push({});
-            insertPosition = array.length - 1;
-        }
-        else {
-            array.insertAt(insertPosition, {});
-        }
-    }); // 1st contact
-    // Step 2: getElementID and then put it into thse identity card
-    // return the mainDoc
-    var elementID;
-    _a = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer), board_1["default"].mainDoc = _a[0], elementID = _a[1];
-    // the function can differentiate the difference between a link object and a master object
-    htmlObject.setAttribute("accessPointer", elementID);
-    htmlObject.soul.identity = s_data.identity;
-    return htmlObject;
-}
-exports.createNewItem = createNewItem;
-/** This function is to create a link object and relate it with the master object
-Step 1: Add empty linkObjectData into the database
-Step 2: add the link object to the masterObject's linkObjectArray
-*/
-function createLinkObject(linkObject, containerID, masterObjectSoul) {
-    var linkObjectData = {
-        "stylesheet": {},
-        "identity": {
-            "accessPointer": "",
-            "dataPointer": masterObjectSoul.identity.dataPointer
-        }
-    };
-    linkObject = createNewItem(linkObject, linkObjectData, containerID, false, masterObjectSoul.identity.dataPointer);
-    var linkObjectAccessPointer = linkObjectData["identity"]["accessPointer"];
-    // add the linkObject to masterObject's linkObjectArray
-    var masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer);
-    // if not in the linkObjectArray, then add it into the array
-    if (!masterObjectData.linkObjectArray.find(function (p) { return p == linkObjectAccessPointer; })) {
-        board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
-            var masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer, doc);
-            masterObjectData.linkObjectArray.push(linkObjectAccessPointer);
-        });
-    }
-    return linkObject;
-}
-exports.createLinkObject = createLinkObject;
-
-},{"./board":4,"automerge":1}],6:[function(require,module,exports){
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-exports.__esModule = true;
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-var GreatNoteControllerClass = __importStar(require("./GreatNoteControllerClass"));
-var inputField = GreatNoteDataClass.GNInputField("colorInputField");
-inputField.value = 'Test';
-inputField.update(123);
-// document.body.appendChild(inputField);
-// let inputField = new GreatNoteDataClass.GNInputField()
-var div = GreatNoteDataClass.GNEditableDiv("nameField");
-div.update('Testing Div');
-// let inputField = new GreatNoteDataClass.GNInputField()
-var button = GreatNoteDataClass.GNButton("saveButton", ["save", "unsave"], function (e) {
-    var currentIndex = button.statusList.indexOf(button.innerText);
-    var nextIndex = (currentIndex + 1) % button.statusList.length;
-    button.innerHTML = button.statusList[nextIndex];
-    console.log(nextIndex, button.statusList);
-});
-var img = GreatNoteDataClass.GNImage("testImage", "http://1.bp.blogspot.com/-nxUhwaWQceU/Vbne9scyheI/AAAAAAAABJk/KN8-02fIgoc/s1600/Pichu.full.1426629.jpg");
-// imageController
-var page = GreatNoteDataClass.GNDivPage("page1");
-var divContainer = GreatNoteDataClass.GNContainerDiv();
-var imageController = GreatNoteControllerClass.GNImageController("imageController");
-var textController = GreatNoteControllerClass.GNTextController("textController");
-var currentSelectedObject;
-page.addEventListener("click", function (e) {
-    var isPageObject = false;
-    var className = e.target["classList"][0];
-    if (className && className.startsWith("page_item_")) {
-        isPageObject = true;
-    }
-    // to check if tthe selected object is the saame one or different one
-    if (currentSelectedObject != e.target && isPageObject) {
-        switch (e.target["tagName"]) {
-            // case
-        }
-        if (className.includes(GreatNoteDataClass.GNImage.name)) {
-            // if an image is clicked
-            imageController.getControlledObject(e.target);
-            console.log("An image is selected.", imageController.controlledObject);
-        }
-        else if (className.includes(GreatNoteDataClass.GNEditableDiv.name)) {
-            // if it is GNEditableDiv
-            textController.getControlledObject(e.target);
-            console.log("An editable textfield is selected.", imageController.controlledObject);
-        }
-        currentSelectedObject = e.target;
-        console.log(currentSelectedObject._parent);
-    }
-});
-var r1 = {
-    "identity": "1002012",
-    "data": "1230423",
-    "fatt": [{}]
-};
-function createNode(name, ap, dp, color) {
-    var data_object = {
-        "name": name,
-        "array": [],
-        "identity": {
-            "accessPointer": ap,
-            "dataPointer": dp
-        },
-        "stylesheet": {
-            "background": color
-        }
-    };
-    data_object.push = function (item) {
-        data_object["array"].push(item);
-    };
-    return data_object;
-}
 var database = {
     "root": {
         "itemName": "rootNode",
-        "pageArray": [],
+        "array": [],
         "bookmarkArray": [],
-        "itemIdentity": {
-            "accessPointer": 1,
-            "dataPointer": 1,
-            "parentPointer": 0
-        },
+        "itemIdentity": {},
         "itemStylesheet": {
             "background": "silver"
         }
     }
 };
-database.push = function (array, data) {
-    database[array].push(data);
-};
-function createInputField(name) {
-    var inputField = document.createElement("input");
-    inputField.placeholder = name;
-    inputField.style.margin = "10px";
-    // inputField.addEventListener("")
-    controlPanel.append(inputField);
-    return inputField;
-}
-function createHTMLObject(data_object, parent) {
-    var node = document.createElement("div");
-    node.parent = parent;
-    node.style.background = data_object.itemStylesheet.background;
-    node.style.width = "200px";
-    node.style.height = "70px";
-    node.style.padding = "20px";
-    node.itemName = data_object.itemName;
-    node.itemIdentity = data_object.itemIdentity;
-    node.classList.add("item_" + node.itemIdentity.accessPointer);
-    node.innerHTML = "arrayName:\n     " + node.itemName + "<br>accessPointer: " + node.itemIdentity.accessPointer + "<br>dataPointer: " + node.itemIdentity.dataPointer + "<br>parentPointer: " + node.parent.itemIdentity.parentPointer;
-    node.getData = function () {
-        return data_object;
+var MainDocArrayEnum;
+(function (MainDocArrayEnum) {
+    MainDocArrayEnum["page"] = "page";
+    MainDocArrayEnum["bookmark"] = "bookmark";
+    MainDocArrayEnum["panel"] = "panel";
+    MainDocArrayEnum["pokemon"] = "pokemon";
+})(MainDocArrayEnum = exports.MainDocArrayEnum || (exports.MainDocArrayEnum = {}));
+var MainController = /** @class */ (function () {
+    function MainController() {
+        this.initializeRootArray();
+        console.log(this.mainDocArray);
+        this.initalizeMainDoc();
+    }
+    MainController.prototype.initializeRootArray = function () {
+        this.mainDocArray = {};
+        for (var arrayName in MainDocArrayEnum) {
+            console.log(this.mainDocArray, arrayName);
+            this.mainDocArray[arrayName] = "";
+        }
+        this.baseArrayID = "";
     };
-    node.addEventListener("click", function () {
-        controlPannelTitle.innerHTML = "Append to " + node.itemName;
-        console.log("current node is " + node.itemName);
-        controlPanel.currentNode = node;
-    });
-    if (!parent) {
-        nodeContainer.append(node);
-    }
-    else {
-        parent.append(node);
-    }
-    return node;
+    MainController.prototype.initalizeMainDoc = function () {
+        var _this = this;
+        var initialArray = { "rootArray": [] };
+        this.mainDoc = Automerge.init();
+        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+            doc["rootArray"] = [];
+        });
+        this.baseArrayID = Automerge.getObjectId(this.mainDoc["rootArray"]);
+        console.log(this.baseArrayID, this.mainDoc["rootArray"]);
+        for (var arrayName in MainDocArrayEnum) {
+            var initialArrayData = {
+                "data": { "name": arrayName },
+                "array": [],
+                "identity": { "dataPointer": "", "accessPointer": "" },
+                "styleSheet": {}
+            };
+            var htmlObject = document.createElement("div");
+            this.addData(this.baseArrayID, initialArrayData, htmlObject, false, false, true);
+        }
+        console.log(this.mainDoc["rootArray"]);
+        Array.from(this.mainDoc["rootArray"]).forEach(function (arrayObject) {
+            console.log(arrayObject);
+            var objectID = Automerge.getObjectId(arrayObject);
+            _this.mainDocArray[arrayObject["data"]["name"]] = objectID;
+        });
+    }; // initalizeMainDoc
+    /** to append data to the database
+    return: the HTMLObject related to, the accessID of the object in the database*/
+    MainController.prototype.addData = function (arrayID, objectData, htmlObject, insertPosition, dataPointer, attachToRoot) {
+        if (attachToRoot === void 0) { attachToRoot = false; }
+        // Step 1: register an accessPointer in the database
+        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+            // add the data to the object
+            var arrayToBeAttachedTo;
+            if (attachToRoot) {
+                arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID);
+            }
+            else {
+                arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
+            }
+            if (!insertPosition)
+                insertPosition = arrayToBeAttachedTo.length;
+            arrayToBeAttachedTo.insertAt(insertPosition, {});
+        });
+        // step 2
+        var arrayToBeAttachedTo;
+        if (attachToRoot) {
+            arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID);
+        }
+        else {
+            arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"];
+        }
+        var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
+        var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
+        objectData.identity.accessPointer = accessPointer;
+        objectData.identity.dataPointer = accessPointer;
+        if (dataPointer) {
+            objectData.identity.dataPointer = dataPointer;
+        }
+        htmlObject.identity = objectData.identity;
+        console.log(1234, htmlObject.identity);
+        // Step 3: put real data into the database
+        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+            // add the data to the object
+            var objectInDatabase = Automerge.getObjectById(doc, accessPointer);
+            Object.entries(objectData).forEach(function (_a, _) {
+                var key = _a[0], value = _a[1];
+                objectInDatabase[key] = value;
+            });
+        });
+        return htmlObject, accessPointer;
+    }; // addData
+    MainController.prototype.createDummyData = function (name, age, sex) {
+        var _dummyData = {
+            "data": { "name": name, "age": age, "sex": sex },
+            "array": [],
+            "identity": { "dataPointer": "", "accessPointer": "" },
+            "stylesheet": {}
+        };
+        var htmlObject = document.createElement("div");
+        htmlObject.style.width = "300px";
+        htmlObject.style.height = "200px";
+        return [_dummyData, htmlObject];
+    };
+    return MainController;
+}());
+exports.MainController = MainController;
+function MainControlle2r() {
+    var _object = {};
+    // initialize the databasae
+    return _object;
 }
-document.body.style.display = "grid";
-document.body.style.gridTemplateColumns = "4fr 1fr";
-var controlPanel = document.createElement("div");
-controlPanel.style.background = "pink";
-controlPanel.style.height = "100vh";
-var controlPannelTitle = document.createElement("div");
-controlPannelTitle.innerHTML = "Title";
-controlPannelTitle.style.fontSize = "20px";
-controlPannelTitle.style.margin = "10px";
-controlPannelTitle.style.display = "block";
-controlPanel.currentNode = null;
-controlPanel.append(controlPannelTitle);
-var nameInputField = createInputField("name");
-var apInputField = createInputField("apInputField");
-var dpInputField = createInputField("dpInputField");
-var submitButton = document.createElement("input");
-submitButton.style.margin = "10px";
-submitButton.style.display = "block";
-submitButton.type = "submit";
-submitButton.addEventListener("click", function () {
-    var nameValue = nameInputField.value;
-    var apValue = apInputField.value;
-    var dpValue = dpInputField.value;
-    var newData = controlPanel.currentNode;
-    console.log(nameValue, apValue, dpValue);
-});
-controlPanel.append(submitButton);
-var getAccessChainOfNodeButton = document.createElement("button");
-getAccessChainOfNodeButton.innerText = "getAccessChain";
-getAccessChainOfNodeButton.style.margin = "10px";
-getAccessChainOfNodeButton.addEventListener("click", function () {
-    if (controlPanel.currentNode) {
-        var accessChain = getAccessChain(controlPanel.currentNode);
-        console.log(179, accessChain);
-    }
-});
-controlPanel.append(getAccessChainOfNodeButton);
-var nodeContainer = document.createElement("div");
-nodeContainer.style.background = "gold";
-nodeContainer.style.height = "100vh";
-nodeContainer.itemIdentity = {
-    "accessPointer": 0,
-    "dataPointer": 0,
-    "parentPointer": null
-};
-// initialize thee dataa
-document.body.append(nodeContainer, controlPanel);
-var r = createHTMLObject(database["root"], nodeContainer);
-r.style.position = "absolute";
-// methods to access the database
-function getItem(accessPointer) {
-    return document.querySelector(".item_" + accessPointer);
-}
-function getAccessChain(htmlNode, accessChain) {
-    if (accessChain === void 0) { accessChain = []; }
-    console.log(htmlNode);
-    accessChain.unshift(htmlNode.itemIdentity.accessPointer);
-    console.log(accessChain);
-    if (htmlNode.parent && htmlNode.parent.itemIdentity) {
-        return getAccessChain(htmlNode.parent, accessChain);
-    }
-    else {
-        return accessChain;
-    }
-}
-window.getItem = getItem;
-// r.style.marginRight = "auto"
+exports.MainControlle2r = MainControlle2r;
 
-},{"./GreatNoteControllerClass":2,"./GreatNoteDataClass":3}]},{},[2,3,4,5,6]);
+},{"automerge":1}],3:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+var DatabaseCode = __importStar(require("./constructInitialCondition"));
+var mainController = new DatabaseCode.MainController();
+// let bookmarkArrayId = mainController.mainDocArray[MainDocArrayEnum.bookmark]
+//
+// let [data1, node1] = mainController.createDummyData("Rashida", 29, "F")
+// let [data2, node2] = mainController.createDummyData("Mike", 39, "M")
+// let [data3, node3] = mainController.createDummyData("Chess", 12, "L")
+// let [data4, node4] = mainController.createDummyData("Cook", 39, "M")
+// let htmlObject1
+// mainController.addData(bookmarkArrayId, data1, node1)
+console.log(mainController.mainDoc);
+//
+// database.push = function(array, data){
+//   database[array].push(data)
+// }
+//
+// function createInputField(name){
+//     let inputField = document.createElement("input")
+//     inputField.placeholder = name
+//     inputField.style.margin = "10px"
+//     // inputField.addEventListener("")
+//     controlPanel.append(inputField)
+//     return inputField
+//
+// }
+//
+//
+// function createHTMLObject(data_object, parent){
+//    let node = document.createElement("div")
+//    node.parent = parent
+//    node.style.background =data_object.itemStylesheet.background
+//    node.style.width = "200px"
+//    node.style.height = "70px"
+//    node.style.padding = "20px"
+//
+//
+//    node.itemName = data_object.itemName
+//    node.itemIdentity = data_object.itemIdentity
+//    node.classList.add(`item_${node.itemIdentity.accessPointer}`)
+//
+//    node.innerHTML = `arrayName:
+//      ${node.itemName}<br>accessPointer: ${node.itemIdentity.accessPointer}<br>dataPointer: ${node.itemIdentity.dataPointer}<br>parentPointer: ${node.parent.itemIdentity.parentPointer}`
+//
+//
+//    node.getData = function(){
+//       return data_object
+//    }
+//
+//    node.addEventListener("click", function(){
+//       controlPannelTitle.innerHTML = "Append to " + node.itemName
+//       console.log("current node is " + node.itemName)
+//       controlPanel.currentNode = node
+//    })
+//
+//    if (!parent){
+//       nodeContainer.append(node)
+//    } else {
+//       parent.append(node)
+//    }
+//    return node
+// }
+//
+//
+// document.body.style.display = "grid"
+// document.body.style.gridTemplateColumns = "4fr 1fr"
+//
+// let controlPanel = document.createElement("div")
+// controlPanel.style.background = "pink"
+// controlPanel.style.height = "100vh"
+//
+// let controlPannelTitle = document.createElement("div")
+// controlPannelTitle.innerHTML = "Title"
+// controlPannelTitle.style.fontSize = "20px"
+// controlPannelTitle.style.margin = "10px"
+// controlPannelTitle.style.display = "block"
+// controlPanel.currentNode = null
+// controlPanel.append(controlPannelTitle)
+//
+// let nameInputField = createInputField("name")
+// let apInputField = createInputField("apInputField")
+// let dpInputField = createInputField("dpInputField")
+// let submitButton = document.createElement("input")
+//
+// submitButton.style.margin = "10px"
+// submitButton.style.display = "block"
+// submitButton.type = "submit"
+//
+// submitButton.addEventListener("click", function(){
+//     let nameValue = nameInputField.value
+//     let apValue = apInputField.value
+//     let dpValue= dpInputField.value
+//
+//     let newData =
+//     controlPanel.currentNode
+//     console.log(nameValue, apValue, dpValue)
+//
+//
+// })
+//
+// controlPanel.append(submitButton)
+//
+// let getAccessChainOfNodeButton = document.createElement("button")
+// getAccessChainOfNodeButton.innerText = "getAccessChain"
+// getAccessChainOfNodeButton.style.margin = "10px"
+// getAccessChainOfNodeButton.addEventListener("click", function(){
+//     if (controlPanel.currentNode){
+//         let accessChain = getAccessChain(controlPanel.currentNode)
+//         console.log(179, accessChain)
+//     }
+// })
+// controlPanel.append(getAccessChainOfNodeButton)
+//
+//
+// let nodeContainer = document.createElement("div")
+// nodeContainer.style.background = "gold"
+// nodeContainer.style.height = "100vh"
+// nodeContainer.itemIdentity = {
+//       "accessPointer": 0,
+//       "dataPointer": 0,
+//       "parentPointer": null
+// }
+//
+//
+// // initialize thee dataa
+// document.body.append(nodeContainer, controlPanel)
+// let r = createHTMLObject(database["root"], nodeContainer)
+// r.style.position = "absolute"
+//
+//
+// // methods to access the database
+// function getItem(accessPointer){
+//   return document.querySelector(".item_" + accessPointer)
+// }
+//
+// function getAccessChain(htmlNode, accessChain = []){
+//     console.log(htmlNode)
+//     accessChain.unshift(htmlNode.itemIdentity.accessPointer)
+//     console.log(accessChain)
+//     if (htmlNode.parent && htmlNode.parent.itemIdentity){
+//         return getAccessChain(htmlNode.parent, accessChain)
+//     } else {
+//         return accessChain
+//     }
+// }
+//
+// window.getItem = getItem
+// // r.style.marginRight = "auto"
+
+},{"./constructInitialCondition":2}]},{},[2,3]);

@@ -1,5 +1,3 @@
-
-
 export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice?:any){
   if (stylechoice){
     Object.entries(styleList[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
@@ -46,7 +44,8 @@ export function GNInputField(_name:string) : GNInputFieldInterface {
     _object.extract = () => _object.value
 
     _object.addEventListener("input", (e)=>{
-        _object._parent.extract()
+        let newData = _object.extract()
+        _object._parent.receiveDataFromChild(newData)
     })
 
     return _object
@@ -77,7 +76,14 @@ export function GNButton(_name:string, statusList: string[], event:(any)=>void, 
 
     _object.extract = ()=>_object.innerHTML
 
+    // a user define array
     _object.addEventListener("click", _object.event)
+    _object.addEventListener("click", ()=>{
+      let newData = _object.extract()
+      console.log(newData)
+      _object._parent.receiveDataFromChild(newData)
+    })
+
 
     return _object
 }
@@ -208,6 +214,7 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
             _object.appendChild(gridItem)
             _object.childrenList[p._name] = p
             p._parent = _object
+            p.classList.add(`page_item_${_object._name}_${p._type}`)
         })
         console.log(Object.entries(_object.childrenList))
     }
@@ -261,10 +268,3 @@ export function GNTemplate(_name:string, _parent?:any) : GNEditableDivInterface 
 
     return _object
 }
-
-
-
-
-document.addEventListener("click", function(e){
-  console.log(e.target)
-})

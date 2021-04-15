@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.GNTemplate = exports.GNImageController = exports.GNController = exports.GNControllerItem = void 0;
+exports.GNTemplate = exports.GNImageController = exports.GNTextController = exports.GNController = exports.GNControllerItem = void 0;
 var GreatNoteDataClass_1 = require("./GreatNoteDataClass");
 function GNControllerItem(controllerObject, eventType, controlledObject) {
     controllerObject.addEventListener(eventType, controllerObject.controllerEvent);
@@ -32,6 +32,9 @@ function GNController(_name, _parent) {
     // functions
     _object.update = function (data) { data; };
     _object.extract = function () { return 123; };
+    _object.receiveDataFromChild = function (data) {
+        console.log(data);
+    };
     // events
     _object.addEventListener("eventName", function (e) {
         // do something
@@ -41,6 +44,55 @@ function GNController(_name, _parent) {
     return _object;
 }
 exports.GNController = GNController;
+/** to creat Text controller*/
+function GNTextController(_name, _parent) {
+    var _object = GNController(_name);
+    // internal properties
+    _object._name = _name;
+    _object._type = GNTextController.name;
+    // functions
+    _object.getControlledObject = function (target) {
+        _object.controlledObject = target;
+    };
+    _object.update = function (data) { data; };
+    _object.extract = function () { return 123; };
+    /* part 2: controllers
+        textSizeController?: any,
+        textBoldController?: any,
+        textItalicController?: any,
+        textColorController: any,
+        textHighlightController?:any
+    */
+    // a)  create width controller
+    _object.textSizeController = GreatNoteDataClass_1.GNInputField("textSizeController");
+    _object.textSizeController.placeholder = "fontSize...";
+    _object.textSizeController.controllerEvent = function (e) {
+        if (_object.controlledObject) {
+            _object.controlledObject.style.fontSize = textSizeControllerItem.value + "px";
+        }
+        else {
+            console.log("please select an item");
+        }
+    };
+    var textSizeControllerItem = GNControllerItem(_object.textSizeController, "input");
+    // =========================================//
+    // a)  create text color  controller        //
+    // =========================================//
+    _object.textColorController = GreatNoteDataClass_1.GNInputField("textColorController");
+    _object.textColorController.placeholder = "color...";
+    _object.textColorController.controllerEvent = function (e) {
+        if (_object.controlledObject) {
+            _object.controlledObject.style.color = textColorControllerItem.value;
+        }
+        else {
+            console.log("please select an item");
+        }
+    };
+    var textColorControllerItem = GNControllerItem(_object.textColorController, "input");
+    _object.appendElements(_object.textSizeController, _object.textColorController);
+    return _object;
+}
+exports.GNTextController = GNTextController;
 /** to create GNImageController*/
 function GNImageController(_name, _parent) {
     var _object = GNController(_name);
@@ -63,8 +115,8 @@ function GNImageController(_name, _parent) {
         // d) creatte rotation controller
     */
     // a)  create width controller
-    var imgWidthInputController = GreatNoteDataClass_1.GNInputField("imgWidthController");
-    imgWidthInputController.controllerEvent = function (e) {
+    _object.imgWidthController = GreatNoteDataClass_1.GNInputField("imgWidthController");
+    _object.imgWidthController.controllerEvent = function (e) {
         if (_object.controlledObject) {
             _object.controlledObject.style.width = imgWidthInputControllerItem.value + "px";
         }
@@ -72,7 +124,7 @@ function GNImageController(_name, _parent) {
             console.log("please select an item");
         }
     };
-    var imgWidthInputControllerItem = GNControllerItem(imgWidthInputController, "input");
+    var imgWidthInputControllerItem = GNControllerItem(_object.imgWidthController, "input");
     // b)  create height controller
     // c) create transparency controller
     // d) creatte rotation controller

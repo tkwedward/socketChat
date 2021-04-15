@@ -24,7 +24,8 @@ function GNInputField(_name) {
     _object.update = function (data) { _object.value = data; };
     _object.extract = function () { return _object.value; };
     _object.addEventListener("input", function (e) {
-        _object._parent.extract();
+        var newData = _object.extract();
+        _object._parent.receiveDataFromChild(newData);
     });
     return _object;
 }
@@ -38,7 +39,13 @@ function GNButton(_name, statusList, event, _parent) {
     _object.event = event;
     _object.update = function (data) { _object.innerHTML = data; };
     _object.extract = function () { return _object.innerHTML; };
+    // a user define array
     _object.addEventListener("click", _object.event);
+    _object.addEventListener("click", function () {
+        var newData = _object.extract();
+        console.log(newData);
+        _object._parent.receiveDataFromChild(newData);
+    });
     return _object;
 }
 exports.GNButton = GNButton;
@@ -133,6 +140,7 @@ function GNDivPage(_name, _parent) {
             _object.appendChild(gridItem);
             _object.childrenList[p._name] = p;
             p._parent = _object;
+            p.classList.add("page_item_" + _object._name + "_" + p._type);
         });
         console.log(Object.entries(_object.childrenList));
     };
@@ -166,6 +174,3 @@ function GNTemplate(_name, _parent) {
     return _object;
 }
 exports.GNTemplate = GNTemplate;
-document.addEventListener("click", function (e) {
-    console.log(e.target);
-});
