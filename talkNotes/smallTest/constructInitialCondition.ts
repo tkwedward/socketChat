@@ -28,6 +28,8 @@ export interface MainControllerInterface {
     /** to save the document*/
     save(htmlObject:GNObjectInterface):string
 
+    getObjectById(objectID: string, doc?:any)
+
     saveHTMLObjectToDatabase(htmlObject: GNObjectInterface)
 
 
@@ -71,7 +73,7 @@ export class MainController implements MainControllerInterface{
                 return  {
                     "data": {"name": arrayName},
                     "array": [],
-                    "identity": {"dataPointer": "", "accessPointer": ""},
+                    "_identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
                     "styleSheet": {}
                 }
             }
@@ -108,14 +110,17 @@ export class MainController implements MainControllerInterface{
         let objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[<number>insertPosition])
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
 
-        // create new object dataa
+
+        // create new object data
         let objectData  = htmlObject.extract()
-        objectData.identity.accessPointer = accessPointer
-        objectData.identity.dataPointer = accessPointer
+        objectData._identity.accessPointer = accessPointer
+        objectData._identity.dataPointer = accessPointer
+        objectData._identity.linkArray.push(accessPointer)
+        console.log(119, objectData, dataPointer)
         if (dataPointer){
-            objectData.identity.dataPointer = dataPointer
+            objectData._identity.dataPointer = dataPointer
         }
-        htmlObject._identity = objectData.identity
+
         // console.log(1234, htmlObject._identity)
 
         // Step 3: put real data into the database
@@ -126,8 +131,17 @@ export class MainController implements MainControllerInterface{
             Object.entries(objectData).forEach(([key, value], _)=>{
                 objectInDatabase[key] = value
             })
+
+            console.log(133, dataPointer)
+            // update the masterobject if it is a link object
+            if (dataPointer){
+                let masterObject = this.getObjectById(dataPointer, doc)
+                masterObject._identity.linkArray.push(accessPointer)
+            }
         })
 
+        htmlObject._identity = objectData._identity
+        console.log(122, htmlObject._identity)
         return [htmlObject, accessPointer]
     }// addData
 
@@ -170,8 +184,22 @@ export class MainController implements MainControllerInterface{
     }
 
     saveHTMLObjectToDatabase(htmlObject:GNObjectInterface){
-        let data = htmlObject.extract()["identity"]["dataPointer"]
+        let newData = htmlObject.extract()
+        let dataPointer = htmlObject.getDataPointer()
 
+        this.mainDoc = Automerge.change(this.mainDoc , doc=>{
+            let dataPointerObejct = Automerge.getObjectById(doc, dataPointer)
+
+            Object.entries(newData.data).forEach(([key, value], _)=>{
+                // console.log(193, key, value)
+                dataPointerObejct[key] = value
+            })
+        })
+    }
+
+    getObjectById(objectID, doc=this.mainDoc){
+        let object = Automerge.getObjectById(doc, objectID)
+        return object
     }
 
     save():string{
@@ -183,4 +211,3 @@ export class MainController implements MainControllerInterface{
 
 export var mainController:MainControllerInterface
 mainController = new MainController()
-console.log(186, mainController)

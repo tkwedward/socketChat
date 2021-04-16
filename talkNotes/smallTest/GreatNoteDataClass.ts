@@ -1,43 +1,7 @@
 import {mainController} from "./constructInitialCondition"
-console.log(4, mainController)
-
-/** to apply stylesheet to an element */
-export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice?:any){
-  if (stylechoice){
-    Object.entries(styleList[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
-  } else {
-    Object.entries(styleList).forEach(([key, value], _)=>{_object.style[key] = value})
-  }
-}
-
-/** important function to extract data from individual elements*/
-function createDataObject(_object){
-    let dataObject = {
-        "data": {},
-        "array": [],
-        "identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
-        "stylesheet": {}
-    }
-
-    if (_object._identity){
-        dataObject["identity"] = _object._identity
-    }
-
-    if (_object._dataStructure){
-        _object._dataStructure.forEach(property=> {
-             dataObject["data"][property] = _object[property]
-        })
-    }
-
-    if (_object._stylesList){
-        _object._stylesList.forEach(property=> dataObject["stylesheet"][property] = _object["style"][property])
-    }
-
-    return dataObject
-}
 
 export interface GNObjectInterface {
-    update?(data)
+    loadFromData?(data)
     extract?():any
     controlledObject?:any
     controllerEvent?:any
@@ -61,6 +25,10 @@ export interface GNObjectInterface {
     createDataObject(GNObjectInterface?):any
     appendElements(...any)
     getDataPointer():string
+    getAccessPointer():string
+    getLinkArray():any
+    reloadDataFromDatabase()
+    saveHTMLObjectToDatabase()
 
     /** to save data from the database and extract data*/
     save()
@@ -74,12 +42,6 @@ function GNObject():GNObjectInterface{
     let _object = <GNObjectInterface> new Object()
 
     return _object
-}
-
-
-
-interface HTMLElement {
-    applyStyle?()
 }
 
 // GNInputFieldInterface
@@ -96,9 +58,9 @@ export function GNInputField(_name:string) : GNInputFieldInterface {
     _object._styleStructure = []
 
     // functions
-    _object.update = (data)=>{ _object.value = data }
+    _object.loadFromData = (data)=>{ _object.value = data }
 
-    _object.extract = () => createDataObject(_object)
+    _object.extract = () => _object.createDataObject()
 
     _object.save = ()=>{
     }
@@ -107,6 +69,9 @@ export function GNInputField(_name:string) : GNInputFieldInterface {
         let newData = _object.extract()
         // _object._parent.receiveDataFromChild(newData)
     })
+
+    // add extra funcitons to the object
+    superGNObject(_object)
 
     return _object
 }
@@ -131,8 +96,8 @@ export function GNButton(_name:string, statusList: string[], event:(any)=>void, 
 
 
     // functions
-    _object.update = (data) => { _object.innerHTML = data }
-    _object.extract = () => createDataObject(_object)
+    _object.loadFromData = (data) => { _object.innerHTML = data }
+    _object.extract = () => _object.createDataObject()
 
     // a user define array
     _object.addEventListener("click", _object.event)
@@ -142,23 +107,25 @@ export function GNButton(_name:string, statusList: string[], event:(any)=>void, 
     })
 
 
+    // add extra funcitons to the object
+    superGNObject(_object)
+
     return _object
 }
-
-
 
 export interface GNContainerDivInterface extends HTMLDivElement, GNObjectInterface {
     _parent?: any
     childrenList?: {string:GNObjectInterface}|{}
     applyStyle(data)
-    update(data)
+    loadFromData(data)
     extract(): any
     appendElements(...any)
+    getAccessPointer():string
+    linkTo(_object)
 
 }
 
-
-export function GNContainerDiv(_parent?):GNContainerDivInterface{
+export function GNContainerDiv(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string, _parent?:any):GNContainerDivInterface{
     let _object = <GNContainerDivInterface> document.createElement("div");
     _object.childrenList = {}
 
@@ -173,18 +140,17 @@ export function GNContainerDiv(_parent?):GNContainerDivInterface{
               _object.childrenList[p._name] = p
               p._parent = _object
           })
-          console.log(Object.entries(_object.childrenList))
     }
 
-    _object.update = function (data){
-        Object.values(_object.childrenList).forEach(p=>p.update(data[p._name]))
+    _object.loadFromData = function (data){
+        Object.values(_object.childrenList).forEach(p=>p.loadFromData(data[p._name]))
     }
 
-    _object.extract = () => createDataObject(_object)
+    _object.extract = () => _object.createDataObject()
 
-    _object.applyStyle = function(styleList){
-          applyStyleHelperFunction(_object, styleList)
-    }
+    // add extra funcitons to the object
+    superGNObject(_object)
+    _object.addToDatabase(arrayID, insertPosition, dataPointer)
 
     return _object
 }
@@ -194,8 +160,10 @@ export interface GNEditableDivInterface extends   GNContainerDivInterface {
     _parent?: any
 }
 
-export function GNEditableDiv(_name:string, _parent?:any) : GNEditableDivInterface {
-    let _object = <GNEditableDivInterface> GNContainerDiv()
+let testArray = []
+
+export function GNEditableDiv(_name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string,  _parent?:any) : GNEditableDivInterface {
+    let _object = <GNEditableDivInterface> GNContainerDiv(_name, arrayID, insertPosition, dataPointer, _parent)
     _object.contentEditable = "true"
 
     _object._name = _name
@@ -203,32 +171,44 @@ export function GNEditableDiv(_name:string, _parent?:any) : GNEditableDivInterfa
     _object._type = GNEditableDiv.name
     _object._dataStructure = ["innerHTML"]
 
-    _object.update = (data) => {_object.innerHTML = data}
-
     _object.extract = () => {
-      let _dummyData = createDataObject(_object)
+      let _dummyData = _object.createDataObject()
       return _dummyData
     }
 
-    _object.addToDatabase = function (arrayID, insertPosition?:number|boolean, dataPointer?){
-        addToDatabase(arrayID, _object, insertPosition, dataPointer)
-        // console.log(mainController)
-    }
 
+    // add extra funcitons to the object
     superGNObject(_object)
+    _object.addToDatabase(arrayID, insertPosition, dataPointer)
 
 
     // event
     _object.addEventListener("input", (e)=>{
-        console.log(mainController)
-        console.log(_object.getDataPointer)
-    })
+        _object.saveHTMLObjectToDatabase()
 
+        let linkArrayInfo  = document.querySelector(".linkArrayInfo")
+        linkArrayInfo.innerHTML = ""
+
+        let dataPointer = _object.getDataPointer()
+        let accessPointer = _object.getAccessPointer()
+        let masterObject = mainController.getObjectById(dataPointer)
+        let linkArray = masterObject._identity.linkArray
+        // let dataObject = masterObject.data
+        let dataObject = _object.extract()["data"]
+        // console.log(192, linkArray, dataObject)
+
+        linkArray.forEach(p=>{
+            linkArrayInfo.innerHTML += p + "</br>"
+            let targetHTML = document.querySelector(`div[accesspointer='${p}']`)
+
+            if (p!= accessPointer){
+                targetHTML?.loadFromData(dataObject)
+            }
+        })
+    })
 
     return _object
 }
-
-
 
 export interface GNImageInterface extends GNObjectInterface, HTMLImageElement {
     _name:string
@@ -244,8 +224,8 @@ export function GNImage(_name, imgsrc):GNImageInterface{
     _object._dataStructure = ["src"]
     _object._styleStructure = ["width", "height"]
 
-    _object.update = (data) => {data}
-    _object.extract = () => createDataObject(_object)
+    _object.loadFromData = (data) => {data}
+    _object.extract = () => _object.createDataObject()
 
     _object.addEventListener("eventName", (e)=>{
         // do something
@@ -285,7 +265,6 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
     }
 
     _object.appendElements = function(...childrenList){
-
         childrenList.forEach(p=>{
             let gridItem = document.createElement("div")
             gridItem.style.border = "1px black solid"
@@ -297,7 +276,6 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
             p._parent = _object
             p.classList.add(`page_item_${_object._name}_${p._type}`)
         })
-        console.log(Object.entries(_object.childrenList))
     }
 
     /** apply the styleList to the HTMLObject */
@@ -305,7 +283,7 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
         Object.entries(_object.styleListArray[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
     }
 
-    _object.extract = () => createDataObject(_object)
+    _object.extract = () => _object.createDataObject()
 
     _object.addEventListener("eventName", (e)=>{
         // do something
@@ -333,7 +311,6 @@ export function GNTemplate(_name:string, _parent?:any) : GNEditableDivInterface 
     _object._type = GNImage.name
 
     // functions
-    _object.update = (data) => {data}
     _object.extract = () => 123
 
     _object.addEventListener("eventName", (e)=>{
@@ -345,17 +322,89 @@ export function GNTemplate(_name:string, _parent?:any) : GNEditableDivInterface 
 
 interface superGNObjectInterface {
     /** To link to other objects */
-    uploadToDatabase()
-    linkTo(_object):superGNObjectInterface
+    saveHTMLObjectToDatabase()
+    linkTo(_object)
 }
 
-function addToDatabase(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?){
-    mainController.addData(arrayID, htmlObject, insertPosition, dataPointer)
-}
+
 
 function superGNObject(_object){
     _object = <superGNObjectInterface>_object
 
+    /** important function to extract data from individual elements*/
+    _object.createDataObject = function(){
+        let dataObject = {
+            "data": {},
+            "array": [],
+            "_identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
+            "stylesheet": {}
+        }
+
+        if (_object._identity){
+            dataObject["_identity"] = _object._identity
+        }
+
+        if (_object._dataStructure){
+            _object._dataStructure.forEach(property=> {
+                 dataObject["data"][property] = _object[property]
+            })
+        }
+
+        if (_object._stylesList){
+            _object._stylesList.forEach(property=> dataObject["stylesheet"][property] = _object["style"][property])
+        }
+
+        return dataObject
+    }
+
+    // when the data is first created, add it to the database
+    _object.addToDatabase = function(arrayID, insertPosition?:number|boolean, dataPointer?){
+        mainController.addData(arrayID, _object, insertPosition, dataPointer)
+        _object.setAttribute("accessPointer", _object.getAccessPointer())
+    }
+
+    _object.loadFromData = (data) => {
+        console.log(370, data, _object)
+        _object._dataStructure.forEach(key=>{
+            _object[key] = data[key]
+        })
+    }
+
+
+
+    _object.saveHTMLObjectToDatabase = function(){
+        mainController.saveHTMLObjectToDatabase(_object)
+        console.log(_object.getDataFromDataBase(), _object)
+    }
+
+    /** to apply stylesheet to an element */
+    _object.applyStyle = function( styleList:{}|{}[], stylechoice?:any){
+      if (stylechoice){
+        Object.entries(styleList[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
+      } else {
+        Object.entries(styleList).forEach(([key, value], _)=>{_object.style[key] = value})
+      }
+    }
+
+    _object.reloadDataFromDatabase = function(){
+        let dataPointer = _object.getDataPointer()
+        let accessPointer = _object.getAccessPointer()
+
+        let dataPointerObject = mainController.getObjectById(dataPointer)
+        _object.loadFromData(dataPointerObject.data)
+
+        // if (dataPointer!= accessPointer){
+        //     let accessPointerObject= mainController.getObjectById(accessPointer)
+        //     _object.applyStyle(accessPointerObject._styleList)
+        // } else {
+        //     _object.applyStyle(dataPointerObject._styleList)
+        // }
+        // _object.applyStyle()
+    }
+
+    // ========================================
+    // =======   for database acces    ========
+    // ========================================
     _object.getDataPointer = function(){
         return _object._identity.dataPointer
     }
@@ -372,12 +421,12 @@ function superGNObject(_object){
         _object._identity.accessPointer = accessPointer
     }
 
-    _object.uploadToDatabase = function (){
-        // mainController
-        mainController.updateData(_object, _object.getDataPointer())
+    _object.getLinkArray = function(){
+        let objectInDatabase = mainController.getObjectById(_object.getAccessPointer())
+        return objectInDatabase._identity.linkArray
     }
 
-    _object.linkTo = function(dataPointer){
-        mainController.getObjectById(dataPointer)
+    _object.getDataFromDataBase = function(){
+        return mainController.getObjectById(_object.getDataPointer())
     }
 }

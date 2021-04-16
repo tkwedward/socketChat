@@ -55,7 +55,7 @@ var MainController = /** @class */ (function () {
                 return {
                     "data": { "name": arrayName },
                     "array": [],
-                    "identity": { "dataPointer": "", "accessPointer": "" },
+                    "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
                     "styleSheet": {}
                 };
             };
@@ -76,6 +76,7 @@ var MainController = /** @class */ (function () {
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
+        var _this = this;
         // Step 1: register an accessPointer in the database
         htmlObject.mainController = this;
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -88,14 +89,15 @@ var MainController = /** @class */ (function () {
         var arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"];
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
-        // create new object dataa
+        // create new object data
         var objectData = htmlObject.extract();
-        objectData.identity.accessPointer = accessPointer;
-        objectData.identity.dataPointer = accessPointer;
+        objectData._identity.accessPointer = accessPointer;
+        objectData._identity.dataPointer = accessPointer;
+        objectData._identity.linkArray.push(accessPointer);
+        console.log(119, objectData, dataPointer);
         if (dataPointer) {
-            objectData.identity.dataPointer = dataPointer;
+            objectData._identity.dataPointer = dataPointer;
         }
-        htmlObject._identity = objectData.identity;
         // console.log(1234, htmlObject._identity)
         // Step 3: put real data into the database
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -105,7 +107,15 @@ var MainController = /** @class */ (function () {
                 var key = _a[0], value = _a[1];
                 objectInDatabase[key] = value;
             });
+            console.log(133, dataPointer);
+            // update the masterobject if it is a link object
+            if (dataPointer) {
+                var masterObject = _this.getObjectById(dataPointer, doc);
+                masterObject._identity.linkArray.push(accessPointer);
+            }
         });
+        htmlObject._identity = objectData._identity;
+        console.log(122, htmlObject._identity);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
@@ -147,7 +157,21 @@ var MainController = /** @class */ (function () {
         return _dummyData;
     };
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
-        var data = htmlObject.extract()["identity"]["dataPointer"];
+        var newData = htmlObject.extract();
+        var dataPointer = htmlObject.getDataPointer();
+        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+            var dataPointerObejct = Automerge.getObjectById(doc, dataPointer);
+            Object.entries(newData.data).forEach(function (_a, _) {
+                var key = _a[0], value = _a[1];
+                // console.log(193, key, value)
+                dataPointerObejct[key] = value;
+            });
+        });
+    };
+    MainController.prototype.getObjectById = function (objectID, doc) {
+        if (doc === void 0) { doc = this.mainDoc; }
+        var object = Automerge.getObjectById(doc, objectID);
+        return object;
     };
     MainController.prototype.save = function () {
         return Automerge.save(this.mainDoc);
@@ -156,4 +180,3 @@ var MainController = /** @class */ (function () {
 }());
 exports.MainController = MainController;
 exports.mainController = new MainController();
-console.log(186, exports.mainController);
