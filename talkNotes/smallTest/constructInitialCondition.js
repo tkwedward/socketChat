@@ -19,8 +19,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.MainControlle2r = exports.MainController = exports.MainDocArrayEnum = void 0;
+exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
 var database = {
     "root": {
         "itemName": "rootNode",
@@ -69,8 +70,10 @@ var MainController = /** @class */ (function () {
                 "identity": { "dataPointer": "", "accessPointer": "" },
                 "styleSheet": {}
             };
-            var htmlObject = document.createElement("div");
-            this.addData(this.baseArrayID, initialArrayData, htmlObject, false, false, true);
+            console.log(GreatNoteDataClass);
+            var htmlObject = GreatNoteDataClass.GNInputField("dummy");
+            // let htmlObject = document.createElement("div")
+            this.addData(this.baseArrayID, htmlObject, false, false, true);
         }
         console.log(this.mainDoc["rootArray"]);
         Array.from(this.mainDoc["rootArray"]).forEach(function (arrayObject) {
@@ -81,7 +84,7 @@ var MainController = /** @class */ (function () {
     }; // initalizeMainDoc
     /** to append data to the database
     return: the HTMLObject related to, the accessID of the object in the database*/
-    MainController.prototype.addData = function (arrayID, objectData, htmlObject, insertPosition, dataPointer, attachToRoot) {
+    MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer, attachToRoot) {
         if (attachToRoot === void 0) { attachToRoot = false; }
         // Step 1: register an accessPointer in the database
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -97,7 +100,7 @@ var MainController = /** @class */ (function () {
                 insertPosition = arrayToBeAttachedTo.length;
             arrayToBeAttachedTo.insertAt(insertPosition, {});
         });
-        // step 2
+        // step 2 update the identityProperties of the object
         var arrayToBeAttachedTo;
         if (attachToRoot) {
             arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID);
@@ -107,13 +110,15 @@ var MainController = /** @class */ (function () {
         }
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
+        // create new object dataa
+        var objectData = htmlObject.extract();
         objectData.identity.accessPointer = accessPointer;
         objectData.identity.dataPointer = accessPointer;
         if (dataPointer) {
             objectData.identity.dataPointer = dataPointer;
         }
-        htmlObject.identity = objectData.identity;
-        console.log(1234, htmlObject.identity);
+        htmlObject._identity = objectData.identity;
+        // console.log(1234, htmlObject._identity)
         // Step 3: put real data into the database
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             // add the data to the object
@@ -125,9 +130,35 @@ var MainController = /** @class */ (function () {
         });
         return [htmlObject, accessPointer];
     }; // addData
-    MainController.prototype.createDummyData = function (name, age, sex) {
+    /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
+    The last parameter updateType has two kinds. The first one is called dataPointer type.
+    The second type is called accessPointer typer.
+    */
+    MainController.prototype.updateData = function (_object, dataPointerType) {
+        var _this = this;
+        if (dataPointerType === void 0) { dataPointerType = true; }
+        var htmlObjectData = _object.extract();
+        var accessPointer = htmlObjectData["identity"]["accessPointer"];
+        var dataPointer = htmlObjectData["identity"]["dataPointer"];
+        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+            var dataPointerObject = Automerge.getObjectById(doc, dataPointer);
+            Object.entries(htmlObjectData["data"])
+                .forEach(function (_a, _) {
+                var key = _a[0], value = _a[1];
+                dataPointerObject["data"][key] = value;
+            });
+            var accessPointerObject = Automerge.getObjectById(_this.mainDoc, dataPointer);
+            Object.entries(htmlObjectData["styleList"])
+                .forEach(function (_a, _) {
+                var key = _a[0], value = _a[1];
+                dataPointerObject["styleList"][key] = value;
+            });
+        });
+    };
+    MainController.prototype.createDummyData = function (data) {
+        if (data === void 0) { data = {}; }
         var _dummyData = {
-            "data": { "name": name, "age": age, "sex": sex },
+            "data": data,
             "array": [],
             "identity": { "dataPointer": "", "accessPointer": "" },
             "stylesheet": {}
@@ -135,14 +166,14 @@ var MainController = /** @class */ (function () {
         var htmlObject = document.createElement("div");
         htmlObject.style.width = "300px";
         htmlObject.style.height = "200px";
-        return [_dummyData, htmlObject];
+        return _dummyData;
+    };
+    MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
+        var data = htmlObject.extract()["identity"]["dataPointer"];
+    };
+    MainController.prototype.save = function () {
+        return Automerge.save(this.mainDoc);
     };
     return MainController;
 }());
 exports.MainController = MainController;
-function MainControlle2r() {
-    var _object = {};
-    // initialize the databasae
-    return _object;
-}
-exports.MainControlle2r = MainControlle2r;

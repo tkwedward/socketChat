@@ -1,8 +1,3 @@
-import {MainDocArrayEnum}  from "./constructInitialCondition"
-import * as DatabaseCode from "./constructInitialCondition"
-
-
-let mainController = new DatabaseCode.MainController()
 
 // let bookmarkArrayId = mainController.mainDocArray[MainDocArrayEnum.bookmark]
 //
@@ -13,7 +8,7 @@ let mainController = new DatabaseCode.MainController()
 
 // let htmlObject1
 // mainController.addData(bookmarkArrayId, data1, node1)
-console.log(mainController.mainDoc)
+
 
 //
 // database.push = function(array, data){

@@ -1,4 +1,5 @@
 import * as Automerge from 'automerge'
+import * as GreatNoteDataClass from "./GreatNoteDataClass"
 let database = {
     "root": {
         "itemName": "rootNode",
@@ -19,15 +20,6 @@ export enum MainDocArrayEnum {
     pokemon = "pokemon"
 }
 
-interface SubmitDataStructure {
-    data: any,
-    array: any[],
-    identity: {"dataPointer": string, "accessPointer": string},
-    styleSheet: any
-}
-
-
-
 export interface MainControllerInterface {
     mainDoc: any,
     mainDocArray: any,
@@ -35,10 +27,17 @@ export interface MainControllerInterface {
     baseArrayID: string,
     // getArrayID(MainDocArrayEnum):string
     initalizeMainDoc()
-    addData(arrayID: string, objectData: SubmitDataStructure, htmlObject: HTMLElement, insertPosition?:number|boolean, dataPointer?:string, attachToRoot?: boolean): [HTMLElement, string]
-    createDummyData(name:string, age: number, sex: string):any
-}
 
+    addData(arrayID: string, htmlObject: GreatNoteDataClass.GNObjectInterface|HTMLElement, insertPosition?:number|boolean, dataPointer?:string, attachToRoot?: boolean): [HTMLElement, string]
+
+    createDummyData(name:string, age: number, sex: string):any
+
+    updateData(_object:GreatNoteDataClass.GNObjectInterface, dataPointerType:boolean)
+    /** to save the document*/
+    save(htmlObject:GreatNoteDataClass.GNObjectInterface):string
+
+    saveHTMLObjectToDatabase(htmlObject:GreatNoteDataClass.GNObjectInterface)
+}
 
 export class MainController implements MainControllerInterface{
   mainDocArray: any;
@@ -80,8 +79,10 @@ export class MainController implements MainControllerInterface{
                 "styleSheet": {}
             }
 
-            let htmlObject = document.createElement("div")
-            this.addData(this.baseArrayID, initialArrayData, htmlObject, false, false, true)
+            console.log(GreatNoteDataClass)
+            let htmlObject = GreatNoteDataClass.GNInputField("dummy")
+            // let htmlObject = document.createElement("div")
+            this.addData(this.baseArrayID, htmlObject, false, false, true)
         }
 
         console.log(this.mainDoc["rootArray"])
@@ -96,7 +97,7 @@ export class MainController implements MainControllerInterface{
 
     /** to append data to the database
     return: the HTMLObject related to, the accessID of the object in the database*/
-    addData(arrayID, objectData, htmlObject, insertPosition:number|boolean, dataPointer, attachToRoot:boolean = false):[HTMLElement, string]{
+    addData(arrayID, htmlObject:GreatNoteDataClass.GNObjectInterface, insertPosition?:number|boolean, dataPointer?, attachToRoot:boolean=false):[any, string]{
       // Step 1: register an accessPointer in the database
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             // add the data to the object
@@ -111,7 +112,7 @@ export class MainController implements MainControllerInterface{
             arrayToBeAttachedTo.insertAt(insertPosition, {})
         })
 
-        // step 2
+        // step 2 update the identityProperties of the object
         let arrayToBeAttachedTo
         if (attachToRoot) {
             arrayToBeAttachedTo =  Automerge.getObjectById(this.mainDoc, arrayID)
@@ -121,13 +122,16 @@ export class MainController implements MainControllerInterface{
         let objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[<number>insertPosition])
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
 
+        // create new object dataa
+        let objectData  = htmlObject.extract()
         objectData.identity.accessPointer = accessPointer
         objectData.identity.dataPointer = accessPointer
         if (dataPointer){
             objectData.identity.dataPointer = dataPointer
         }
-        htmlObject.identity = objectData.identity
-        console.log(1234, htmlObject.identity)
+        htmlObject._identity = objectData.identity
+        // console.log(1234, htmlObject._identity)
+
         // Step 3: put real data into the database
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             // add the data to the object
@@ -138,12 +142,37 @@ export class MainController implements MainControllerInterface{
             })
         })
 
-        return htmlObject, accessPointer
+        return [htmlObject, accessPointer]
     }// addData
 
-    createDummyData(name, age, sex){
+    /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
+    The last parameter updateType has two kinds. The first one is called dataPointer type.
+    The second type is called accessPointer typer.
+    */
+    updateData(_object:GreatNoteDataClass.GNObjectInterface, dataPointerType:boolean = true){
+        let htmlObjectData = _object.extract()
+        let accessPointer:string = htmlObjectData["identity"]["accessPointer"]
+        let dataPointer:string = htmlObjectData["identity"]["dataPointer"]
+
+        this.mainDoc = Automerge.change(this.mainDoc, doc=>{
+            let dataPointerObject = Automerge.getObjectById(doc, dataPointer)
+            Object.entries(htmlObjectData["data"])
+                  .forEach(([key, value], _)=>{
+                    dataPointerObject["data"][key] = value
+            })
+
+            let accessPointerObject = Automerge.getObjectById(this.mainDoc, dataPointer)
+            Object.entries(htmlObjectData["styleList"])
+                  .forEach(([key, value], _)=>{
+                    dataPointerObject["styleList"][key] = value
+            })
+        })
+    }
+
+
+    createDummyData(data = {}): any{
         let _dummyData = {
-            "data": {"name": name, "age": age, "sex": sex},
+            "data": data,
             "array": [],
             "identity": {"dataPointer": "", "accessPointer": ""},
             "stylesheet": {}
@@ -152,17 +181,15 @@ export class MainController implements MainControllerInterface{
         let htmlObject = document.createElement("div")
         htmlObject.style.width = "300px"
         htmlObject.style.height = "200px"
-        return [_dummyData, htmlObject]
+        return _dummyData
     }
-}
 
+    saveHTMLObjectToDatabase(htmlObject:GreatNoteDataClass.GNObjectInterface){
+        let data = htmlObject.extract()["identity"]["dataPointer"]
 
-export function MainControlle2r():MainControllerInterface{
-    let _object = <MainControllerInterface> {}
+    }
 
-
-
-    // initialize the databasae
-
-    return _object
+    save():string{
+      return Automerge.save(this.mainDoc)
+    }
 }

@@ -1,3 +1,8 @@
+/// <reference path="newClassTest.ts" />
+
+import * as Automerge from 'automerge'
+
+/** to apply stylesheet to an element */
 export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice?:any){
   if (stylechoice){
     Object.entries(styleList[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
@@ -6,19 +11,66 @@ export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice
   }
 }
 
+
+
+function createDataObject(_object){
+    let dataObject = {
+        "data": {},
+        "array": [],
+        "identity": {"dataPointer": "", "accessPointer": ""},
+        "stylesheet": {}
+    }
+
+    if (_object._identity){
+        dataObject["identity"] = _object._identity
+    }
+
+    if (_object._dataStructure){
+        _object._dataStructure.forEach(property=> {
+             dataObject["data"][property] = _object[property]
+             console.log(dataObject["data"][property])
+        })
+    }
+
+    if (_object._stylesList){
+        _object._stylesList.forEach(property=> dataObject["stylesheet"][property] = _object["style"][property])
+    }
+
+    return dataObject
+}
+
+
 export interface GNObjectInterface {
     update?(data)
     extract?():any
     controlledObject?:any
     controllerEvent?:any
 
+    _type: string
+    _name: string // a name to describe the object
+    _styleList?: {}
+
+
+    // these two are used for extracting data and create dataObject
+    _dataStructure?: string[]
+    _styleStructure?: string[]
+
     _identity?: {
       "accessPointer": string,
       "dataPointer": string
     }
-    _styleList?: {}
-    _type: string
-    _name: string // a name to describe the object
+
+    applyStyle(any)
+    createDataObject(GNObjectInterface?):any
+    /** to save data from the database and extract data*/
+    save()
+    load(data:any)
+}
+
+function GNObject():GNObjectInterface{
+    let _object = <GNObjectInterface> new Object()
+
+    return _object
 }
 
 interface HTMLElement {
@@ -34,18 +86,21 @@ export function GNInputField(_name:string) : GNInputFieldInterface {
     let _object = <GNInputFieldInterface> document.createElement("input");
 
     _object._type = GNInputField.name
-
-    console.log(_object._type)
-
     _object._name = _name
+    _object._dataStructure = ["value"]
+    _object._styleStructure = []
 
+    // functions
     _object.update = (data)=>{ _object.value = data }
 
-    _object.extract = () => _object.value
+    _object.extract = () => createDataObject(_object)
+
+    _object.save = ()=>{
+    }
 
     _object.addEventListener("input", (e)=>{
         let newData = _object.extract()
-        _object._parent.receiveDataFromChild(newData)
+        // _object._parent.receiveDataFromChild(newData)
     })
 
     return _object
@@ -63,58 +118,34 @@ export function GNButton(_name:string, statusList: string[], event:(any)=>void, 
     let _object = <GNButtonInterface> document.createElement("button");
 
     _object._name = _name
-
     _object._type = GNButton.name
-
     _object.statusList = statusList
-
+    _object._dataStructure = ["innerText"]
     _object.innerHTML = statusList[0]
-
     _object.event = event
 
-    _object.update = (data) => { _object.innerHTML = data }
 
-    _object.extract = ()=>_object.innerHTML
+    // functions
+    _object.update = (data) => { _object.innerHTML = data }
+    _object.extract = () => createDataObject(_object)
 
     // a user define array
     _object.addEventListener("click", _object.event)
     _object.addEventListener("click", ()=>{
       let newData = _object.extract()
-      console.log(newData)
-      _object._parent.receiveDataFromChild(newData)
+      return newData
     })
 
 
     return _object
 }
 
-// GNEditableDivInterface
-export interface GNEditableDivInterface extends HTMLDivElement, GNObjectInterface {
-    _parent?: any
-}
-
-export function GNEditableDiv(_name:string, _parent?:any) : GNEditableDivInterface {
-    let _object = <GNEditableDivInterface> document.createElement("div");
-    _object.contentEditable = "true"
-
-    _object._name = _name
-    _object._parent = _parent
-    _object._type = GNEditableDiv.name
-
-    _object.update = (data) => {_object.innerHTML = data}
-    _object.extract = () => _object.innerHTML
-
-    _object.addEventListener("input", (e)=>{
-        _object._parent.extract()
-    })
-
-    return _object
-}
 
 
 export interface GNContainerDivInterface extends HTMLDivElement, GNObjectInterface {
     _parent?: any
     childrenList?: {string:GNObjectInterface}|{}
+    applyStyle(data)
     update(data)
     extract(): any
     appendElements(...any)
@@ -126,7 +157,10 @@ export function GNContainerDiv(_parent?):GNContainerDivInterface{
     _object.childrenList = {}
 
     _object._type = GNContainerDiv.name
+    _object._dataStructure = ["innerHTML", "innerText"]
+    _object._styleStructure = ["background", "width"]
 
+    // functions
     _object.appendElements = function(...childrenArray){
           childrenArray.forEach(p=>{
               _object.appendChild(p)
@@ -140,24 +174,48 @@ export function GNContainerDiv(_parent?):GNContainerDivInterface{
         Object.values(_object.childrenList).forEach(p=>p.update(data[p._name]))
     }
 
-    _object.extract = function (){
-        let dataObject = {}
-        Object.entries(_object.childrenList).forEach(([key, value], index) => {
-            // let _value = <GNObjectInterface>value
-            dataObject[key] = value.extract()
-        })
+    _object.extract = () => createDataObject(_object)
 
-        _object.style.background = dataObject["colorInputField"]
-        console.log(dataObject)
+    _object.applyStyle = function(styleList){
+          applyStyleHelperFunction(_object, styleList)
     }
 
     return _object
-
 }
+
+// GNEditableDivInterface
+export interface GNEditableDivInterface extends HTMLDivElement, GNObjectInterface {
+    _parent?: any
+}
+
+export function GNEditableDiv(_name:string, _parent?:any) : GNEditableDivInterface {
+    let _object = <GNEditableDivInterface> GNContainerDiv()
+    _object.contentEditable = "true"
+
+    _object._name = _name
+    _object._parent = _parent
+    _object._type = GNEditableDiv.name
+    _object._dataStructure = ["innerHTML"]
+
+    _object.update = (data) => {_object.innerHTML = data}
+
+    _object.extract = () => {
+      let _dummyData = createDataObject(_object)
+      return _dummyData
+    }
+
+    _object.addEventListener("input", (e)=>{
+        // mainController.updateData(_object)
+        // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
+    })
+
+    return _object
+}
+
+
 
 export interface GNImageInterface extends GNObjectInterface, HTMLImageElement {
     _name:string
-
 }
 
 export function GNImage(_name, imgsrc):GNImageInterface{
@@ -167,9 +225,11 @@ export function GNImage(_name, imgsrc):GNImageInterface{
     _object.src = imgsrc
     _object._type = GNImage.name
     _object.style.width = "60%"
+    _object._dataStructure = ["src"]
+    _object._styleStructure = ["width", "height"]
 
     _object.update = (data) => {data}
-    _object.extract = () => 123
+    _object.extract = () => createDataObject(_object)
 
     _object.addEventListener("eventName", (e)=>{
         // do something
@@ -179,8 +239,13 @@ export function GNImage(_name, imgsrc):GNImageInterface{
 }
 
 
+interface GNImageDataStructure {
+  name: string
+  src: string
+}
+
 export interface GNPageInterface extends GNContainerDivInterface {
-    styleList: {}[]
+    styleListArray: {}[]
     applyStyle(any?)
 }
 
@@ -190,12 +255,12 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
     // internal properties
     _object._name = _name
     _object._type = GNImage.name
-    _object.styleList = []
-    _object.styleList[0] = {
+    _object.styleListArray = []
+    _object.styleListArray[0] = {
         "height": "400px",
         "background": "lightgreen"
     }
-    _object.styleList[1] = {
+    _object.styleListArray[1] = {
         "height": "50vh",
         "display": "grid",
         "gridTemplateColumns": "1fr 1fr 1fr",
@@ -220,9 +285,11 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
     }
 
     /** apply the styleList to the HTMLObject */
-    _object.applyStyle = function(stylechoice){
-        Object.entries(_object.styleList[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
+    _object.applyStyle = function(stylechoice=0){
+        Object.entries(_object.styleListArray[stylechoice]).forEach(([key, value], _)=>{_object.style[key] = value})
     }
+
+    _object.extract = () => createDataObject(_object)
 
     _object.addEventListener("eventName", (e)=>{
         // do something
@@ -230,18 +297,12 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
 
     // do something before the object is returned
     _object.applyStyle(1)
-
-    console.log(_object)
-
     return _object
 }
 
 export interface GNDropdownListInterface extends GNObjectInterface{
 
 }
-
-
-
 
 
 export interface GNTemplateInterface extends GNObjectInterface, HTMLImageElement {
@@ -254,9 +315,6 @@ export function GNTemplate(_name:string, _parent?:any) : GNEditableDivInterface 
     // internal properties
     _object._name = _name
     _object._type = GNImage.name
-
-
-
 
     // functions
     _object.update = (data) => {data}

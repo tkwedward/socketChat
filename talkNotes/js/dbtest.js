@@ -15196,7 +15196,7 @@ var MainController = /** @class */ (function () {
                 objectInDatabase[key] = value;
             });
         });
-        return htmlObject, accessPointer;
+        return [htmlObject, accessPointer];
     }; // addData
     MainController.prototype.createDummyData = function (name, age, sex) {
         var _dummyData = {

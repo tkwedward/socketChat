@@ -1,6 +1,8 @@
 "use strict";
+/// <reference path="newClassTest.ts" />
 exports.__esModule = true;
-exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNContainerDiv = exports.GNEditableDiv = exports.GNButton = exports.GNInputField = exports.applyStyleHelperFunction = void 0;
+exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = exports.applyStyleHelperFunction = void 0;
+/** to apply stylesheet to an element */
 function applyStyleHelperFunction(_object, styleList, stylechoice) {
     if (stylechoice) {
         Object.entries(styleList[stylechoice]).forEach(function (_a, _) {
@@ -16,16 +18,45 @@ function applyStyleHelperFunction(_object, styleList, stylechoice) {
     }
 }
 exports.applyStyleHelperFunction = applyStyleHelperFunction;
+function createDataObject(_object) {
+    var dataObject = {
+        "data": {},
+        "array": [],
+        "identity": { "dataPointer": "", "accessPointer": "" },
+        "stylesheet": {}
+    };
+    if (_object._identity) {
+        dataObject["identity"] = _object._identity;
+    }
+    if (_object._dataStructure) {
+        _object._dataStructure.forEach(function (property) {
+            dataObject["data"][property] = _object[property];
+            console.log(dataObject["data"][property]);
+        });
+    }
+    if (_object._stylesList) {
+        _object._stylesList.forEach(function (property) { return dataObject["stylesheet"][property] = _object["style"][property]; });
+    }
+    return dataObject;
+}
+function GNObject() {
+    var _object = new Object();
+    return _object;
+}
 function GNInputField(_name) {
     var _object = document.createElement("input");
     _object._type = GNInputField.name;
-    console.log(_object._type);
     _object._name = _name;
+    _object._dataStructure = ["value"];
+    _object._styleStructure = [];
+    // functions
     _object.update = function (data) { _object.value = data; };
-    _object.extract = function () { return _object.value; };
+    _object.extract = function () { return createDataObject(_object); };
+    _object.save = function () {
+    };
     _object.addEventListener("input", function (e) {
         var newData = _object.extract();
-        _object._parent.receiveDataFromChild(newData);
+        // _object._parent.receiveDataFromChild(newData)
     });
     return _object;
 }
@@ -35,38 +66,28 @@ function GNButton(_name, statusList, event, _parent) {
     _object._name = _name;
     _object._type = GNButton.name;
     _object.statusList = statusList;
+    _object._dataStructure = ["innerText"];
     _object.innerHTML = statusList[0];
     _object.event = event;
+    // functions
     _object.update = function (data) { _object.innerHTML = data; };
-    _object.extract = function () { return _object.innerHTML; };
+    _object.extract = function () { return createDataObject(_object); };
     // a user define array
     _object.addEventListener("click", _object.event);
     _object.addEventListener("click", function () {
         var newData = _object.extract();
-        console.log(newData);
-        _object._parent.receiveDataFromChild(newData);
+        return newData;
     });
     return _object;
 }
 exports.GNButton = GNButton;
-function GNEditableDiv(_name, _parent) {
-    var _object = document.createElement("div");
-    _object.contentEditable = "true";
-    _object._name = _name;
-    _object._parent = _parent;
-    _object._type = GNEditableDiv.name;
-    _object.update = function (data) { _object.innerHTML = data; };
-    _object.extract = function () { return _object.innerHTML; };
-    _object.addEventListener("input", function (e) {
-        _object._parent.extract();
-    });
-    return _object;
-}
-exports.GNEditableDiv = GNEditableDiv;
 function GNContainerDiv(_parent) {
     var _object = document.createElement("div");
     _object.childrenList = {};
     _object._type = GNContainerDiv.name;
+    _object._dataStructure = ["innerHTML", "innerText"];
+    _object._styleStructure = ["background", "width"];
+    // functions
     _object.appendElements = function () {
         var childrenArray = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -82,27 +103,42 @@ function GNContainerDiv(_parent) {
     _object.update = function (data) {
         Object.values(_object.childrenList).forEach(function (p) { return p.update(data[p._name]); });
     };
-    _object.extract = function () {
-        var dataObject = {};
-        Object.entries(_object.childrenList).forEach(function (_a, index) {
-            var key = _a[0], value = _a[1];
-            // let _value = <GNObjectInterface>value
-            dataObject[key] = value.extract();
-        });
-        _object.style.background = dataObject["colorInputField"];
-        console.log(dataObject);
+    _object.extract = function () { return createDataObject(_object); };
+    _object.applyStyle = function (styleList) {
+        applyStyleHelperFunction(_object, styleList);
     };
     return _object;
 }
 exports.GNContainerDiv = GNContainerDiv;
+function GNEditableDiv(_name, _parent) {
+    var _object = GNContainerDiv();
+    _object.contentEditable = "true";
+    _object._name = _name;
+    _object._parent = _parent;
+    _object._type = GNEditableDiv.name;
+    _object._dataStructure = ["innerHTML"];
+    _object.update = function (data) { _object.innerHTML = data; };
+    _object.extract = function () {
+        var _dummyData = createDataObject(_object);
+        return _dummyData;
+    };
+    _object.addEventListener("input", function (e) {
+        // mainController.updateData(_object)
+        // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
+    });
+    return _object;
+}
+exports.GNEditableDiv = GNEditableDiv;
 function GNImage(_name, imgsrc) {
     var _object = document.createElement("img");
     _object._name = _name;
     _object.src = imgsrc;
     _object._type = GNImage.name;
     _object.style.width = "60%";
+    _object._dataStructure = ["src"];
+    _object._styleStructure = ["width", "height"];
     _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
+    _object.extract = function () { return createDataObject(_object); };
     _object.addEventListener("eventName", function (e) {
         // do something
     });
@@ -114,12 +150,12 @@ function GNDivPage(_name, _parent) {
     // internal properties
     _object._name = _name;
     _object._type = GNImage.name;
-    _object.styleList = [];
-    _object.styleList[0] = {
+    _object.styleListArray = [];
+    _object.styleListArray[0] = {
         "height": "400px",
         "background": "lightgreen"
     };
-    _object.styleList[1] = {
+    _object.styleListArray[1] = {
         "height": "50vh",
         "display": "grid",
         "gridTemplateColumns": "1fr 1fr 1fr",
@@ -146,17 +182,18 @@ function GNDivPage(_name, _parent) {
     };
     /** apply the styleList to the HTMLObject */
     _object.applyStyle = function (stylechoice) {
-        Object.entries(_object.styleList[stylechoice]).forEach(function (_a, _) {
+        if (stylechoice === void 0) { stylechoice = 0; }
+        Object.entries(_object.styleListArray[stylechoice]).forEach(function (_a, _) {
             var key = _a[0], value = _a[1];
             _object.style[key] = value;
         });
     };
+    _object.extract = function () { return createDataObject(_object); };
     _object.addEventListener("eventName", function (e) {
         // do something
     });
     // do something before the object is returned
     _object.applyStyle(1);
-    console.log(_object);
     return _object;
 }
 exports.GNDivPage = GNDivPage;
