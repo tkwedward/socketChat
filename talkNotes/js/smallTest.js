@@ -15242,6 +15242,7 @@ function applyStyleHelperFunction(_object, styleList, stylechoice) {
     }
 }
 exports.applyStyleHelperFunction = applyStyleHelperFunction;
+/** important function to extract data from individual elements*/
 function createDataObject(_object) {
     var dataObject = {
         "data": {},
@@ -15347,6 +15348,8 @@ function GNEditableDiv(_name, _parent) {
         return _dummyData;
     };
     _object.addEventListener("input", function (e) {
+        console.log(_object.mainController);
+        // _object.mainController.getObjectById(_object.identity.accessPointer)
         // mainController.updateData(_object)
         // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
     });
@@ -15618,7 +15621,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var GreatNoteDataClass_1 = require("./GreatNoteDataClass");
+function testHTML1() {
+    var _object = document.createElement("input");
+    return _object;
+}
+function testHTML2() {
+    var _object = document.createElement("div");
+    // augment function
+    _object = augmentFunction(_object);
+    return _object;
+}
+function augmentFunction(object) {
+    object.save = function () {
+        console.log(21, "from augmentFunction");
+    };
+    return object;
+}
+var test2 = testHTML2();
+test2.save();
+console.log(test2);
 var database = {
     "root": {
         "itemName": "rootNode",
@@ -15640,7 +15662,6 @@ var MainDocArrayEnum;
 var MainController = /** @class */ (function () {
     function MainController() {
         this.initializeRootArray();
-        console.log(this.mainDocArray);
         this.initalizeMainDoc();
     }
     MainController.prototype.initializeRootArray = function () {
@@ -15667,9 +15688,8 @@ var MainController = /** @class */ (function () {
                 "identity": { "dataPointer": "", "accessPointer": "" },
                 "styleSheet": {}
             };
-            console.log(GreatNoteDataClass);
-            var htmlObject = GreatNoteDataClass.GNInputField("dummy");
-            // let htmlObject = document.createElement("div")
+            var htmlObject = GreatNoteDataClass_1.GNInputField("dummy");
+            // let htmlObject = document.createEle ment("div")
             this.addData(this.baseArrayID, htmlObject, false, false, true);
         }
         console.log(this.mainDoc["rootArray"]);
@@ -15680,10 +15700,13 @@ var MainController = /** @class */ (function () {
         });
     }; // initalizeMainDoc
     /** to append data to the database
-    return: the HTMLObject related to, the accessID of the object in the database*/
+    return: the HTMLObject related to, the accessID of the object in the database
+    the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
+    */
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer, attachToRoot) {
         if (attachToRoot === void 0) { attachToRoot = false; }
         // Step 1: register an accessPointer in the database
+        htmlObject.mainController = this;
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             // add the data to the object
             var arrayToBeAttachedTo;
@@ -15707,6 +15730,7 @@ var MainController = /** @class */ (function () {
         }
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
+        // must have extract function
         // create new object dataa
         var objectData = htmlObject.extract();
         objectData.identity.accessPointer = accessPointer;
@@ -15751,6 +15775,14 @@ var MainController = /** @class */ (function () {
                 dataPointerObject["styleList"][key] = value;
             });
         });
+    };
+    MainController.prototype.createGNItem = function (GNtype, arrayID) {
+        var newGNObject = GNtype();
+        newGNObject.mainController = this;
+        if (arrayID) {
+            this.addData(arrayID, newGNObject);
+        }
+        return newGNObject;
     };
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
@@ -15991,7 +16023,7 @@ function createPokemonContainer() {
     var pkmName = chosenPKM.name;
     var pkmType = chosenPKM.type;
     var pkmNumber = chosenPKM.number;
-    var pkmContainer = GreatNoteDataClass.GNContainerDiv();
+    var pkmContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
     var pkmNameContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
     pkmNameContainer.innerHTML = pkmName;
     var pkmTypeContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
@@ -16001,7 +16033,6 @@ function createPokemonContainer() {
     var pkmImage = GreatNoteDataClass.GNImage("image", pkmImgSrc);
     pkmContainer.appendElements(pkmNameContainer, pkmTypeContainer, pkmNumberContainer);
 }
-// basic cell test
 // to create a controller
 document.body.style.display = "grid";
 document.body.style.gridTemplateColumns = "1fr 3fr";
@@ -16015,11 +16046,15 @@ var controllerStyleList = {
 controller.innerHTML = "king";
 controller.applyStyle(controllerStyleList);
 document.body.appendChild(controller);
-var bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer");
+var bookmarkArrayId = exports.mainController.mainDocArray["bookmaark"];
+var bigFourContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
 document.body.appendChild(bigFourContainer);
 Object.entries(exports.mainController.mainDocArray).forEach(function (_a, _) {
     var arrayName = _a[0], accessPointer = _a[1];
-    var container = GreatNoteDataClass.GNEditableDiv(arrayName);
+    // let container =
+    //
+    var container = exports.mainController.createGNItem(GreatNoteDataClass.GNEditableDiv);
+    // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
     var styleList = {
         "width": "95%",
         "height": "200px",

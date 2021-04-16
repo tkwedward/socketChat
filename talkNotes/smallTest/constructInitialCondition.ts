@@ -1,5 +1,33 @@
 import * as Automerge from 'automerge'
-import * as GreatNoteDataClass from "./GreatNoteDataClass"
+import {GNObjectInterface, GNImage, GNButton, GNDivPage, GNInputField, GNEditableDiv, GNContainerDiv, GNPageInterface}  from "./GreatNoteDataClass"
+
+
+function testHTML1():HTMLInputElement{
+    let _object = document.createElement("input")
+    return _object
+
+}
+
+function testHTML2():HTMLDivElement{
+    let _object = document.createElement("div")
+
+    // augment function
+    _object = augmentFunction(_object)
+    return _object
+}
+
+function augmentFunction(object:any):any{
+    object.save = function (){
+        console.log(21, "from augmentFunction")
+    }
+    return object
+}
+
+let test2 = testHTML2()
+test2.save()
+console.log(test2)
+
+
 let database = {
     "root": {
         "itemName": "rootNode",
@@ -20,23 +48,32 @@ export enum MainDocArrayEnum {
     pokemon = "pokemon"
 }
 
+
+
 export interface MainControllerInterface {
     mainDoc: any,
+
+    // a maapping to link  root array and arraayID
     mainDocArray: any,
     // mainDocArrayIDMapping: any,
     baseArrayID: string,
     // getArrayID(MainDocArrayEnum):string
     initalizeMainDoc()
 
-    addData(arrayID: string, htmlObject: GreatNoteDataClass.GNObjectInterface|HTMLElement, insertPosition?:number|boolean, dataPointer?:string, attachToRoot?: boolean): [HTMLElement, string]
+    addData(arrayID: string, htmlObject: GNObjectInterface|HTMLElement, insertPosition?:number|boolean, dataPointer?:string, attachToRoot?: boolean): [HTMLElement, string]
 
     createDummyData(name:string, age: number, sex: string):any
 
-    updateData(_object:GreatNoteDataClass.GNObjectInterface, dataPointerType:boolean)
-    /** to save the document*/
-    save(htmlObject:GreatNoteDataClass.GNObjectInterface):string
+    /** the arrayID is for attaching to the array*/
+    createGNItem(GNItem:any, arrayID?:string):GNObjectInterface
 
-    saveHTMLObjectToDatabase(htmlObject:GreatNoteDataClass.GNObjectInterface)
+    updateData(_object:GNObjectInterface, dataPointerType:boolean)
+    /** to save the document*/
+    save(htmlObject:GNObjectInterface):string
+
+    saveHTMLObjectToDatabase(htmlObject: GNObjectInterface)
+
+
 }
 
 export class MainController implements MainControllerInterface{
@@ -46,7 +83,6 @@ export class MainController implements MainControllerInterface{
 
     constructor(){
         this.initializeRootArray()
-        console.log(this.mainDocArray)
         this.initalizeMainDoc()
     }
 
@@ -79,9 +115,8 @@ export class MainController implements MainControllerInterface{
                 "styleSheet": {}
             }
 
-            console.log(GreatNoteDataClass)
-            let htmlObject = GreatNoteDataClass.GNInputField("dummy")
-            // let htmlObject = document.createElement("div")
+            let htmlObject = GNInputField("dummy")
+            // let htmlObject = document.createEle ment("div")
             this.addData(this.baseArrayID, htmlObject, false, false, true)
         }
 
@@ -96,9 +131,13 @@ export class MainController implements MainControllerInterface{
 
 
     /** to append data to the database
-    return: the HTMLObject related to, the accessID of the object in the database*/
-    addData(arrayID, htmlObject:GreatNoteDataClass.GNObjectInterface, insertPosition?:number|boolean, dataPointer?, attachToRoot:boolean=false):[any, string]{
+    return: the HTMLObject related to, the accessID of the object in the database
+    the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
+    */
+    addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?, attachToRoot:boolean=false):[any, string]{
       // Step 1: register an accessPointer in the database
+        htmlObject.mainController = this
+
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             // add the data to the object
             let arrayToBeAttachedTo
@@ -121,6 +160,9 @@ export class MainController implements MainControllerInterface{
         }
         let objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[<number>insertPosition])
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
+
+
+        // must have extract function
 
         // create new object dataa
         let objectData  = htmlObject.extract()
@@ -149,7 +191,7 @@ export class MainController implements MainControllerInterface{
     The last parameter updateType has two kinds. The first one is called dataPointer type.
     The second type is called accessPointer typer.
     */
-    updateData(_object:GreatNoteDataClass.GNObjectInterface, dataPointerType:boolean = true){
+    updateData(_object:GNObjectInterface, dataPointerType:boolean = true){
         let htmlObjectData = _object.extract()
         let accessPointer:string = htmlObjectData["identity"]["accessPointer"]
         let dataPointer:string = htmlObjectData["identity"]["dataPointer"]
@@ -169,6 +211,18 @@ export class MainController implements MainControllerInterface{
         })
     }
 
+    createGNItem(GNtype:any, arrayID?:string):GNObjectInterface{
+        let newGNObject = GNtype()
+        newGNObject.mainController = this
+
+        if (arrayID){
+            this.addData(arrayID, newGNObject)
+        }
+
+        return newGNObject
+    }
+
+
 
     createDummyData(data = {}): any{
         let _dummyData = {
@@ -184,7 +238,7 @@ export class MainController implements MainControllerInterface{
         return _dummyData
     }
 
-    saveHTMLObjectToDatabase(htmlObject:GreatNoteDataClass.GNObjectInterface){
+    saveHTMLObjectToDatabase(htmlObject:GNObjectInterface){
         let data = htmlObject.extract()["identity"]["dataPointer"]
 
     }

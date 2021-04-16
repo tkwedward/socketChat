@@ -35,7 +35,7 @@ function createPokemonContainer() {
     var pkmName = chosenPKM.name;
     var pkmType = chosenPKM.type;
     var pkmNumber = chosenPKM.number;
-    var pkmContainer = GreatNoteDataClass.GNContainerDiv();
+    var pkmContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
     var pkmNameContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
     pkmNameContainer.innerHTML = pkmName;
     var pkmTypeContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
@@ -45,7 +45,6 @@ function createPokemonContainer() {
     var pkmImage = GreatNoteDataClass.GNImage("image", pkmImgSrc);
     pkmContainer.appendElements(pkmNameContainer, pkmTypeContainer, pkmNumberContainer);
 }
-// basic cell test
 // to create a controller
 document.body.style.display = "grid";
 document.body.style.gridTemplateColumns = "1fr 3fr";
@@ -59,11 +58,15 @@ var controllerStyleList = {
 controller.innerHTML = "king";
 controller.applyStyle(controllerStyleList);
 document.body.appendChild(controller);
-var bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer");
+var bookmarkArrayId = exports.mainController.mainDocArray["bookmaark"];
+var bigFourContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
 document.body.appendChild(bigFourContainer);
 Object.entries(exports.mainController.mainDocArray).forEach(function (_a, _) {
     var arrayName = _a[0], accessPointer = _a[1];
-    var container = GreatNoteDataClass.GNEditableDiv(arrayName);
+    // let container =
+    //
+    var container = exports.mainController.createGNItem(GreatNoteDataClass.GNEditableDiv);
+    // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
     var styleList = {
         "width": "95%",
         "height": "200px",

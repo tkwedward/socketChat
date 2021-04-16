@@ -18,6 +18,7 @@ function applyStyleHelperFunction(_object, styleList, stylechoice) {
     }
 }
 exports.applyStyleHelperFunction = applyStyleHelperFunction;
+/** important function to extract data from individual elements*/
 function createDataObject(_object) {
     var dataObject = {
         "data": {},
@@ -123,6 +124,8 @@ function GNEditableDiv(_name, _parent) {
         return _dummyData;
     };
     _object.addEventListener("input", function (e) {
+        console.log(_object.mainController);
+        // _object.mainController.getObjectById(_object.identity.accessPointer)
         // mainController.updateData(_object)
         // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
     });

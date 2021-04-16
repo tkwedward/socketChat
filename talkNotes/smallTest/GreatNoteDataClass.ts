@@ -11,8 +11,7 @@ export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice
   }
 }
 
-
-
+/** important function to extract data from individual elements*/
 function createDataObject(_object){
     let dataObject = {
         "data": {},
@@ -40,6 +39,8 @@ function createDataObject(_object){
 }
 
 
+
+
 export interface GNObjectInterface {
     update?(data)
     extract?():any
@@ -49,6 +50,7 @@ export interface GNObjectInterface {
     _type: string
     _name: string // a name to describe the object
     _styleList?: {}
+    mainController:any
 
 
     // these two are used for extracting data and create dataObject
@@ -62,6 +64,7 @@ export interface GNObjectInterface {
 
     applyStyle(any)
     createDataObject(GNObjectInterface?):any
+    appendElements(...any)
     /** to save data from the database and extract data*/
     save()
     load(data:any)
@@ -184,7 +187,7 @@ export function GNContainerDiv(_parent?):GNContainerDivInterface{
 }
 
 // GNEditableDivInterface
-export interface GNEditableDivInterface extends HTMLDivElement, GNObjectInterface {
+export interface GNEditableDivInterface extends   GNContainerDivInterface {
     _parent?: any
 }
 
@@ -205,6 +208,8 @@ export function GNEditableDiv(_name:string, _parent?:any) : GNEditableDivInterfa
     }
 
     _object.addEventListener("input", (e)=>{
+        console.log(_object.mainController)
+        // _object.mainController.getObjectById(_object.identity.accessPointer)
         // mainController.updateData(_object)
         // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
     })

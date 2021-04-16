@@ -4,7 +4,7 @@ import * as GreatNoteControllerClass from "./GreatNoteControllerClass"
 import {MainDocArrayEnum}  from "./constructInitialCondition"
 import * as DatabaseCode from "./constructInitialCondition"
 
-export var mainController
+export var mainController:DatabaseCode.MainControllerInterface
 mainController = new DatabaseCode.MainController()
 
 var dataArray
@@ -21,7 +21,7 @@ function createPokemonContainer(){
     let pkmType = chosenPKM.type
     let pkmNumber = chosenPKM.number
 
-    let pkmContainer = GreatNoteDataClass.GNContainerDiv()
+    let pkmContainer = mainController.createGNItem(GreatNoteDataClass.GNContainerDiv)
 
     let pkmNameContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer)
     pkmNameContainer.innerHTML = pkmName
@@ -34,13 +34,7 @@ function createPokemonContainer(){
     let pkmImage = GreatNoteDataClass.GNImage("image", pkmImgSrc)
 
     pkmContainer.appendElements(pkmNameContainer, pkmTypeContainer, pkmNumberContainer)
-
 }
-
-
-
-// basic cell test
-
 
 // to create a controller
 document.body.style.display = "grid"
@@ -58,10 +52,16 @@ controller.applyStyle(controllerStyleList)
 document.body.appendChild(controller)
 
 
-let bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer")
+let bookmarkArrayId = mainController.mainDocArray["bookmaark"]
+
+let bigFourContainer = mainController.createGNItem(GreatNoteDataClass.GNContainerDiv)
 document.body.appendChild(bigFourContainer)
 Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], _) => {
-    let container = GreatNoteDataClass.GNEditableDiv(arrayName)
+    // let container =
+    //
+    let container = mainController.createGNItem(GreatNoteDataClass.GNEditableDiv)
+
+    // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
     let styleList = {
         "width": "95%",
         "height": "200px",

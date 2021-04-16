@@ -21,7 +21,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var GreatNoteDataClass_1 = require("./GreatNoteDataClass");
+function testHTML1() {
+    var _object = document.createElement("input");
+    return _object;
+}
+function testHTML2() {
+    var _object = document.createElement("div");
+    // augment function
+    _object = augmentFunction(_object);
+    return _object;
+}
+function augmentFunction(object) {
+    object.save = function () {
+        console.log(21, "from augmentFunction");
+    };
+    return object;
+}
+var test2 = testHTML2();
+test2.save();
+console.log(test2);
 var database = {
     "root": {
         "itemName": "rootNode",
@@ -43,7 +62,6 @@ var MainDocArrayEnum;
 var MainController = /** @class */ (function () {
     function MainController() {
         this.initializeRootArray();
-        console.log(this.mainDocArray);
         this.initalizeMainDoc();
     }
     MainController.prototype.initializeRootArray = function () {
@@ -70,9 +88,8 @@ var MainController = /** @class */ (function () {
                 "identity": { "dataPointer": "", "accessPointer": "" },
                 "styleSheet": {}
             };
-            console.log(GreatNoteDataClass);
-            var htmlObject = GreatNoteDataClass.GNInputField("dummy");
-            // let htmlObject = document.createElement("div")
+            var htmlObject = GreatNoteDataClass_1.GNInputField("dummy");
+            // let htmlObject = document.createEle ment("div")
             this.addData(this.baseArrayID, htmlObject, false, false, true);
         }
         console.log(this.mainDoc["rootArray"]);
@@ -83,10 +100,13 @@ var MainController = /** @class */ (function () {
         });
     }; // initalizeMainDoc
     /** to append data to the database
-    return: the HTMLObject related to, the accessID of the object in the database*/
+    return: the HTMLObject related to, the accessID of the object in the database
+    the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
+    */
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer, attachToRoot) {
         if (attachToRoot === void 0) { attachToRoot = false; }
         // Step 1: register an accessPointer in the database
+        htmlObject.mainController = this;
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             // add the data to the object
             var arrayToBeAttachedTo;
@@ -110,6 +130,7 @@ var MainController = /** @class */ (function () {
         }
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
+        // must have extract function
         // create new object dataa
         var objectData = htmlObject.extract();
         objectData.identity.accessPointer = accessPointer;
@@ -154,6 +175,14 @@ var MainController = /** @class */ (function () {
                 dataPointerObject["styleList"][key] = value;
             });
         });
+    };
+    MainController.prototype.createGNItem = function (GNtype, arrayID) {
+        var newGNObject = GNtype();
+        newGNObject.mainController = this;
+        if (arrayID) {
+            this.addData(arrayID, newGNObject);
+        }
+        return newGNObject;
     };
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
