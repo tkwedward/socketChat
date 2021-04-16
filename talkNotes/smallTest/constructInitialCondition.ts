@@ -89,7 +89,6 @@ export class MainController implements MainControllerInterface{
     initializeRootArray(){
       this.mainDocArray = {}
       for (let arrayName in MainDocArrayEnum) {
-        console.log(this.mainDocArray, arrayName)
           this.mainDocArray[arrayName] = ""
       }
 
@@ -101,29 +100,31 @@ export class MainController implements MainControllerInterface{
 
         this.mainDoc = Automerge.init()
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
-            doc["rootArray"] = []
+            doc["array"] = []
         })
 
-        this.baseArrayID = Automerge.getObjectId(this.mainDoc["rootArray"])
-        console.log(this.baseArrayID, this.mainDoc["rootArray"])
+        this.baseArrayID = Automerge.getObjectId(this.mainDoc)
+
 
         for (let arrayName in MainDocArrayEnum) {
-            let initialArrayData = {
-                "data": {"name": arrayName},
-                "array": [],
-                "identity": {"dataPointer": "", "accessPointer": ""},
-                "styleSheet": {}
+            // create an object with extract function here so that you cdo not need to use GNInputFIeld here
+
+            let htmlObject = {extract: function (){}}
+            htmlObject.extract = function(){
+                return  {
+                    "data": {"name": arrayName},
+                    "array": [],
+                    "identity": {"dataPointer": "", "accessPointer": ""},
+                    "styleSheet": {}
+                }
             }
 
-            let htmlObject = GNInputField("dummy")
             // let htmlObject = document.createEle ment("div")
-            this.addData(this.baseArrayID, htmlObject, false, false, true)
+            this.addData(this.baseArrayID, htmlObject)
+
         }
 
-        console.log(this.mainDoc["rootArray"])
-
-        Array.from(this.mainDoc["rootArray"]).forEach(arrayObject=>{
-            console.log(arrayObject)
+        Array.from(this.mainDoc["array"]).forEach(arrayObject=>{
             let objectID = Automerge.getObjectId(arrayObject)
             this.mainDocArray[arrayObject["data"]["name"]] = objectID
         })
@@ -134,35 +135,26 @@ export class MainController implements MainControllerInterface{
     return: the HTMLObject related to, the accessID of the object in the database
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
-    addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?, attachToRoot:boolean=false):[any, string]{
+    addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?):[any, string]{
       // Step 1: register an accessPointer in the database
         htmlObject.mainController = this
 
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             // add the data to the object
-            let arrayToBeAttachedTo
-            if (attachToRoot) {
-                arrayToBeAttachedTo =  Automerge.getObjectById(doc, arrayID)
-            } else {
-                arrayToBeAttachedTo =  Automerge.getObjectById(doc, arrayID)["array"]
-            }
+
+            console.log(this.mainDoc)
+            let arrayToBeAttachedTo =  Automerge.getObjectById(doc, arrayID)["array"]
+            console.log(doc, arrayID)
 
             if (!insertPosition) insertPosition = arrayToBeAttachedTo.length
             arrayToBeAttachedTo.insertAt(insertPosition, {})
         })
 
         // step 2 update the identityProperties of the object
-        let arrayToBeAttachedTo
-        if (attachToRoot) {
-            arrayToBeAttachedTo =  Automerge.getObjectById(this.mainDoc, arrayID)
-        } else {
-            arrayToBeAttachedTo =  Automerge.getObjectById(this.mainDoc, arrayID)["array"]
-        }
+        let arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"]
+
         let objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[<number>insertPosition])
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
-
-
-        // must have extract function
 
         // create new object dataa
         let objectData  = htmlObject.extract()
@@ -221,8 +213,6 @@ export class MainController implements MainControllerInterface{
 
         return newGNObject
     }
-
-
 
     createDummyData(data = {}): any{
         let _dummyData = {

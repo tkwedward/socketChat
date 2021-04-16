@@ -21,7 +21,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
-var GreatNoteDataClass_1 = require("./GreatNoteDataClass");
 function testHTML1() {
     var _object = document.createElement("input");
     return _object;
@@ -67,7 +66,6 @@ var MainController = /** @class */ (function () {
     MainController.prototype.initializeRootArray = function () {
         this.mainDocArray = {};
         for (var arrayName in MainDocArrayEnum) {
-            console.log(this.mainDocArray, arrayName);
             this.mainDocArray[arrayName] = "";
         }
         this.baseArrayID = "";
@@ -77,24 +75,28 @@ var MainController = /** @class */ (function () {
         var initialArray = { "rootArray": [] };
         this.mainDoc = Automerge.init();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
-            doc["rootArray"] = [];
+            doc["array"] = [];
         });
-        this.baseArrayID = Automerge.getObjectId(this.mainDoc["rootArray"]);
-        console.log(this.baseArrayID, this.mainDoc["rootArray"]);
-        for (var arrayName in MainDocArrayEnum) {
-            var initialArrayData = {
-                "data": { "name": arrayName },
-                "array": [],
-                "identity": { "dataPointer": "", "accessPointer": "" },
-                "styleSheet": {}
+        this.baseArrayID = Automerge.getObjectId(this.mainDoc);
+        var _loop_1 = function (arrayName) {
+            // create an object with extract function here so that you cdo not need to use GNInputFIeld here
+            var htmlObject = { extract: function () { } };
+            htmlObject.extract = function () {
+                return {
+                    "data": { "name": arrayName },
+                    "array": [],
+                    "identity": { "dataPointer": "", "accessPointer": "" },
+                    "styleSheet": {}
+                };
             };
-            var htmlObject = GreatNoteDataClass_1.GNInputField("dummy");
             // let htmlObject = document.createEle ment("div")
-            this.addData(this.baseArrayID, htmlObject, false, false, true);
+            this_1.addData(this_1.baseArrayID, htmlObject);
+        };
+        var this_1 = this;
+        for (var arrayName in MainDocArrayEnum) {
+            _loop_1(arrayName);
         }
-        console.log(this.mainDoc["rootArray"]);
-        Array.from(this.mainDoc["rootArray"]).forEach(function (arrayObject) {
-            console.log(arrayObject);
+        Array.from(this.mainDoc["array"]).forEach(function (arrayObject) {
             var objectID = Automerge.getObjectId(arrayObject);
             _this.mainDocArray[arrayObject["data"]["name"]] = objectID;
         });
@@ -103,34 +105,23 @@ var MainController = /** @class */ (function () {
     return: the HTMLObject related to, the accessID of the object in the database
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
-    MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer, attachToRoot) {
-        if (attachToRoot === void 0) { attachToRoot = false; }
+    MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
+        var _this = this;
         // Step 1: register an accessPointer in the database
         htmlObject.mainController = this;
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             // add the data to the object
-            var arrayToBeAttachedTo;
-            if (attachToRoot) {
-                arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID);
-            }
-            else {
-                arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
-            }
+            console.log(_this.mainDoc);
+            var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
+            console.log(doc, arrayID);
             if (!insertPosition)
                 insertPosition = arrayToBeAttachedTo.length;
             arrayToBeAttachedTo.insertAt(insertPosition, {});
         });
         // step 2 update the identityProperties of the object
-        var arrayToBeAttachedTo;
-        if (attachToRoot) {
-            arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID);
-        }
-        else {
-            arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"];
-        }
+        var arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"];
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
-        // must have extract function
         // create new object dataa
         var objectData = htmlObject.extract();
         objectData.identity.accessPointer = accessPointer;

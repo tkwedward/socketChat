@@ -1,6 +1,7 @@
-/// <reference path="newClassTest.ts" />
-
 import * as Automerge from 'automerge'
+
+import {mainController} from "./newClassTest"
+console.log(mainController)
 
 /** to apply stylesheet to an element */
 export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice?:any){

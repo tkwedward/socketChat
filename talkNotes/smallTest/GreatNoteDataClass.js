@@ -1,7 +1,8 @@
 "use strict";
-/// <reference path="newClassTest.ts" />
 exports.__esModule = true;
 exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = exports.applyStyleHelperFunction = void 0;
+var newClassTest_1 = require("./newClassTest");
+console.log(newClassTest_1.mainController);
 /** to apply stylesheet to an element */
 function applyStyleHelperFunction(_object, styleList, stylechoice) {
     if (stylechoice) {
