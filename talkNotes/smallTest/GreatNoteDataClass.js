@@ -1,8 +1,8 @@
 "use strict";
 exports.__esModule = true;
 exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = exports.applyStyleHelperFunction = void 0;
-var newClassTest_1 = require("./newClassTest");
-console.log(newClassTest_1.mainController);
+var constructInitialCondition_1 = require("./constructInitialCondition");
+console.log(4, constructInitialCondition_1.mainController);
 /** to apply stylesheet to an element */
 function applyStyleHelperFunction(_object, styleList, stylechoice) {
     if (stylechoice) {
@@ -24,7 +24,7 @@ function createDataObject(_object) {
     var dataObject = {
         "data": {},
         "array": [],
-        "identity": { "dataPointer": "", "accessPointer": "" },
+        "identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
         "stylesheet": {}
     };
     if (_object._identity) {
@@ -33,7 +33,6 @@ function createDataObject(_object) {
     if (_object._dataStructure) {
         _object._dataStructure.forEach(function (property) {
             dataObject["data"][property] = _object[property];
-            console.log(dataObject["data"][property]);
         });
     }
     if (_object._stylesList) {
@@ -124,11 +123,15 @@ function GNEditableDiv(_name, _parent) {
         var _dummyData = createDataObject(_object);
         return _dummyData;
     };
+    _object.addToDatabase = function (arrayID, insertPosition, dataPointer) {
+        addToDatabase(arrayID, _object, insertPosition, dataPointer);
+        // console.log(mainController)
+    };
+    superGNObject(_object);
+    // event
     _object.addEventListener("input", function (e) {
-        console.log(_object.mainController);
-        // _object.mainController.getObjectById(_object.identity.accessPointer)
-        // mainController.updateData(_object)
-        // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
+        console.log(constructInitialCondition_1.mainController);
+        console.log(_object.getDataPointer);
     });
     return _object;
 }
@@ -215,3 +218,28 @@ function GNTemplate(_name, _parent) {
     return _object;
 }
 exports.GNTemplate = GNTemplate;
+function addToDatabase(arrayID, htmlObject, insertPosition, dataPointer) {
+    constructInitialCondition_1.mainController.addData(arrayID, htmlObject, insertPosition, dataPointer);
+}
+function superGNObject(_object) {
+    _object = _object;
+    _object.getDataPointer = function () {
+        return _object._identity.dataPointer;
+    };
+    _object.setDataPointer = function (dataPointer) {
+        _object._identity.dataPointer = dataPointer;
+    };
+    _object.getAccessPointer = function () {
+        return _object._identity.accessPointer;
+    };
+    _object.setAccessPointer = function (accessPointer) {
+        _object._identity.accessPointer = accessPointer;
+    };
+    _object.uploadToDatabase = function () {
+        // mainController
+        constructInitialCondition_1.mainController.updateData(_object, _object.getDataPointer());
+    };
+    _object.linkTo = function (dataPointer) {
+        constructInitialCondition_1.mainController.getObjectById(dataPointer);
+    };
+}

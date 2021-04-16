@@ -15225,8 +15225,8 @@ exports.GNTemplate = GNTemplate;
 "use strict";
 exports.__esModule = true;
 exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = exports.applyStyleHelperFunction = void 0;
-var newClassTest_1 = require("./newClassTest");
-console.log(newClassTest_1.mainController);
+var constructInitialCondition_1 = require("./constructInitialCondition");
+console.log(4, constructInitialCondition_1.mainController);
 /** to apply stylesheet to an element */
 function applyStyleHelperFunction(_object, styleList, stylechoice) {
     if (stylechoice) {
@@ -15248,7 +15248,7 @@ function createDataObject(_object) {
     var dataObject = {
         "data": {},
         "array": [],
-        "identity": { "dataPointer": "", "accessPointer": "" },
+        "identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
         "stylesheet": {}
     };
     if (_object._identity) {
@@ -15257,7 +15257,6 @@ function createDataObject(_object) {
     if (_object._dataStructure) {
         _object._dataStructure.forEach(function (property) {
             dataObject["data"][property] = _object[property];
-            console.log(dataObject["data"][property]);
         });
     }
     if (_object._stylesList) {
@@ -15348,11 +15347,15 @@ function GNEditableDiv(_name, _parent) {
         var _dummyData = createDataObject(_object);
         return _dummyData;
     };
+    _object.addToDatabase = function (arrayID, insertPosition, dataPointer) {
+        addToDatabase(arrayID, _object, insertPosition, dataPointer);
+        // console.log(mainController)
+    };
+    superGNObject(_object);
+    // event
     _object.addEventListener("input", function (e) {
-        console.log(_object.mainController);
-        // _object.mainController.getObjectById(_object.identity.accessPointer)
-        // mainController.updateData(_object)
-        // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
+        console.log(constructInitialCondition_1.mainController);
+        console.log(_object.getDataPointer);
     });
     return _object;
 }
@@ -15439,8 +15442,33 @@ function GNTemplate(_name, _parent) {
     return _object;
 }
 exports.GNTemplate = GNTemplate;
+function addToDatabase(arrayID, htmlObject, insertPosition, dataPointer) {
+    constructInitialCondition_1.mainController.addData(arrayID, htmlObject, insertPosition, dataPointer);
+}
+function superGNObject(_object) {
+    _object = _object;
+    _object.getDataPointer = function () {
+        return _object._identity.dataPointer;
+    };
+    _object.setDataPointer = function (dataPointer) {
+        _object._identity.dataPointer = dataPointer;
+    };
+    _object.getAccessPointer = function () {
+        return _object._identity.accessPointer;
+    };
+    _object.setAccessPointer = function (accessPointer) {
+        _object._identity.accessPointer = accessPointer;
+    };
+    _object.uploadToDatabase = function () {
+        // mainController
+        constructInitialCondition_1.mainController.updateData(_object, _object.getDataPointer());
+    };
+    _object.linkTo = function (dataPointer) {
+        constructInitialCondition_1.mainController.getObjectById(dataPointer);
+    };
+}
 
-},{"./newClassTest":7}],4:[function(require,module,exports){
+},{"./constructInitialCondition":5}],4:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -15620,38 +15648,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.MainController = exports.MainDocArrayEnum = void 0;
+exports.mainController = exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
-function testHTML1() {
-    var _object = document.createElement("input");
-    return _object;
-}
-function testHTML2() {
-    var _object = document.createElement("div");
-    // augment function
-    _object = augmentFunction(_object);
-    return _object;
-}
-function augmentFunction(object) {
-    object.save = function () {
-        console.log(21, "from augmentFunction");
-    };
-    return object;
-}
-var test2 = testHTML2();
-test2.save();
-console.log(test2);
-var database = {
-    "root": {
-        "itemName": "rootNode",
-        "array": [],
-        "bookmarkArray": [],
-        "itemIdentity": {},
-        "itemStylesheet": {
-            "background": "silver"
-        }
-    }
-};
 var MainDocArrayEnum;
 (function (MainDocArrayEnum) {
     MainDocArrayEnum["page"] = "page";
@@ -15707,14 +15705,10 @@ var MainController = /** @class */ (function () {
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
-        var _this = this;
         // Step 1: register an accessPointer in the database
         htmlObject.mainController = this;
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
-            // add the data to the object
-            console.log(_this.mainDoc);
             var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
-            console.log(doc, arrayID);
             if (!insertPosition)
                 insertPosition = arrayToBeAttachedTo.length;
             arrayToBeAttachedTo.insertAt(insertPosition, {});
@@ -15768,14 +15762,6 @@ var MainController = /** @class */ (function () {
             });
         });
     };
-    MainController.prototype.createGNItem = function (GNtype, arrayID) {
-        var newGNObject = GNtype();
-        newGNObject.mainController = this;
-        if (arrayID) {
-            this.addData(arrayID, newGNObject);
-        }
-        return newGNObject;
-    };
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
         var _dummyData = {
@@ -15798,6 +15784,8 @@ var MainController = /** @class */ (function () {
     return MainController;
 }());
 exports.MainController = MainController;
+exports.mainController = new MainController();
+console.log(186, exports.mainController);
 
 },{"automerge":1}],6:[function(require,module,exports){
 "use strict";
@@ -15999,23 +15987,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.mainController = void 0;
+var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-var DatabaseCode = __importStar(require("./constructInitialCondition"));
-exports.mainController = new DatabaseCode.MainController();
+// export var mainController:DatabaseCode.MainControllerInterface
+// mainController = new DatabaseCode.MainController()
 var dataArray;
 fetch("../data/pokemon.json")
     .then(function (response) { return response.json(); })
     .then(function (data) {
     dataArray = data;
 });
+console.log(24, GreatNoteDataClass);
 function createPokemonContainer() {
     var chosenPKM = dataArray[Math.random() * dataArray.length];
     var pkmImgSrc = chosenPKM.image;
     var pkmName = chosenPKM.name;
     var pkmType = chosenPKM.type;
     var pkmNumber = chosenPKM.number;
-    var pkmContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
+    var pkmContainer = GreatNoteDataClass.GNContainerDiv();
     var pkmNameContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
     pkmNameContainer.innerHTML = pkmName;
     var pkmTypeContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
@@ -16038,14 +16027,19 @@ var controllerStyleList = {
 controller.innerHTML = "king";
 controller.applyStyle(controllerStyleList);
 document.body.appendChild(controller);
-var bookmarkArrayId = exports.mainController.mainDocArray["bookmaark"];
-var bigFourContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
+var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
+var masterObjectPointer;
+var bigFourContainer = GreatNoteDataClass.GNEditableDiv("bigFourContainer");
 document.body.appendChild(bigFourContainer);
-Object.entries(exports.mainController.mainDocArray).forEach(function (_a, _) {
-    var arrayName = _a[0], accessPointer = _a[1];
+Object.entries(constructInitialCondition_1.mainController.mainDocArray).forEach(function (_a, index) {
     // let container =
     //
-    var container = exports.mainController.createGNItem(GreatNoteDataClass.GNEditableDiv);
+    var arrayName = _a[0], accessPointer = _a[1];
+    var container = GreatNoteDataClass.GNEditableDiv("editable");
+    container.addToDatabase(bookmarkArrayId, false, masterObjectPointer);
+    if (index == 0) {
+        masterObjectPointer = container.getDataPointer();
+    }
     // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
     var styleList = {
         "width": "95%",

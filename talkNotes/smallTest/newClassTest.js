@@ -19,23 +19,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.mainController = void 0;
+var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-var DatabaseCode = __importStar(require("./constructInitialCondition"));
-exports.mainController = new DatabaseCode.MainController();
+// export var mainController:DatabaseCode.MainControllerInterface
+// mainController = new DatabaseCode.MainController()
 var dataArray;
 fetch("../data/pokemon.json")
     .then(function (response) { return response.json(); })
     .then(function (data) {
     dataArray = data;
 });
+console.log(24, GreatNoteDataClass);
 function createPokemonContainer() {
     var chosenPKM = dataArray[Math.random() * dataArray.length];
     var pkmImgSrc = chosenPKM.image;
     var pkmName = chosenPKM.name;
     var pkmType = chosenPKM.type;
     var pkmNumber = chosenPKM.number;
-    var pkmContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
+    var pkmContainer = GreatNoteDataClass.GNContainerDiv();
     var pkmNameContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
     pkmNameContainer.innerHTML = pkmName;
     var pkmTypeContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer);
@@ -58,14 +59,19 @@ var controllerStyleList = {
 controller.innerHTML = "king";
 controller.applyStyle(controllerStyleList);
 document.body.appendChild(controller);
-var bookmarkArrayId = exports.mainController.mainDocArray["bookmaark"];
-var bigFourContainer = exports.mainController.createGNItem(GreatNoteDataClass.GNContainerDiv);
+var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
+var masterObjectPointer;
+var bigFourContainer = GreatNoteDataClass.GNEditableDiv("bigFourContainer");
 document.body.appendChild(bigFourContainer);
-Object.entries(exports.mainController.mainDocArray).forEach(function (_a, _) {
-    var arrayName = _a[0], accessPointer = _a[1];
+Object.entries(constructInitialCondition_1.mainController.mainDocArray).forEach(function (_a, index) {
     // let container =
     //
-    var container = exports.mainController.createGNItem(GreatNoteDataClass.GNEditableDiv);
+    var arrayName = _a[0], accessPointer = _a[1];
+    var container = GreatNoteDataClass.GNEditableDiv("editable");
+    container.addToDatabase(bookmarkArrayId, false, masterObjectPointer);
+    if (index == 0) {
+        masterObjectPointer = container.getDataPointer();
+    }
     // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
     var styleList = {
         "width": "95%",

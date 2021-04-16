@@ -1,46 +1,5 @@
 import * as Automerge from 'automerge'
-import {GNObjectInterface, GNImage, GNButton, GNDivPage, GNInputField, GNEditableDiv, GNContainerDiv, GNPageInterface}  from "./GreatNoteDataClass"
-
-
-function testHTML1():HTMLInputElement{
-    let _object = document.createElement("input")
-    return _object
-
-}
-
-function testHTML2():HTMLDivElement{
-    let _object = document.createElement("div")
-
-    // augment function
-    _object = augmentFunction(_object)
-    return _object
-}
-
-function augmentFunction(object:any):any{
-    object.save = function (){
-        console.log(21, "from augmentFunction")
-    }
-    return object
-}
-
-let test2 = testHTML2()
-test2.save()
-console.log(test2)
-
-
-let database = {
-    "root": {
-        "itemName": "rootNode",
-        "array": [],
-        "bookmarkArray": [],
-        "itemIdentity": {
-        },
-        "itemStylesheet": {
-            "background": "silver"
-        }
-    }
-}
-
+import {GNObjectInterface}  from "./GreatNoteDataClass"
 export enum MainDocArrayEnum {
     page = "page",
     bookmark = "bookmark",
@@ -65,8 +24,6 @@ export interface MainControllerInterface {
     createDummyData(name:string, age: number, sex: string):any
 
     /** the arrayID is for attaching to the array*/
-    createGNItem(GNItem:any, arrayID?:string):GNObjectInterface
-
     updateData(_object:GNObjectInterface, dataPointerType:boolean)
     /** to save the document*/
     save(htmlObject:GNObjectInterface):string
@@ -140,12 +97,7 @@ export class MainController implements MainControllerInterface{
         htmlObject.mainController = this
 
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
-            // add the data to the object
-
-            console.log(this.mainDoc)
             let arrayToBeAttachedTo =  Automerge.getObjectById(doc, arrayID)["array"]
-            console.log(doc, arrayID)
-
             if (!insertPosition) insertPosition = arrayToBeAttachedTo.length
             arrayToBeAttachedTo.insertAt(insertPosition, {})
         })
@@ -203,17 +155,6 @@ export class MainController implements MainControllerInterface{
         })
     }
 
-    createGNItem(GNtype:any, arrayID?:string):GNObjectInterface{
-        let newGNObject = GNtype()
-        newGNObject.mainController = this
-
-        if (arrayID){
-            this.addData(arrayID, newGNObject)
-        }
-
-        return newGNObject
-    }
-
     createDummyData(data = {}): any{
         let _dummyData = {
             "data": data,
@@ -237,3 +178,9 @@ export class MainController implements MainControllerInterface{
       return Automerge.save(this.mainDoc)
     }
 }
+// import {mainController} from "./newClassTest"
+// console.log(4, mainController)
+
+export var mainController:MainControllerInterface
+mainController = new MainController()
+console.log(186, mainController)

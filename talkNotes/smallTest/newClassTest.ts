@@ -1,11 +1,13 @@
 import * as Automerge from 'automerge'
+import {mainController} from "./constructInitialCondition"
 import * as GreatNoteDataClass from "./GreatNoteDataClass"
 import * as GreatNoteControllerClass from "./GreatNoteControllerClass"
 import {MainDocArrayEnum}  from "./constructInitialCondition"
-import * as DatabaseCode from "./constructInitialCondition"
 
-export var mainController:DatabaseCode.MainControllerInterface
-mainController = new DatabaseCode.MainController()
+
+// export var mainController:DatabaseCode.MainControllerInterface
+// mainController = new DatabaseCode.MainController()
+
 
 var dataArray
 fetch("../data/pokemon.json")
@@ -13,6 +15,7 @@ fetch("../data/pokemon.json")
   .then(data => {
     dataArray = data
 })
+console.log(24, GreatNoteDataClass)
 
 function createPokemonContainer(){
     let chosenPKM = dataArray[Math.random()*dataArray.length]
@@ -21,7 +24,7 @@ function createPokemonContainer(){
     let pkmType = chosenPKM.type
     let pkmNumber = chosenPKM.number
 
-    let pkmContainer = mainController.createGNItem(GreatNoteDataClass.GNContainerDiv)
+    let pkmContainer = GreatNoteDataClass.GNContainerDiv()
 
     let pkmNameContainer = GreatNoteDataClass.GNContainerDiv(pkmContainer)
     pkmNameContainer.innerHTML = pkmName
@@ -52,14 +55,23 @@ controller.applyStyle(controllerStyleList)
 document.body.appendChild(controller)
 
 
-let bookmarkArrayId = mainController.mainDocArray["bookmaark"]
+let bookmarkArrayId = mainController.mainDocArray["bookmark"]
+let masterObjectPointer
 
-let bigFourContainer = mainController.createGNItem(GreatNoteDataClass.GNContainerDiv)
+
+let bigFourContainer = GreatNoteDataClass.GNEditableDiv("bigFourContainer")
 document.body.appendChild(bigFourContainer)
-Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], _) => {
+Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
     // let container =
     //
-    let container = mainController.createGNItem(GreatNoteDataClass.GNEditableDiv)
+
+    let container = GreatNoteDataClass.GNEditableDiv("editable")
+    container.addToDatabase(bookmarkArrayId, false, masterObjectPointer)
+
+    if (index == 0){
+        masterObjectPointer = container.getDataPointer()
+    }
+
 
     // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
     let styleList = {

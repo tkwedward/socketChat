@@ -19,38 +19,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.MainController = exports.MainDocArrayEnum = void 0;
+exports.mainController = exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
-function testHTML1() {
-    var _object = document.createElement("input");
-    return _object;
-}
-function testHTML2() {
-    var _object = document.createElement("div");
-    // augment function
-    _object = augmentFunction(_object);
-    return _object;
-}
-function augmentFunction(object) {
-    object.save = function () {
-        console.log(21, "from augmentFunction");
-    };
-    return object;
-}
-var test2 = testHTML2();
-test2.save();
-console.log(test2);
-var database = {
-    "root": {
-        "itemName": "rootNode",
-        "array": [],
-        "bookmarkArray": [],
-        "itemIdentity": {},
-        "itemStylesheet": {
-            "background": "silver"
-        }
-    }
-};
 var MainDocArrayEnum;
 (function (MainDocArrayEnum) {
     MainDocArrayEnum["page"] = "page";
@@ -106,14 +76,10 @@ var MainController = /** @class */ (function () {
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
-        var _this = this;
         // Step 1: register an accessPointer in the database
         htmlObject.mainController = this;
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
-            // add the data to the object
-            console.log(_this.mainDoc);
             var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
-            console.log(doc, arrayID);
             if (!insertPosition)
                 insertPosition = arrayToBeAttachedTo.length;
             arrayToBeAttachedTo.insertAt(insertPosition, {});
@@ -167,14 +133,6 @@ var MainController = /** @class */ (function () {
             });
         });
     };
-    MainController.prototype.createGNItem = function (GNtype, arrayID) {
-        var newGNObject = GNtype();
-        newGNObject.mainController = this;
-        if (arrayID) {
-            this.addData(arrayID, newGNObject);
-        }
-        return newGNObject;
-    };
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
         var _dummyData = {
@@ -197,3 +155,5 @@ var MainController = /** @class */ (function () {
     return MainController;
 }());
 exports.MainController = MainController;
+exports.mainController = new MainController();
+console.log(186, exports.mainController);

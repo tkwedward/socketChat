@@ -1,7 +1,5 @@
-import * as Automerge from 'automerge'
-
-import {mainController} from "./newClassTest"
-console.log(mainController)
+import {mainController} from "./constructInitialCondition"
+console.log(4, mainController)
 
 /** to apply stylesheet to an element */
 export function applyStyleHelperFunction(_object, styleList:{}|{}[], stylechoice?:any){
@@ -17,7 +15,7 @@ function createDataObject(_object){
     let dataObject = {
         "data": {},
         "array": [],
-        "identity": {"dataPointer": "", "accessPointer": ""},
+        "identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
         "stylesheet": {}
     }
 
@@ -28,7 +26,6 @@ function createDataObject(_object){
     if (_object._dataStructure){
         _object._dataStructure.forEach(property=> {
              dataObject["data"][property] = _object[property]
-             console.log(dataObject["data"][property])
         })
     }
 
@@ -38,9 +35,6 @@ function createDataObject(_object){
 
     return dataObject
 }
-
-
-
 
 export interface GNObjectInterface {
     update?(data)
@@ -66,9 +60,14 @@ export interface GNObjectInterface {
     applyStyle(any)
     createDataObject(GNObjectInterface?):any
     appendElements(...any)
+    getDataPointer():string
+
     /** to save data from the database and extract data*/
     save()
     load(data:any)
+
+    // relate to DB
+    addToDatabase(arrayID, insertPosition?:number|boolean, dataPointer?)
 }
 
 function GNObject():GNObjectInterface{
@@ -76,6 +75,8 @@ function GNObject():GNObjectInterface{
 
     return _object
 }
+
+
 
 interface HTMLElement {
     applyStyle?()
@@ -153,6 +154,7 @@ export interface GNContainerDivInterface extends HTMLDivElement, GNObjectInterfa
     update(data)
     extract(): any
     appendElements(...any)
+
 }
 
 
@@ -208,12 +210,20 @@ export function GNEditableDiv(_name:string, _parent?:any) : GNEditableDivInterfa
       return _dummyData
     }
 
+    _object.addToDatabase = function (arrayID, insertPosition?:number|boolean, dataPointer?){
+        addToDatabase(arrayID, _object, insertPosition, dataPointer)
+        // console.log(mainController)
+    }
+
+    superGNObject(_object)
+
+
+    // event
     _object.addEventListener("input", (e)=>{
-        console.log(_object.mainController)
-        // _object.mainController.getObjectById(_object.identity.accessPointer)
-        // mainController.updateData(_object)
-        // console.log(Automerge.getObjectById(mainController.mainDoc, _object._identity.dataPointer))
+        console.log(mainController)
+        console.log(_object.getDataPointer)
     })
+
 
     return _object
 }
@@ -331,4 +341,43 @@ export function GNTemplate(_name:string, _parent?:any) : GNEditableDivInterface 
     })
 
     return _object
+}
+
+interface superGNObjectInterface {
+    /** To link to other objects */
+    uploadToDatabase()
+    linkTo(_object):superGNObjectInterface
+}
+
+function addToDatabase(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?){
+    mainController.addData(arrayID, htmlObject, insertPosition, dataPointer)
+}
+
+function superGNObject(_object){
+    _object = <superGNObjectInterface>_object
+
+    _object.getDataPointer = function(){
+        return _object._identity.dataPointer
+    }
+
+    _object.setDataPointer = function(dataPointer){
+        _object._identity.dataPointer = dataPointer
+    }
+
+    _object.getAccessPointer = function(){
+        return _object._identity.accessPointer
+    }
+
+    _object.setAccessPointer = function(accessPointer){
+        _object._identity.accessPointer = accessPointer
+    }
+
+    _object.uploadToDatabase = function (){
+        // mainController
+        mainController.updateData(_object, _object.getDataPointer())
+    }
+
+    _object.linkTo = function(dataPointer){
+        mainController.getObjectById(dataPointer)
+    }
 }
