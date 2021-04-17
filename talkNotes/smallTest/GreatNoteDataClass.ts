@@ -83,6 +83,7 @@ export interface GNButtonInterface extends HTMLButtonElement, GNObjectInterface 
 }
 //@auto-fold here
 export function GNButton(_name:string, statusList: string[], arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true):GNButtonInterface{
+  console.log(86, "name", _name, "statusList: ",  statusList, "arrayID", arrayID, "insertPosition", insertPosition, "saveToDatabase: ", saveToDatabase))
     let _object = <GNButtonInterface> document.createElement("button");
 
     _object._name = _name
@@ -103,15 +104,11 @@ export function GNButton(_name:string, statusList: string[], arrayID: string, in
     // a user define array
 
     _object.addEventListener("click", ()=>{
-      let newData = _object.extract()
-      return newData
-    })
-
-    _object.addEventListener("changeStatusEvent", (e)=>{
-        console.log(111, "click event triggered")
-        _object.saveHTMLObjectToDatabase()
-        _object.updateLinkObject()
-
+      let currentIndex = _object.statusList.indexOf(_object.innerText)
+      let nextIndex = (currentIndex + 1) % _object.statusList.length
+      _object.innerText = _object.statusList[nextIndex]
+      _object.saveHTMLObjectToDatabase()
+      _object.updateLinkObject()
     })
 
     // add extra funcitons to the object

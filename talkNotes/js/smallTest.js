@@ -20113,6 +20113,7 @@ exports.GNInputField = GNInputField;
 //@auto-fold here
 function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
+    console.log(86, "name", _name, "statusList: ", statusList, "arrayID", arrayID, "insertPosition", insertPosition, "saveToDatabase: ", saveToDatabase);
     var _object = document.createElement("button");
     _object._name = _name;
     _object._type = GNButton.name;
@@ -20129,11 +20130,9 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     };
     // a user define array
     _object.addEventListener("click", function () {
-        var newData = _object.extract();
-        return newData;
-    });
-    _object.addEventListener("changeStatusEvent", function (e) {
-        console.log(111, "click event triggered");
+        var currentIndex = _object.statusList.indexOf(_object.innerText);
+        var nextIndex = (currentIndex + 1) % _object.statusList.length;
+        _object.innerText = _object.statusList[nextIndex];
         _object.saveHTMLObjectToDatabase();
         _object.updateLinkObject();
     });
@@ -20467,8 +20466,9 @@ var MainController = /** @class */ (function () {
     function MainController() {
         this.initializeRootArray();
         this.initalizeMainDoc();
-        this.template = true;
-        if (!this.template) {
+        this.applyMainDocTemplate = false;
+        this.applyMainDocTemplate = true;
+        if (this.applyMainDocTemplate) {
             this.initializeHTMLBackground();
         }
         //
@@ -20600,6 +20600,8 @@ var MainController = /** @class */ (function () {
             }
         });
         htmlObject._identity = objectData._identity;
+        console.log(htmlObject, accessPointer);
+        console.log(190, htmlObject, accessPointer);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
@@ -20683,6 +20685,7 @@ var MainController = /** @class */ (function () {
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
         this.mainDoc = Automerge.load(data);
+        console.log(this.mainDoc);
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];
@@ -20694,10 +20697,17 @@ var MainController = /** @class */ (function () {
     };
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
-        var newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+        var newHTMLObject;
+        if (data.GNType == "GNButton") {
+            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
+        }
+        else {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+        }
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {
+            console.log(334, _data);
             _this.renderDataToHTML(_data, newHTMLObject);
         });
     };
@@ -20885,12 +20895,13 @@ constructInitialCondition_1.mainController.GNDataStructureMapping = {
     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
     GNImage: GreatNoteDataClass.GNImage,
-    GNDivPage: GreatNoteDataClass.GNDivPage
+    GNDivPage: GreatNoteDataClass.GNDivPage,
+    GNButton: GreatNoteDataClass.GNButton
 };
 console.log(constructInitialCondition_1.mainController.GNDataStructureMapping);
 // socket.emit("loadMainDoc")
 // to create a controller
-if (constructInitialCondition_1.mainController.template) {
+if (!constructInitialCondition_1.mainController.applyMainDocTemplate) {
     document.body.style.display = "grid";
     document.body.style.gridTemplateColumns = "1fr 3fr";
     var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];

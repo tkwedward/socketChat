@@ -28,12 +28,13 @@ constructInitialCondition_1.mainController.GNDataStructureMapping = {
     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
     GNImage: GreatNoteDataClass.GNImage,
-    GNDivPage: GreatNoteDataClass.GNDivPage
+    GNDivPage: GreatNoteDataClass.GNDivPage,
+    GNButton: GreatNoteDataClass.GNButton
 };
 console.log(constructInitialCondition_1.mainController.GNDataStructureMapping);
 // socket.emit("loadMainDoc")
 // to create a controller
-if (constructInitialCondition_1.mainController.template) {
+if (!constructInitialCondition_1.mainController.applyMainDocTemplate) {
     document.body.style.display = "grid";
     document.body.style.gridTemplateColumns = "1fr 3fr";
     var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];

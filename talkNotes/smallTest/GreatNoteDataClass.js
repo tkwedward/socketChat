@@ -21,6 +21,7 @@ exports.GNInputField = GNInputField;
 //@auto-fold here
 function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
+    console.log(86, "name", _name, "statusList: ", statusList, "arrayID", arrayID, "insertPosition", insertPosition, "saveToDatabase: ", saveToDatabase);
     var _object = document.createElement("button");
     _object._name = _name;
     _object._type = GNButton.name;
@@ -37,11 +38,9 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     };
     // a user define array
     _object.addEventListener("click", function () {
-        var newData = _object.extract();
-        return newData;
-    });
-    _object.addEventListener("changeStatusEvent", function (e) {
-        console.log(111, "click event triggered");
+        var currentIndex = _object.statusList.indexOf(_object.innerText);
+        var nextIndex = (currentIndex + 1) % _object.statusList.length;
+        _object.innerText = _object.statusList[nextIndex];
         _object.saveHTMLObjectToDatabase();
         _object.updateLinkObject();
     });

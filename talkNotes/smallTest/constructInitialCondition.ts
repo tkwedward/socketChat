@@ -56,14 +56,15 @@ export class MainController implements MainControllerInterface{
   baseArrayID: string;
   previousDoc: any;
   GNDataStructureMapping:any
-  template:boolean
+  applyMainDocTemplate:boolean
 
     //@auto-fold here
     constructor(){
         this.initializeRootArray()
         this.initalizeMainDoc()
-        this.template = true
-        if (!this.template){
+        this.applyMainDocTemplate = false
+        this.applyMainDocTemplate = true
+        if (this.applyMainDocTemplate){
             this.initializeHTMLBackground()
         }
         //
@@ -186,7 +187,9 @@ export class MainController implements MainControllerInterface{
         })
 
         // step 2 update the identityProperties of the object
+
         let arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"]
+
 
         let objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[<number>insertPosition])
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
@@ -200,6 +203,8 @@ export class MainController implements MainControllerInterface{
         if (dataPointer){
             objectData._identity.dataPointer = dataPointer
         }
+        )
+
 
         // Step 3: put real data into the database
         //@auto-fold here
@@ -219,6 +224,8 @@ export class MainController implements MainControllerInterface{
         })
 
         htmlObject._identity = objectData._identity
+        console.log(htmlObject, accessPointer)
+        console.log(190, htmlObject, accessPointer)
         return [htmlObject, accessPointer]
     }// addData
 
@@ -305,6 +312,7 @@ export class MainController implements MainControllerInterface{
     //@auto-fold here
     loadMainDoc(data){
       this.mainDoc = Automerge.load(data)
+      console.log(this.mainDoc)
       this.previousDoc = this.mainDoc
       let contentContainer = document.querySelector(".contentContainer")
 
@@ -317,12 +325,20 @@ export class MainController implements MainControllerInterface{
     }
 
     renderDataToHTML(data:communicationDataStructure, arrayHTMLObject){
-        let newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+      let newHTMLObject
+      if (data.GNType=="GNButton"){
+          newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
+      } else {
+          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+      }
+
 
         newHTMLObject.applyStyle(data.stylesheet)
 
         arrayHTMLObject.appendChild(newHTMLObject)
         data.array.forEach(_data=>{
+            console.log(334, _data)
+
             this.renderDataToHTML(_data, newHTMLObject)
         })
 

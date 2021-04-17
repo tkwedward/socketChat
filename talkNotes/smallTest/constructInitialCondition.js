@@ -34,8 +34,9 @@ var MainController = /** @class */ (function () {
     function MainController() {
         this.initializeRootArray();
         this.initalizeMainDoc();
-        this.template = true;
-        if (!this.template) {
+        this.applyMainDocTemplate = false;
+        this.applyMainDocTemplate = true;
+        if (this.applyMainDocTemplate) {
             this.initializeHTMLBackground();
         }
         //
@@ -167,6 +168,8 @@ var MainController = /** @class */ (function () {
             }
         });
         htmlObject._identity = objectData._identity;
+        console.log(htmlObject, accessPointer);
+        console.log(190, htmlObject, accessPointer);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
@@ -250,6 +253,7 @@ var MainController = /** @class */ (function () {
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
         this.mainDoc = Automerge.load(data);
+        console.log(this.mainDoc);
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];
@@ -261,10 +265,17 @@ var MainController = /** @class */ (function () {
     };
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
-        var newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+        var newHTMLObject;
+        if (data.GNType == "GNButton") {
+            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
+        }
+        else {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+        }
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {
+            console.log(334, _data);
             _this.renderDataToHTML(_data, newHTMLObject);
         });
     };
