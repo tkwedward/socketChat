@@ -50,7 +50,6 @@ var MainController = /** @class */ (function () {
     };
     //@auto-fold here
     MainController.prototype.initializeHTMLBackground = function () {
-        var _this = this;
         // to create a controller
         document.body.style.display = "grid";
         document.body.style.gridTemplateColumns = "1fr 3fr";
@@ -76,7 +75,6 @@ var MainController = /** @class */ (function () {
         saveButton.innerHTML = "save";
         saveButton.addEventListener("click", function (e) {
             var s = exports.mainController.saveMainDoc();
-            console.log(_this.mainDoc);
             socketFunction_1.socket.emit("saveMainDocToDisk", s);
         });
         var loadButton = document.createElement("button");
@@ -150,11 +148,9 @@ var MainController = /** @class */ (function () {
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
         objectData._identity.linkArray.push(accessPointer);
-        // console.log(119, objectData, dataPointer)
         if (dataPointer) {
             objectData._identity.dataPointer = dataPointer;
         }
-        // console.log(1234, htmlObject._identity)
         // Step 3: put real data into the database
         //@auto-fold here
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -217,7 +213,6 @@ var MainController = /** @class */ (function () {
     //@auto-fold here
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
         var newData = htmlObject.extract();
-        console.log(268, newData, htmlObject);
         var dataPointer = htmlObject.getDataPointer();
         var accessPointer = htmlObject.getAccessPointer();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -225,7 +220,6 @@ var MainController = /** @class */ (function () {
             var accessPointerObject = Automerge.getObjectById(doc, accessPointer);
             Object.entries(newData.data).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
-                // console.log(193, key, value)
                 dataPointerObejct["data"][key] = value;
             });
             if (accessPointer != dataPointer) {
@@ -241,7 +235,6 @@ var MainController = /** @class */ (function () {
                 });
             }
         });
-        console.log(292, this.getObjectById(accessPointer).stylesheet);
     };
     //@auto-fold here
     MainController.prototype.getObjectById = function (objectID, doc) {
@@ -251,7 +244,6 @@ var MainController = /** @class */ (function () {
     };
     //@auto-fold here
     MainController.prototype.saveMainDoc = function () {
-        console.log(this.mainDoc);
         return Automerge.save(this.mainDoc);
     };
     //@auto-fold here
@@ -261,7 +253,6 @@ var MainController = /** @class */ (function () {
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];
-        console.log(rootArray);
         rootArray.forEach(function (mainArray) {
             mainArray["array"].forEach(function (elem) {
                 _this.renderDataToHTML(elem, contentContainer);
@@ -270,13 +261,10 @@ var MainController = /** @class */ (function () {
     };
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
-        console.log(284, this.GNDataStructureMapping);
-        console.log(this.mainDoc);
         var newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {
-            console.log(323, newHTMLObject);
             _this.renderDataToHTML(_data, newHTMLObject);
         });
     };

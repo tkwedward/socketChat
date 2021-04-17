@@ -66,7 +66,7 @@ if (mainController.template){
     document.body.appendChild(contentContainer)
 
 
-    function addApAndDpDiv(htmlObject){
+    function addAccessPointerAndDataPointerDiv(htmlObject){
       let containerInfo = document.createElement("div")
       containerInfo.innerHTML +=  "=========================<br>"
       let dpContainer = document.createElement("div")
@@ -87,26 +87,24 @@ if (mainController.template){
     }
 
 
-
-
     let bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId)
     bigFourContainer.appendTo(contentContainer)
 
-    let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
-    inpuField1.appendTo(bigFourContainer)
-    addApAndDpDiv(inpuField1)
+    let selectObject = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
+    selectObject.appendTo(bigFourContainer)
+    addAccessPointerAndDataPointerDiv(selectObject)
 
 
 
-    function createInputField(){
-      let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
-      inpuField2.appendTo(bigFourContainer)
-      addApAndDpDiv(inpuField2)
+    function createHTMLObject(){
+      let _object = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
+      _object.appendTo(bigFourContainer)
+      addAccessPointerAndDataPointerDiv(_object)
     }
 
     let number = 20
     for (let i = 0; i< number; i++){
-      createInputField()
+      createHTMLObject()
     }
 }
 

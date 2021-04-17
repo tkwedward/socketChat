@@ -113,7 +113,6 @@ export class MainController implements MainControllerInterface{
       saveButton.innerHTML = "save"
       saveButton.addEventListener("click", (e)=>{
           let s = mainController.saveMainDoc()
-          console.log(this.mainDoc)
           socket.emit("saveMainDocToDisk", s)
       })
       let loadButton = document.createElement("button")
@@ -198,12 +197,9 @@ export class MainController implements MainControllerInterface{
         objectData._identity.accessPointer = accessPointer
         objectData._identity.dataPointer = accessPointer
         objectData._identity.linkArray.push(accessPointer)
-        // console.log(119, objectData, dataPointer)
         if (dataPointer){
             objectData._identity.dataPointer = dataPointer
         }
-
-        // console.log(1234, htmlObject._identity)
 
         // Step 3: put real data into the database
         //@auto-fold here
@@ -270,7 +266,6 @@ export class MainController implements MainControllerInterface{
     //@auto-fold here
     saveHTMLObjectToDatabase(htmlObject:GNObjectInterface){
         let newData = htmlObject.extract()
-        console.log(268, newData, htmlObject)
         let dataPointer = htmlObject.getDataPointer()
         let accessPointer = htmlObject.getAccessPointer()
 
@@ -279,7 +274,6 @@ export class MainController implements MainControllerInterface{
             let accessPointerObject = Automerge.getObjectById(doc, accessPointer)
 
             Object.entries(newData.data).forEach(([key, value], _)=>{
-                // console.log(193, key, value)
                 dataPointerObejct["data"][key] = value
             })
 
@@ -294,7 +288,6 @@ export class MainController implements MainControllerInterface{
                 })
             }
         })
-        console.log(292, this.getObjectById(accessPointer).stylesheet)
 
     }
 
@@ -306,7 +299,6 @@ export class MainController implements MainControllerInterface{
 
     //@auto-fold here
     saveMainDoc(){
-      console.log(this.mainDoc)
       return Automerge.save(this.mainDoc)
     }
 
@@ -317,7 +309,6 @@ export class MainController implements MainControllerInterface{
       let contentContainer = document.querySelector(".contentContainer")
 
       let rootArray = this.mainDoc["array"]
-      console.log(rootArray)
       rootArray.forEach(mainArray=>{
           mainArray["array"].forEach(elem=>{
               this.renderDataToHTML(elem, contentContainer)
@@ -326,24 +317,18 @@ export class MainController implements MainControllerInterface{
     }
 
     renderDataToHTML(data:communicationDataStructure, arrayHTMLObject){
-        console.log(284, this.GNDataStructureMapping)
-        console.log(this.mainDoc)
         let newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
 
         newHTMLObject.applyStyle(data.stylesheet)
 
         arrayHTMLObject.appendChild(newHTMLObject)
         data.array.forEach(_data=>{
-            console.log(323, newHTMLObject)
             this.renderDataToHTML(_data, newHTMLObject)
         })
 
 
     }
 }
-// import {mainController} from "./newClassTest"
-// console.log(4, mainController)
-
 
 export var mainController:MainControllerInterface
 mainController = new MainController()

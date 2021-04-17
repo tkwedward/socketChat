@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
+exports.GNTemplate = exports.GNDropdownList = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
 //@auto-fold here
 function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
@@ -19,14 +19,15 @@ function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase
 }
 exports.GNInputField = GNInputField;
 //@auto-fold here
-function GNButton(_name, statusList, event, _parent) {
+function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
     var _object = document.createElement("button");
     _object._name = _name;
     _object._type = GNButton.name;
     _object.statusList = statusList;
     _object._dataStructure = ["innerText"];
     _object.innerHTML = statusList[0];
-    _object.event = event;
+    // _object.event = event
     // functions
     _object.loadFromData = function (data) { _object.innerHTML = data; };
     _object.extract = function () { return _object.createDataObject(); };
@@ -154,6 +155,28 @@ function GNDivPage(_name, _parent) {
     return _object;
 }
 exports.GNDivPage = GNDivPage;
+//@auto-fold here
+function GNDropdownList(_name, selectList, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var _object = document.createElement("select");
+    selectList.forEach(function (p) {
+        var option = document.createElement("option");
+        option.value = p;
+        option.innerText = p;
+        _object.appendChild(option);
+    });
+    _object._name = _name;
+    _object._type = GNDropdownList.name;
+    _object._dataStructure = ["value"];
+    _object.extract = function () {
+        var _dummyData = _object.createDataObject();
+        return _dummyData;
+    };
+    // add extra funcitons to the object
+    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
+    return _object;
+}
+exports.GNDropdownList = GNDropdownList;
 function GNTemplate(_name, _parent) {
     var _object = document.createElement("div");
     // internal properties
@@ -208,7 +231,6 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     };
     _object.saveHTMLObjectToDatabase = function () {
         constructInitialCondition_1.mainController.saveHTMLObjectToDatabase(_object);
-        console.log(constructInitialCondition_1.mainController.mainDoc);
     };
     /** to apply stylesheet to an element */
     _object.applyStyle = function (stylesheet, stylechoice) {
@@ -238,13 +260,10 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
             var accessPointer = _object.getAccessPointer();
             var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
             var linkArray = masterObject._identity.linkArray;
-            // let dataObject = masterObject.data
             var dataObject = _object.extract()["data"];
-            // console.log(192, linkArray, dataObject)
             linkArray.forEach(function (p) {
                 linkArrayInfo.innerHTML += p + "</br>";
                 var targetHTML = document.querySelector("*[accesspointer='" + p + "']");
-                console.log(389, dataObject, targetHTML);
                 if (p != accessPointer) {
                     targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
                 }

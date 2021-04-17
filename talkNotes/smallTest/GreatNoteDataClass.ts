@@ -79,7 +79,7 @@ export interface GNButtonInterface extends HTMLButtonElement, GNObjectInterface 
     event(e)
 }
 //@auto-fold here
-export function GNButton(_name:string, statusList: string[], event:(any)=>void, _parent?:any):GNButtonInterface{
+export function GNButton(_name:string, statusList: string[],arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true):GNButtonInterface{
     let _object = <GNButtonInterface> document.createElement("button");
 
     _object._name = _name
@@ -87,7 +87,7 @@ export function GNButton(_name:string, statusList: string[], event:(any)=>void, 
     _object.statusList = statusList
     _object._dataStructure = ["innerText"]
     _object.innerHTML = statusList[0]
-    _object.event = event
+    // _object.event = event
 
     // functions
     _object.loadFromData = (data) => { _object.innerHTML = data }
@@ -268,9 +268,36 @@ export function GNDivPage(_name:string, _parent?:any) : GNPageInterface {
 }
 
 //@auto-fold here
-export interface GNDropdownListInterface extends GNObjectInterface{
+export interface GNDropdownListInterface extends GNObjectInterface, HTMLSelectElement{
 
 }
+
+//@auto-fold here
+export function GNDropdownList(_name:string, selectList: string[],arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true) : GNDropdownListInterface {
+    let _object = <GNDropdownListInterface> document.createElement("select")
+
+    selectList.forEach(p=>{
+        let option = document.createElement("option")
+        option.value = p
+        option.innerText = p
+        _object.appendChild(option)
+    })
+
+    _object._name = _name
+    _object._type = GNDropdownList.name
+    _object._dataStructure = ["value"]
+
+    _object.extract = () => {
+      let _dummyData = _object.createDataObject()
+      return _dummyData
+    }
+
+    // add extra funcitons to the object
+    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input")
+
+    return _object
+}
+
 
 //@auto-fold here
 export interface GNTemplateInterface extends GNObjectInterface, HTMLImageElement {
@@ -351,7 +378,6 @@ function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPo
 
     _object.saveHTMLObjectToDatabase = function(){
         mainController.saveHTMLObjectToDatabase(_object)
-        console.log(mainController.mainDoc)
     }
 
     /** to apply stylesheet to an element */
@@ -381,15 +407,12 @@ function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPo
             let accessPointer = _object.getAccessPointer()
             let masterObject = mainController.getObjectById(dataPointer)
             let linkArray = masterObject._identity.linkArray
-            // let dataObject = masterObject.data
             let dataObject = _object.extract()["data"]
-            // console.log(192, linkArray, dataObject)
 
             linkArray.forEach(p=>{
 
                 linkArrayInfo.innerHTML += p + "</br>"
                 let targetHTML = document.querySelector(`*[accesspointer='${p}']`)
-                console.log(389, dataObject, targetHTML)
 
                 if (p!= accessPointer){
                     targetHTML?.loadFromData(dataObject)

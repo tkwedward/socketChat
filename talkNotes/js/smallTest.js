@@ -20092,7 +20092,7 @@ exports.GNTemplate = GNTemplate;
 },{"./GreatNoteDataClass":44}],44:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
-exports.GNTemplate = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
+exports.GNTemplate = exports.GNDropdownList = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
 //@auto-fold here
 function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
@@ -20111,14 +20111,15 @@ function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase
 }
 exports.GNInputField = GNInputField;
 //@auto-fold here
-function GNButton(_name, statusList, event, _parent) {
+function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
     var _object = document.createElement("button");
     _object._name = _name;
     _object._type = GNButton.name;
     _object.statusList = statusList;
     _object._dataStructure = ["innerText"];
     _object.innerHTML = statusList[0];
-    _object.event = event;
+    // _object.event = event
     // functions
     _object.loadFromData = function (data) { _object.innerHTML = data; };
     _object.extract = function () { return _object.createDataObject(); };
@@ -20246,6 +20247,28 @@ function GNDivPage(_name, _parent) {
     return _object;
 }
 exports.GNDivPage = GNDivPage;
+//@auto-fold here
+function GNDropdownList(_name, selectList, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var _object = document.createElement("select");
+    selectList.forEach(function (p) {
+        var option = document.createElement("option");
+        option.value = p;
+        option.innerText = p;
+        _object.appendChild(option);
+    });
+    _object._name = _name;
+    _object._type = GNDropdownList.name;
+    _object._dataStructure = ["value"];
+    _object.extract = function () {
+        var _dummyData = _object.createDataObject();
+        return _dummyData;
+    };
+    // add extra funcitons to the object
+    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
+    return _object;
+}
+exports.GNDropdownList = GNDropdownList;
 function GNTemplate(_name, _parent) {
     var _object = document.createElement("div");
     // internal properties
@@ -20300,7 +20323,6 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     };
     _object.saveHTMLObjectToDatabase = function () {
         constructInitialCondition_1.mainController.saveHTMLObjectToDatabase(_object);
-        console.log(constructInitialCondition_1.mainController.mainDoc);
     };
     /** to apply stylesheet to an element */
     _object.applyStyle = function (stylesheet, stylechoice) {
@@ -20330,13 +20352,10 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
             var accessPointer = _object.getAccessPointer();
             var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
             var linkArray = masterObject._identity.linkArray;
-            // let dataObject = masterObject.data
             var dataObject = _object.extract()["data"];
-            // console.log(192, linkArray, dataObject)
             linkArray.forEach(function (p) {
                 linkArrayInfo.innerHTML += p + "</br>";
                 var targetHTML = document.querySelector("*[accesspointer='" + p + "']");
-                console.log(389, dataObject, targetHTML);
                 if (p != accessPointer) {
                     targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
                 }
@@ -20443,7 +20462,6 @@ var MainController = /** @class */ (function () {
     };
     //@auto-fold here
     MainController.prototype.initializeHTMLBackground = function () {
-        var _this = this;
         // to create a controller
         document.body.style.display = "grid";
         document.body.style.gridTemplateColumns = "1fr 3fr";
@@ -20469,7 +20487,6 @@ var MainController = /** @class */ (function () {
         saveButton.innerHTML = "save";
         saveButton.addEventListener("click", function (e) {
             var s = exports.mainController.saveMainDoc();
-            console.log(_this.mainDoc);
             socketFunction_1.socket.emit("saveMainDocToDisk", s);
         });
         var loadButton = document.createElement("button");
@@ -20543,11 +20560,9 @@ var MainController = /** @class */ (function () {
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
         objectData._identity.linkArray.push(accessPointer);
-        // console.log(119, objectData, dataPointer)
         if (dataPointer) {
             objectData._identity.dataPointer = dataPointer;
         }
-        // console.log(1234, htmlObject._identity)
         // Step 3: put real data into the database
         //@auto-fold here
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -20610,7 +20625,6 @@ var MainController = /** @class */ (function () {
     //@auto-fold here
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
         var newData = htmlObject.extract();
-        console.log(268, newData, htmlObject);
         var dataPointer = htmlObject.getDataPointer();
         var accessPointer = htmlObject.getAccessPointer();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -20618,7 +20632,6 @@ var MainController = /** @class */ (function () {
             var accessPointerObject = Automerge.getObjectById(doc, accessPointer);
             Object.entries(newData.data).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
-                // console.log(193, key, value)
                 dataPointerObejct["data"][key] = value;
             });
             if (accessPointer != dataPointer) {
@@ -20634,7 +20647,6 @@ var MainController = /** @class */ (function () {
                 });
             }
         });
-        console.log(292, this.getObjectById(accessPointer).stylesheet);
     };
     //@auto-fold here
     MainController.prototype.getObjectById = function (objectID, doc) {
@@ -20644,7 +20656,6 @@ var MainController = /** @class */ (function () {
     };
     //@auto-fold here
     MainController.prototype.saveMainDoc = function () {
-        console.log(this.mainDoc);
         return Automerge.save(this.mainDoc);
     };
     //@auto-fold here
@@ -20654,7 +20665,6 @@ var MainController = /** @class */ (function () {
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];
-        console.log(rootArray);
         rootArray.forEach(function (mainArray) {
             mainArray["array"].forEach(function (elem) {
                 _this.renderDataToHTML(elem, contentContainer);
@@ -20663,13 +20673,10 @@ var MainController = /** @class */ (function () {
     };
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
-        console.log(284, this.GNDataStructureMapping);
-        console.log(this.mainDoc);
         var newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {
-            console.log(323, newHTMLObject);
             _this.renderDataToHTML(_data, newHTMLObject);
         });
     };
@@ -20903,7 +20910,7 @@ if (constructInitialCondition_1.mainController.template) {
     var contentContainer = document.createElement("div");
     contentContainer.classList.add("contentContainer");
     document.body.appendChild(contentContainer);
-    function addApAndDpDiv(htmlObject) {
+    function addAccessPointerAndDataPointerDiv(htmlObject) {
         var containerInfo = document.createElement("div");
         containerInfo.innerHTML += "=========================<br>";
         var dpContainer = document.createElement("div");
@@ -20921,17 +20928,17 @@ if (constructInitialCondition_1.mainController.template) {
     }
     var bigFourContainer_1 = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId);
     bigFourContainer_1.appendTo(contentContainer);
-    var inpuField1_1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer_1.getAccessPointer());
-    inpuField1_1.appendTo(bigFourContainer_1);
-    addApAndDpDiv(inpuField1_1);
-    function createInputField() {
-        var inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer_1.getAccessPointer(), false, inpuField1_1.getDataPointer());
-        inpuField2.appendTo(bigFourContainer_1);
-        addApAndDpDiv(inpuField2);
+    var selectObject_1 = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer());
+    selectObject_1.appendTo(bigFourContainer_1);
+    addAccessPointerAndDataPointerDiv(selectObject_1);
+    function createHTMLObject() {
+        var _object = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer(), false, selectObject_1.getDataPointer());
+        _object.appendTo(bigFourContainer_1);
+        addAccessPointerAndDataPointerDiv(_object);
     }
     var number = 20;
     for (var i = 0; i < number; i++) {
-        createInputField();
+        createHTMLObject();
     }
 }
 // let firstContainer
