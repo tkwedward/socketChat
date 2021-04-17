@@ -27,15 +27,23 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     _object.statusList = statusList;
     _object._dataStructure = ["innerText"];
     _object.innerHTML = statusList[0];
-    // _object.event = event
     // functions
     _object.loadFromData = function (data) { _object.innerHTML = data; };
     _object.extract = function () { return _object.createDataObject(); };
+    _object.addClickEvent = function (clickFunction) {
+        _object.addEventListener("click", function (e) {
+            clickFunction(_object);
+        });
+    };
     // a user define array
-    _object.addEventListener("click", _object.event);
     _object.addEventListener("click", function () {
         var newData = _object.extract();
         return newData;
+    });
+    _object.addEventListener("changeStatusEvent", function (e) {
+        console.log(111, "click event triggered");
+        _object.saveHTMLObjectToDatabase();
+        _object.updateLinkObject();
     });
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
@@ -250,24 +258,37 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         }
         _object.saveHTMLObjectToDatabase();
     };
+    _object.updateLinkObject = function () {
+        var dataPointer = _object.getDataPointer();
+        var accessPointer = _object.getAccessPointer();
+        var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
+        var linkArray = masterObject._identity.linkArray;
+        var dataObject = _object.extract()["data"];
+        linkArray.forEach(function (p) {
+            var targetHTML = document.querySelector("*[accesspointer='" + p + "']");
+            if (p != accessPointer) {
+                targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
+            }
+        });
+    };
     _object.editEvent = function (eventName) {
         //@auto-fold here
         _object.addEventListener(eventName, function (e) {
             _object.saveHTMLObjectToDatabase();
-            var linkArrayInfo = document.querySelector(".linkArrayInfo");
-            linkArrayInfo.innerHTML = "";
             var dataPointer = _object.getDataPointer();
             var accessPointer = _object.getAccessPointer();
             var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
             var linkArray = masterObject._identity.linkArray;
             var dataObject = _object.extract()["data"];
+            var linkArrayInfo = document.querySelector(".linkArrayInfo");
+            linkArrayInfo.innerHTML = "";
             linkArray.forEach(function (p) {
                 linkArrayInfo.innerHTML += p + "</br>";
                 var targetHTML = document.querySelector("*[accesspointer='" + p + "']");
                 if (p != accessPointer) {
                     targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
                 }
-            });
+            }); // linkArray for
         }); //addEventListener
     };
     _object.reloadDataFromDatabase = function () {

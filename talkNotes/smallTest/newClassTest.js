@@ -92,11 +92,21 @@ if (constructInitialCondition_1.mainController.template) {
     }
     var bigFourContainer_1 = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId);
     bigFourContainer_1.appendTo(contentContainer);
-    var selectObject_1 = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer());
+    var clickEvent_1 = function (_object) {
+        var triggerEvent = new Event("changeStatusEvent");
+        var currentIndex = _object.statusList.indexOf(_object.innerText);
+        var nextIndex = (currentIndex + 1) % _object.statusList.length;
+        _object.innerText = _object.statusList[nextIndex];
+        console.log(98, _object, _object.statusList, currentIndex);
+        _object.dispatchEvent(triggerEvent);
+    };
+    var selectObject_1 = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer());
+    selectObject_1.addClickEvent(clickEvent_1);
     selectObject_1.appendTo(bigFourContainer_1);
     addAccessPointerAndDataPointerDiv(selectObject_1);
     function createHTMLObject() {
-        var _object = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer(), false, selectObject_1.getDataPointer());
+        var _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer(), false, selectObject_1.getDataPointer());
+        _object.addClickEvent(clickEvent_1);
         _object.appendTo(bigFourContainer_1);
         addAccessPointerAndDataPointerDiv(_object);
     }

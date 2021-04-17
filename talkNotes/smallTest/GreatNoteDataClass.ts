@@ -31,6 +31,7 @@ export interface GNObjectInterface {
     setAccessPointer():string
     getDataFromDataBase():any
     editEvent(eventName:string)
+    updateLinkObject()
 
     getLinkArray():any
     reloadDataFromDatabase()
@@ -76,10 +77,12 @@ export interface GNButtonInterface extends HTMLButtonElement, GNObjectInterface 
     _parent?: any
     status: any
     statusList: string[]
+    addClickEvent(clickFunction)
+    clickEvent(e)
     event(e)
 }
 //@auto-fold here
-export function GNButton(_name:string, statusList: string[],arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true):GNButtonInterface{
+export function GNButton(_name:string, statusList: string[], arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true):GNButtonInterface{
     let _object = <GNButtonInterface> document.createElement("button");
 
     _object._name = _name
@@ -87,17 +90,28 @@ export function GNButton(_name:string, statusList: string[],arrayID: string, ins
     _object.statusList = statusList
     _object._dataStructure = ["innerText"]
     _object.innerHTML = statusList[0]
-    // _object.event = event
+
 
     // functions
     _object.loadFromData = (data) => { _object.innerHTML = data }
     _object.extract = () => _object.createDataObject()
-
+    _object.addClickEvent = function(clickFunction){
+        _object.addEventListener("click", (e)=>{
+            clickFunction(_object)
+        })
+    }
     // a user define array
-    _object.addEventListener("click", _object.event)
+
     _object.addEventListener("click", ()=>{
       let newData = _object.extract()
       return newData
+    })
+
+    _object.addEventListener("changeStatusEvent", (e)=>{
+        console.log(111, "click event triggered")
+        _object.saveHTMLObjectToDatabase()
+        _object.updateLinkObject()
+
     })
 
     // add extra funcitons to the object
@@ -395,13 +409,26 @@ function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPo
       _object.saveHTMLObjectToDatabase()
     }
 
+    _object.updateLinkObject = function(){
+        let dataPointer = _object.getDataPointer()
+        let accessPointer = _object.getAccessPointer()
+        let masterObject = mainController.getObjectById(dataPointer)
+        let linkArray = masterObject._identity.linkArray
+        let dataObject = _object.extract()["data"]
+
+        linkArray.forEach(p=>{
+            let targetHTML = document.querySelector(`*[accesspointer='${p}']`)
+
+            if (p!= accessPointer){
+                targetHTML?.loadFromData(dataObject)
+            }
+        })
+    }
+
     _object.editEvent = function(eventName:string){
         //@auto-fold here
         _object.addEventListener(eventName, (e)=>{
             _object.saveHTMLObjectToDatabase()
-
-            let linkArrayInfo  = document.querySelector(".linkArrayInfo")
-            linkArrayInfo.innerHTML = ""
 
             let dataPointer = _object.getDataPointer()
             let accessPointer = _object.getAccessPointer()
@@ -409,19 +436,18 @@ function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPo
             let linkArray = masterObject._identity.linkArray
             let dataObject = _object.extract()["data"]
 
+            let linkArrayInfo  = document.querySelector(".linkArrayInfo")
+            linkArrayInfo.innerHTML = ""
             linkArray.forEach(p=>{
-
                 linkArrayInfo.innerHTML += p + "</br>"
                 let targetHTML = document.querySelector(`*[accesspointer='${p}']`)
 
                 if (p!= accessPointer){
                     targetHTML?.loadFromData(dataObject)
                 }
-            })
+            })// linkArray for
         })//addEventListener
     }
-
-
 
 
     _object.reloadDataFromDatabase = function(){

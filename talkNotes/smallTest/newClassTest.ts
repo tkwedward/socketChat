@@ -90,14 +90,25 @@ if (mainController.template){
     let bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId)
     bigFourContainer.appendTo(contentContainer)
 
-    let selectObject = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
+
+    let clickEvent = function(_object){
+        let triggerEvent = new Event("changeStatusEvent")
+        let currentIndex = _object.statusList.indexOf(_object.innerText)
+        let nextIndex = (currentIndex + 1) % _object.statusList.length
+        _object.innerText = _object.statusList[nextIndex]
+        console.log(98, _object, _object.statusList, currentIndex)
+
+        _object.dispatchEvent(triggerEvent)
+    }
+
+    let selectObject = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
+    selectObject.addClickEvent(clickEvent)
     selectObject.appendTo(bigFourContainer)
     addAccessPointerAndDataPointerDiv(selectObject)
 
-
-
     function createHTMLObject(){
-      let _object = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
+      let _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
+      _object.addClickEvent(clickEvent)
       _object.appendTo(bigFourContainer)
       addAccessPointerAndDataPointerDiv(_object)
     }

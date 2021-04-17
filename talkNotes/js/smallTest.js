@@ -20119,15 +20119,23 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     _object.statusList = statusList;
     _object._dataStructure = ["innerText"];
     _object.innerHTML = statusList[0];
-    // _object.event = event
     // functions
     _object.loadFromData = function (data) { _object.innerHTML = data; };
     _object.extract = function () { return _object.createDataObject(); };
+    _object.addClickEvent = function (clickFunction) {
+        _object.addEventListener("click", function (e) {
+            clickFunction(_object);
+        });
+    };
     // a user define array
-    _object.addEventListener("click", _object.event);
     _object.addEventListener("click", function () {
         var newData = _object.extract();
         return newData;
+    });
+    _object.addEventListener("changeStatusEvent", function (e) {
+        console.log(111, "click event triggered");
+        _object.saveHTMLObjectToDatabase();
+        _object.updateLinkObject();
     });
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
@@ -20342,24 +20350,37 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         }
         _object.saveHTMLObjectToDatabase();
     };
+    _object.updateLinkObject = function () {
+        var dataPointer = _object.getDataPointer();
+        var accessPointer = _object.getAccessPointer();
+        var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
+        var linkArray = masterObject._identity.linkArray;
+        var dataObject = _object.extract()["data"];
+        linkArray.forEach(function (p) {
+            var targetHTML = document.querySelector("*[accesspointer='" + p + "']");
+            if (p != accessPointer) {
+                targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
+            }
+        });
+    };
     _object.editEvent = function (eventName) {
         //@auto-fold here
         _object.addEventListener(eventName, function (e) {
             _object.saveHTMLObjectToDatabase();
-            var linkArrayInfo = document.querySelector(".linkArrayInfo");
-            linkArrayInfo.innerHTML = "";
             var dataPointer = _object.getDataPointer();
             var accessPointer = _object.getAccessPointer();
             var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
             var linkArray = masterObject._identity.linkArray;
             var dataObject = _object.extract()["data"];
+            var linkArrayInfo = document.querySelector(".linkArrayInfo");
+            linkArrayInfo.innerHTML = "";
             linkArray.forEach(function (p) {
                 linkArrayInfo.innerHTML += p + "</br>";
                 var targetHTML = document.querySelector("*[accesspointer='" + p + "']");
                 if (p != accessPointer) {
                     targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
                 }
-            });
+            }); // linkArray for
         }); //addEventListener
     };
     _object.reloadDataFromDatabase = function () {
@@ -20928,11 +20949,21 @@ if (constructInitialCondition_1.mainController.template) {
     }
     var bigFourContainer_1 = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId);
     bigFourContainer_1.appendTo(contentContainer);
-    var selectObject_1 = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer());
+    var clickEvent_1 = function (_object) {
+        var triggerEvent = new Event("changeStatusEvent");
+        var currentIndex = _object.statusList.indexOf(_object.innerText);
+        var nextIndex = (currentIndex + 1) % _object.statusList.length;
+        _object.innerText = _object.statusList[nextIndex];
+        console.log(98, _object, _object.statusList, currentIndex);
+        _object.dispatchEvent(triggerEvent);
+    };
+    var selectObject_1 = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer());
+    selectObject_1.addClickEvent(clickEvent_1);
     selectObject_1.appendTo(bigFourContainer_1);
     addAccessPointerAndDataPointerDiv(selectObject_1);
     function createHTMLObject() {
-        var _object = GreatNoteDataClass.GNDropdownList("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer(), false, selectObject_1.getDataPointer());
+        var _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer_1.getAccessPointer(), false, selectObject_1.getDataPointer());
+        _object.addClickEvent(clickEvent_1);
         _object.appendTo(bigFourContainer_1);
         addAccessPointerAndDataPointerDiv(_object);
     }
