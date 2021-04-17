@@ -364,7 +364,6 @@ function superGNObject(_object){
     }
 
     _object.loadFromData = (data) => {
-        console.log(370, data, _object)
         _object._dataStructure.forEach(key=>{
             _object[key] = data[key]
         })
@@ -374,7 +373,6 @@ function superGNObject(_object){
 
     _object.saveHTMLObjectToDatabase = function(){
         mainController.saveHTMLObjectToDatabase(_object)
-        console.log(_object.getDataFromDataBase(), _object)
     }
 
     /** to apply stylesheet to an element */

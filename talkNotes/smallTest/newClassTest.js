@@ -64,12 +64,10 @@ linkArrayInfo.classList.add("linkArrayInfo");
 controller.appendChild(linkArrayInfo);
 var firstContainer;
 var bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId);
-console.log(63, bigFourContainer.getAccessPointer);
 document.body.appendChild(bigFourContainer);
 Object.entries(constructInitialCondition_1.mainController.mainDocArray).forEach(function (_a, index) {
     var arrayName = _a[0], accessPointer = _a[1];
     // let container =
-    console.log(74, firstContainer === null || firstContainer === void 0 ? void 0 : firstContainer.getDataPointer());
     // if ()
     var containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer === null || firstContainer === void 0 ? void 0 : firstContainer.getDataPointer());
     if (index == 0) {

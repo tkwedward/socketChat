@@ -15447,14 +15447,12 @@ function superGNObject(_object) {
         _object.setAttribute("accessPointer", _object.getAccessPointer());
     };
     _object.loadFromData = function (data) {
-        console.log(370, data, _object);
         _object._dataStructure.forEach(function (key) {
             _object[key] = data[key];
         });
     };
     _object.saveHTMLObjectToDatabase = function () {
         constructInitialCondition_1.mainController.saveHTMLObjectToDatabase(_object);
-        console.log(_object.getDataFromDataBase(), _object);
     };
     /** to apply stylesheet to an element */
     _object.applyStyle = function (styleList, stylechoice) {
@@ -15509,164 +15507,8 @@ function superGNObject(_object) {
 }
 
 },{"./constructInitialCondition":5}],4:[function(require,module,exports){
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-exports.__esModule = true;
-var Automerge = __importStar(require("automerge"));
-var DatabaseHelperFunction = __importStar(require("./databaseHelperFunction"));
-var f = Automerge.init();
-f = Automerge.change(f, function (doc) {
-    doc["page"] = [];
-    doc["bookmark"] = [];
-    // doc["page"].push([
-    //   {"name": "page", "number": 123},
-    //   {"name": "Queen", "number": 430},
-    // ])
-    doc["page"].push({ "name": "Jack", "number": 430 });
-    doc["page"].push({ "name": "Rashida", "number": 510 });
-    doc["page"].push({ "name": "Kotaro", "number": 250 });
-    doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
-});
-var MainController = /** @class */ (function () {
-    function MainController() {
-        this.mainDoc = Automerge.init();
-        this.mainDoc = Automerge.change(f, function (doc) {
-            doc["page"] = [];
-            doc["bookmark"] = [];
-            // doc["page"].push([
-            //   {"name": "page", "number": 123},
-            //   {"name": "Queen", "number": 430},
-            // ])
-            doc["page"].push({ "name": "Jack", "number": 430 });
-            doc["page"].push({ "name": "Rashida", "number": 510 });
-            doc["page"].push({ "name": "Kotaro", "number": 250 });
-            doc["page"].push({ "friend": ["Dio", { "joan": "Chris" }] });
-        });
-        this.arrayID = {
-            "page": Automerge.getObjectId(this.mainDoc.page),
-            "bookmark": Automerge.getObjectId(this.mainDoc.bookmark)
-        };
-        console.log(this.mainDoc);
-    }
-    return MainController;
-}());
-var mainController = new MainController();
-exports["default"] = mainController;
-var masterObjectSoul = {
-    "identity": {
-        "accessPointer": Automerge.getObjectId(mainController.mainDoc.page[1]),
-        "dataPointer": Automerge.getObjectId(mainController.mainDoc.page[1])
-    }
-};
-function applyCSS(htmlObject, stylesheet) {
-    Object.entries(stylesheet).forEach(function (_a, index) {
-        var key = _a[0], value = _a[1];
-        htmlObject.style[key] = value;
-    });
-}
-var masterObjectData = {
-    "name": "s",
-    "identity": {},
-    "linkObjectArray": [],
-    "stylesheet": {
-        "width": "50%",
-        "height": "200px",
-        "background": "grey",
-        "margin": "5px"
-    }
-};
-/** a color input */
-function colorControllerCreater(controlledObject) {
-    var colorArray = ["red", "blue", "green"];
-    var colorInput = document.createElement("select");
-    colorArray.forEach(function (p) {
-        var option = document.createElement("option");
-        option.value = p;
-        option.innerHTML = p;
-        colorInput.append(option);
-    });
-    colorInput.addEventListener("change", function (e) {
-        controlledObject.style.background = colorInput.value;
-        // access the linkObjectArray
-        var masterObjectID = controlledObject.soul.identity.dataPointer;
-        var masterObjectData = Automerge.getObjectById(mainController.mainDoc, masterObjectID);
-        var linkObjectArray = masterObjectData["linkObjectArray"];
-        var stylesheet = masterObjectData["stylesheet"];
-        stylesheet.background = colorInput.value;
-        linkObjectArray.forEach(function (p) {
-            var targetObject = document.querySelector("*[accessPointer='" + p + "']");
-            if (targetObject) {
-                Object.entries(stylesheet).forEach(function (_a, index) {
-                    var key = _a[0], value = _a[1];
-                    console.log(115, targetObject, targetObject.style[key]);
-                    targetObject.style[key] = value;
-                });
-            }
-        });
-        // controlledObject
-    });
-    return colorInput;
-}
-var masterObject = document.createElement("div");
-applyCSS(masterObject, masterObjectData["stylesheet"]);
-masterObject.soul = masterObjectSoul;
-DatabaseHelperFunction.createNewItem(masterObject, masterObjectData, mainController["arrayID"]["page"]);
-var masterObejctContainer = document.createElement("div");
-masterObejctContainer.style.display = "grid";
-masterObejctContainer.style.gridTemplateColumns = "1fr 1fr";
-var controllerContainer = document.createElement("div");
-var colorInput = colorControllerCreater(masterObject);
-controllerContainer.append(colorInput);
-masterObejctContainer.append(masterObject);
-masterObejctContainer.append(controllerContainer);
-var linkObjectSoul = {
-    "identity": {}
-};
-var createLinkObjectButton = document.createElement("button");
-createLinkObjectButton.innerText = "createLinkObjectButton";
-createLinkObjectButton.addEventListener("click", function (e) {
-    var linkObject = document.createElement("div");
-    linkObject.classList.add("linkObject");
-    linkObject.soul = linkObjectSoul;
-    DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul);
-    // [_, mainController.mainDoc] = DatabaseHelperFunction.createLinkObject(linkObject, mainController["arrayID"]["bookmark"], masterObject.soul)
-    var masterObjectData = DatabaseHelperFunction.accessDataFromDatabase(masterObject.soul.identity.dataPointer);
-    Object.entries(masterObjectData["stylesheet"]).forEach(function (_a, index) {
-        var key = _a[0], value = _a[1];
-        return linkObject.style[key] = value;
-    });
-    console.log(masterObjectData);
-    // create a container to hold the data
-    var linkObjectContainer = document.createElement("div");
-    linkObjectContainer.style.display = "grid";
-    linkObjectContainer.style.gridTemplateColumns = "1fr 1fr";
-    var controllerContainer = document.createElement("div");
-    var colorInput = colorControllerCreater(linkObject);
-    controllerContainer.append(colorInput);
-    linkObjectContainer.append(linkObject, controllerContainer);
-    document.body.append(linkObjectContainer);
-});
-// document.body.append(masterObejctContainer, createLinkObjectButton)
 
-},{"./databaseHelperFunction":6,"automerge":1}],5:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -15763,7 +15605,7 @@ var MainController = /** @class */ (function () {
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
         objectData._identity.linkArray.push(accessPointer);
-        console.log(119, objectData, dataPointer);
+        // console.log(119, objectData, dataPointer)
         if (dataPointer) {
             objectData._identity.dataPointer = dataPointer;
         }
@@ -15776,7 +15618,6 @@ var MainController = /** @class */ (function () {
                 var key = _a[0], value = _a[1];
                 objectInDatabase[key] = value;
             });
-            console.log(133, dataPointer);
             // update the masterobject if it is a link object
             if (dataPointer) {
                 var masterObject = _this.getObjectById(dataPointer, doc);
@@ -15784,7 +15625,6 @@ var MainController = /** @class */ (function () {
             }
         });
         htmlObject._identity = objectData._identity;
-        console.log(122, htmlObject._identity);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
@@ -15851,184 +15691,8 @@ exports.MainController = MainController;
 exports.mainController = new MainController();
 
 },{"automerge":1}],6:[function(require,module,exports){
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-exports.createLinkObject = exports.createNewItem = exports.addOjectToArrayInDataBase = exports.accessDataFromDatabase = exports.exchangeObjects = exports.traceObjectLocation = void 0;
-var Automerge = __importStar(require("automerge"));
-// declare var mainController: any;
-var board_1 = __importDefault(require("./board"));
-function getObjectbyId(id, doc) {
-    if (doc === void 0) { doc = board_1["default"].mainDoc; }
-    return Automerge.getObjectById(doc, id);
-}
-/** A function to trace the location of an object*/
-function traceObjectLocation(leafID, doc) {
-    // [0: Symbol(_conflicts), 1: Symbol(_objectId), 2: Symbol(_options), 3: Symbol(_cache), 4: Symbol(_inbound), 5: Symbol(_state)]
-    if (doc === void 0) { doc = board_1["default"].mainDoc; }
-    var symbolArray = Object.getOwnPropertySymbols(doc);
-    var inboundSymbol = symbolArray[4];
-    //
-    //
-    // console.log(9, getObjectbyId(leafID), mainController.mainDoc[inboundSymbol])
-}
-exports.traceObjectLocation = traceObjectLocation;
-function copyObjectHelper(value) {
-    // to copy the data in an object to a new object
-    if (Array.isArray(value)) {
-        var newArray = value.map(function (p) { return copyObjectHelper(p); });
-        return newArray;
-    }
-    else if (value === Object(value)) {
-        var newObject_1 = {};
-        Object.entries(value).forEach(function (_a, index) {
-            var _key = _a[0], _value = _a[1];
-            newObject_1[_key] = copyObjectHelper(_value);
-        });
-        return newObject_1;
-    }
-    else {
-        return value;
-    }
-}
-/** to copy an object stored in database to a normal object!*/
-function copyObject(targetObject) {
-    // to copy the data in an object to a new object
-    var new_oo = {};
-    Object.entries(targetObject).forEach(function (_a, index) {
-        var key = _a[0], value = _a[1];
-        new_oo[key] = copyObjectHelper(value);
-    });
-    return new_oo;
-}
-/** to exchnage the position of two items in an array*/
-function exchangeObjects(objectID1, objectID2) {
-    f = Automerge.change(f, function (doc) {
-        var temp1 = copyObject(doc["page"][1]);
-        var temp2 = copyObject(doc["page"][2]);
-        doc["page"][1] = temp2;
-        doc["page"][2] = temp1;
-    });
-}
-exports.exchangeObjects = exchangeObjects;
-/**
-input: the object's ID that you waant to access
-output: clean version of the data stored in the database.
-*/
-function accessDataFromDatabase(objectID) {
-    var objectInDatabase = Automerge.getObjectById(board_1["default"].mainDoc, objectID);
-    return copyObject(objectInDatabase);
-}
-exports.accessDataFromDatabase = accessDataFromDatabase;
-/** a helper function to add object to array */
-function addOjectToArrayInDataBase(mainDoc, containerID, objectData, insertPosition, masterDataPointer) {
-    var array = Automerge.getObjectById(mainDoc, containerID);
-    if (insertPosition == false) {
-        insertPosition = array.length - 1;
-    }
-    else {
-        insertPosition = insertPosition;
-    }
-    var objectSymbolArray = Object.getOwnPropertySymbols(array[insertPosition]);
-    var elementID = array[insertPosition][objectSymbolArray[1]];
-    objectData["identity"]["accessPointer"] = elementID;
-    if (!masterDataPointer) {
-        // if the object is a masterObject, then create a linkObjectArray and put itself into the array
-        objectData["linkObjectArray"].push(elementID);
-        objectData["identity"]["dataPointer"] = elementID;
-    }
-    else {
-        // do something if it is a link object
-        objectData["identity"]["dataPointer"] = masterDataPointer;
-    }
-    console.log(75, masterDataPointer, elementID, objectData);
-    mainDoc = Automerge.change(mainDoc, function (doc) {
-        var array = Automerge.getObjectById(doc, containerID);
-        Object.entries(objectData).forEach(function (_a, index) {
-            var key = _a[0], value = _a[1];
-            array[insertPosition][key] = value;
-        });
-        array[insertPosition] = objectData;
-        // insertPosition = array.length
-    });
-    return [mainDoc, elementID];
-}
-exports.addOjectToArrayInDataBase = addOjectToArrayInDataBase;
-// createNewItem
-function createNewItem(htmlObject /*object*/, s_data /*objectData*/, containerID, insertPosition /*position want to insert*/, masterDataPointer) {
-    var _a;
-    if (insertPosition === void 0) { insertPosition = false; }
-    if (masterDataPointer === void 0) { masterDataPointer = false; }
-    // Step 1: put an empty object to get objectID
-    board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
-        var array = Automerge.getObjectById(doc, containerID);
-        if (!insertPosition) {
-            array.push({});
-            insertPosition = array.length - 1;
-        }
-        else {
-            array.insertAt(insertPosition, {});
-        }
-    }); // 1st contact
-    // Step 2: getElementID and then put it into thse identity card
-    // return the mainDoc
-    var elementID;
-    _a = addOjectToArrayInDataBase(board_1["default"].mainDoc, containerID, s_data, insertPosition, masterDataPointer), board_1["default"].mainDoc = _a[0], elementID = _a[1];
-    // the function can differentiate the difference between a link object and a master object
-    htmlObject.setAttribute("accessPointer", elementID);
-    htmlObject.soul.identity = s_data.identity;
-    return htmlObject;
-}
-exports.createNewItem = createNewItem;
-/** This function is to create a link object and relate it with the master object
-Step 1: Add empty linkObjectData into the database
-Step 2: add the link object to the masterObject's linkObjectArray
-*/
-function createLinkObject(linkObject, containerID, masterObjectSoul) {
-    var linkObjectData = {
-        "stylesheet": {},
-        "identity": {
-            "accessPointer": "",
-            "dataPointer": masterObjectSoul.identity.dataPointer
-        }
-    };
-    linkObject = createNewItem(linkObject, linkObjectData, containerID, false, masterObjectSoul.identity.dataPointer);
-    var linkObjectAccessPointer = linkObjectData["identity"]["accessPointer"];
-    // add the linkObject to masterObject's linkObjectArray
-    var masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer);
-    // if not in the linkObjectArray, then add it into the array
-    if (!masterObjectData.linkObjectArray.find(function (p) { return p == linkObjectAccessPointer; })) {
-        board_1["default"].mainDoc = Automerge.change(board_1["default"].mainDoc, function (doc) {
-            var masterObjectData = getObjectbyId(masterObjectSoul.identity.dataPointer, doc);
-            masterObjectData.linkObjectArray.push(linkObjectAccessPointer);
-        });
-    }
-    return linkObject;
-}
-exports.createLinkObject = createLinkObject;
-
-},{"./board":4,"automerge":1}],7:[function(require,module,exports){
+arguments[4][4][0].apply(exports,arguments)
+},{"dup":4}],7:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -16095,12 +15759,10 @@ linkArrayInfo.classList.add("linkArrayInfo");
 controller.appendChild(linkArrayInfo);
 var firstContainer;
 var bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId);
-console.log(63, bigFourContainer.getAccessPointer);
 document.body.appendChild(bigFourContainer);
 Object.entries(constructInitialCondition_1.mainController.mainDocArray).forEach(function (_a, index) {
     var arrayName = _a[0], accessPointer = _a[1];
     // let container =
-    console.log(74, firstContainer === null || firstContainer === void 0 ? void 0 : firstContainer.getDataPointer());
     // if ()
     var containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer === null || firstContainer === void 0 ? void 0 : firstContainer.getDataPointer());
     if (index == 0) {

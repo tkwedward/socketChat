@@ -223,14 +223,12 @@ function superGNObject(_object) {
         _object.setAttribute("accessPointer", _object.getAccessPointer());
     };
     _object.loadFromData = function (data) {
-        console.log(370, data, _object);
         _object._dataStructure.forEach(function (key) {
             _object[key] = data[key];
         });
     };
     _object.saveHTMLObjectToDatabase = function () {
         constructInitialCondition_1.mainController.saveHTMLObjectToDatabase(_object);
-        console.log(_object.getDataFromDataBase(), _object);
     };
     /** to apply stylesheet to an element */
     _object.applyStyle = function (styleList, stylechoice) {

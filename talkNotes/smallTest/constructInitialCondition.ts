@@ -7,8 +7,6 @@ export enum MainDocArrayEnum {
     pokemon = "pokemon"
 }
 
-
-
 export interface MainControllerInterface {
     mainDoc: any,
 
@@ -116,7 +114,7 @@ export class MainController implements MainControllerInterface{
         objectData._identity.accessPointer = accessPointer
         objectData._identity.dataPointer = accessPointer
         objectData._identity.linkArray.push(accessPointer)
-        console.log(119, objectData, dataPointer)
+        // console.log(119, objectData, dataPointer)
         if (dataPointer){
             objectData._identity.dataPointer = dataPointer
         }
@@ -132,7 +130,6 @@ export class MainController implements MainControllerInterface{
                 objectInDatabase[key] = value
             })
 
-            console.log(133, dataPointer)
             // update the masterobject if it is a link object
             if (dataPointer){
                 let masterObject = this.getObjectById(dataPointer, doc)
@@ -141,7 +138,6 @@ export class MainController implements MainControllerInterface{
         })
 
         htmlObject._identity = objectData._identity
-        console.log(122, htmlObject._identity)
         return [htmlObject, accessPointer]
     }// addData
 

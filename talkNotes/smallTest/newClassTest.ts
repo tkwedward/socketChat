@@ -62,11 +62,9 @@ let firstContainer
 
 
 let bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId)
-console.log(63,bigFourContainer.getAccessPointer )
 document.body.appendChild(bigFourContainer)
 Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
     // let container =
-    console.log(74, firstContainer?.getDataPointer())
     // if ()
     let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
 

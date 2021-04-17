@@ -94,7 +94,7 @@ var MainController = /** @class */ (function () {
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
         objectData._identity.linkArray.push(accessPointer);
-        console.log(119, objectData, dataPointer);
+        // console.log(119, objectData, dataPointer)
         if (dataPointer) {
             objectData._identity.dataPointer = dataPointer;
         }
@@ -107,7 +107,6 @@ var MainController = /** @class */ (function () {
                 var key = _a[0], value = _a[1];
                 objectInDatabase[key] = value;
             });
-            console.log(133, dataPointer);
             // update the masterobject if it is a link object
             if (dataPointer) {
                 var masterObject = _this.getObjectById(dataPointer, doc);
@@ -115,7 +114,6 @@ var MainController = /** @class */ (function () {
             }
         });
         htmlObject._identity = objectData._identity;
-        console.log(122, htmlObject._identity);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
