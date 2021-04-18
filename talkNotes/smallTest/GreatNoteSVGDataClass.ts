@@ -19,7 +19,7 @@ export interface GNSvgContainerInterface extends HTMLDivElement{
     svgNode: SVG.LinkedHTMLElement
 
     applyStyle(attrList: any)
-    appendTo(parentSVGObject)
+    // appendTo(parentSVGObject)
     appendToContainer(parentDiv)
     createDataObject()
 
@@ -30,7 +30,6 @@ export interface GNSvgContainerInterface extends HTMLDivElement{
 export function GNSvg(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase: boolean=true) : GNSvgContainerInterface {
     let svgDivContainer = <GNSvgContainerInterface> document.createElement("div")
     svgDivContainer.id = "testSvgDiv"
-    svgDivContainer._type = GNSvg.name
 
     svgDivContainer.appendToContainer = function(parent){
         parent.appendChild(svgDivContainer)
@@ -132,8 +131,10 @@ export function GNSvgCircle(name:string, arrayID: string, insertPosition?: numbe
 
     svgObject.extract = () => svgObject.createDataObject()
 
-    svgObject.applyStyle = function(attrList:GNSvgCircleData){
-        svgObject.attr(attrList)
+    svgObject.applyStyle = function(attrList:GNSvgRectData){
+        Object.entries(attrList).forEach(([key, value], _)=>{
+            svgObject.node.style[key] = value
+        })
     }
 
     // add extra funcitons to the object
@@ -151,10 +152,10 @@ export interface GNSvgRectInterface extends GNSvgObjectInterface, SVG.Rect {
 
 //@auto-fold here
 export interface GNSvgRectData {
-    x: number
-    y: number
-    width: number
-    height: number
+    x: number|string
+    y: number|string
+    width: number|string
+    height: number|string
     fill: string
 }
 
@@ -172,7 +173,9 @@ export function GNSvgRect(name:string, arrayID: string, insertPosition?: number|
     svgObject.extract = () => svgObject.createDataObject()
 
     svgObject.applyStyle = function(attrList:GNSvgRectData){
-        svgObject.attr(attrList)
+        Object.entries(attrList).forEach(([key, value], _)=>{
+            svgObject.node.style[key] = value
+        })
     }
 
     // add extra funcitons to the object

@@ -10,7 +10,6 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
-    svgDivContainer._type = GNSvg.name;
     svgDivContainer.appendToContainer = function (parent) {
         parent.appendChild(svgDivContainer);
         var svgController = svg_js_1["default"](svgDivContainer);
@@ -66,7 +65,10 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList);
+        Object.entries(attrList).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgObject.node.style[key] = value;
+        });
     };
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
@@ -86,7 +88,10 @@ function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList);
+        Object.entries(attrList).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgObject.node.style[key] = value;
+        });
     };
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)

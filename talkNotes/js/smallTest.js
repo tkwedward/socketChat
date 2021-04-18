@@ -17315,7 +17315,7 @@ class WS extends Transport {
 module.exports = WS;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":55,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
+},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":57,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
     if (obj.hasOwnProperty(k)) {
@@ -17640,7 +17640,7 @@ formatters.j = function (v) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./common":18,"_process":57}],18:[function(require,module,exports){
+},{"./common":18,"_process":59}],18:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -19437,7 +19437,7 @@ exports.url = url;
 
 },{"debug":33,"parseuri":26}],33:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":34,"_process":57,"dup":17}],34:[function(require,module,exports){
+},{"./common":34,"_process":59,"dup":17}],34:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":35}],35:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -19864,7 +19864,7 @@ exports.hasBinary = hasBinary;
 
 },{}],39:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":40,"_process":57,"dup":17}],40:[function(require,module,exports){
+},{"./common":40,"_process":59,"dup":17}],40:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":41}],41:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -25543,6 +25543,79 @@ module.exports = yeast;
 },{}],44:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
+exports.addMovingEvent = void 0;
+function addMovingEvent(htmlObject) {
+    var attributeX;
+    var attributeY;
+    switch (htmlObject.tagName) {
+        case "circle":
+            attributeX = "cx";
+            attributeY = "cy";
+            break;
+        case "rect":
+            attributeX = "x";
+            attributeY = "y";
+            break;
+        default:
+            attributeX = "left";
+            attributeY = "top";
+    }
+    htmlObject.style.position = "relative";
+    htmlObject.addEventListener("mousedown", function (e) {
+        // to stop any event not related to this element
+        if (e.target !== e.currentTarget)
+            return;
+        // e.stopPropagation()
+        // to allow mouse to move into other elements
+        Array.from(htmlObject.parentNode.children).forEach(function (p) {
+            if (p != htmlObject)
+                p.style.pointerEvents = "none";
+            // })
+            var startX = e["screenX"];
+            var startY = e["screenY"];
+            var objectInitialX = 0;
+            var objectInitialY = 0;
+            var initialLeftValue = parseInt(htmlObject.style[attributeX].replace("px", "")) || 0;
+            var initialTopValue = parseInt(htmlObject.style[attributeY].replace("px", "")) || 0;
+            console.log(initialLeftValue, initialTopValue);
+            var currentX;
+            var currentY;
+            var deltaX = 0;
+            var deltaY = 0;
+            var mousemoveFunction = function (e) {
+                currentY = e.screenY;
+                currentX = e.screenX;
+                deltaX = currentX - startX;
+                deltaY = currentY - startY;
+                var newX = htmlObject.style[attributeX] = initialLeftValue + deltaX + "px";
+                htmlObject.style[attributeY] = initialTopValue + deltaY + "px";
+            };
+            htmlObject.addEventListener("mousemove", mousemoveFunction, false);
+            function endDragEvent(e) {
+                console.log(htmlObject.parentNode["children"]);
+                Array.from(htmlObject.parentNode["children"]).forEach(function (p) {
+                    console.log(p);
+                    p["style"]["pointerEvents"] = "inherit";
+                });
+                var endX = e["screenX"];
+                var endY = e["screenY"];
+                htmlObject.removeEventListener("mousemove", mousemoveFunction);
+                console.log("end at = (" + endX + ", " + endY + ")");
+            }
+            htmlObject.addEventListener("mouseup", function (e) {
+                endDragEvent(e);
+            }, false);
+            htmlObject.addEventListener("mouseout", function (e) {
+                endDragEvent(e);
+            }, false);
+        }, false);
+    });
+}
+exports.addMovingEvent = addMovingEvent;
+
+},{}],45:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
 exports.ToolBoxClass = void 0;
 var ToolBoxClass = /** @class */ (function () {
     function ToolBoxClass() {
@@ -25589,7 +25662,7 @@ var ToolBoxClass = /** @class */ (function () {
 }());
 exports.ToolBoxClass = ToolBoxClass;
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.GNTemplate = exports.GNImageController = exports.GNTextController = exports.GNController = exports.GNControllerItem = void 0;
@@ -25740,7 +25813,7 @@ function GNTemplate(_name, _parent) {
 }
 exports.GNTemplate = GNTemplate;
 
-},{"./GreatNoteDataClass":46}],46:[function(require,module,exports){
+},{"./GreatNoteDataClass":47}],47:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.superGNObject = exports.GNTemplate = exports.GNDropdownList = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
@@ -26079,7 +26152,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
 }
 exports.superGNObject = superGNObject;
 
-},{"./constructInitialCondition":49}],47:[function(require,module,exports){
+},{"./constructInitialCondition":51}],48:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -26092,7 +26165,6 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
-    svgDivContainer._type = GNSvg.name;
     svgDivContainer.appendToContainer = function (parent) {
         parent.appendChild(svgDivContainer);
         var svgController = svg_js_1["default"](svgDivContainer);
@@ -26148,7 +26220,10 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList);
+        Object.entries(attrList).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgObject.node.style[key] = value;
+        });
     };
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
@@ -26168,7 +26243,10 @@ function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList);
+        Object.entries(attrList).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgObject.node.style[key] = value;
+        });
     };
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
@@ -26252,9 +26330,61 @@ function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabas
     // }
 }
 
-},{"svg.js":42}],48:[function(require,module,exports){
+},{"svg.js":42}],49:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+var EventModel = __importStar(require("./EventModel"));
+var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
+console.log("Basic event model");
+var basicDiv = document.createElement("div");
+basicDiv.style.width = "90vw";
+basicDiv.style.height = "80vh";
+basicDiv.style.background = "gold";
+EventModel.addMovingEvent(basicDiv);
+var insideDiv1 = document.createElement("div");
+insideDiv1.style.width = "10vw";
+insideDiv1.style.height = "10vh";
+insideDiv1.style.background = "red";
+EventModel.addMovingEvent(insideDiv1);
+// svg div board
+var svgBoard = GreatNoteSvgDataClass.GNSvg("", "", false, false, false);
+svgBoard.appendToContainer(basicDiv);
+console.log(22, svgBoard.svgNode);
+svgBoard.svgNode.style.background = "blue";
+EventModel.addMovingEvent(svgBoard.svgNode);
+basicDiv.appendChild(insideDiv1);
+document.body.appendChild(basicDiv);
+var svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false);
+svgCircle.appendTo(svgBoard);
+console.log(svgCircle);
+EventModel.addMovingEvent(svgCircle.node);
+var svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, false);
+svgRect.applyStyle({ "x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill": "pink" });
+svgRect.appendTo(svgBoard);
+EventModel.addMovingEvent(svgRect.node);
 
-},{}],49:[function(require,module,exports){
+},{"./EventModel":44,"./GreatNoteSvgDataClass":48}],50:[function(require,module,exports){
+
+},{}],51:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26541,9 +26671,9 @@ var MainController = /** @class */ (function () {
 exports.MainController = MainController;
 exports.mainController = new MainController();
 
-},{"./socketFunction":53,"automerge":1}],50:[function(require,module,exports){
-arguments[4][48][0].apply(exports,arguments)
-},{"dup":48}],51:[function(require,module,exports){
+},{"./socketFunction":55,"automerge":1}],52:[function(require,module,exports){
+arguments[4][50][0].apply(exports,arguments)
+},{"dup":50}],53:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = exports.AttributeControllerClass = exports.controllerCreater = void 0;
@@ -26782,296 +26912,357 @@ function choiceController(attribute, choiceList, prototype) {
 }
 exports.choiceController = choiceController;
 
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 exports.__esModule = true;
-var constructInitialCondition_1 = require("./constructInitialCondition");
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
-var socketFunction_1 = require("./socketFunction");
-var ControllerModel = __importStar(require("./dbtest"));
-var ToolBoxModel = __importStar(require("./GNSvgObjectDataStructure"));
-var divTest = false;
-var inputFieldTest = false;
-var buttonTest = false;
-var svgElementTest = false;
-var toolBoxTest = true;
-var bigFourContainer;
-var contentContainer;
-var attributeController;
-var metaDataController;
-var widthController;
-var fillController;
-//@auto-fold here
-constructInitialCondition_1.mainController.GNDataStructureMapping = {
-    GNInputField: GreatNoteDataClass.GNInputField,
-    GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-    GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
-    GNImage: GreatNoteDataClass.GNImage,
-    GNDivPage: GreatNoteDataClass.GNDivPage
-};
-document.body.style.display = "grid";
-document.body.style.gridTemplateColumns = "1fr 3fr";
-var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
-//@auto-fold here
-var controllerStyleList = {
-    "width": "95%",
-    "height": "100vh",
-    "border": "2px black solid",
-    "margin": "20px auto"
-};
 //
-var controller = document.createElement("div");
-controller.classList.add("controller");
-controller.innerHTML = "king";
-controller.style.width = "95%";
-controller.style.height = "100vh";
-controller.style.margin = "20px auto";
-document.body.appendChild(controller);
-//@auto-fold here
-function addAccessPointerAndDataPointerDiv(htmlObject) {
-    var containerInfo = document.createElement("div");
-    containerInfo.innerHTML += "=========================<br>";
-    var dpContainer = document.createElement("div");
-    dpContainer.innerHTML += "DP:" + htmlObject.getDataPointer() + "<br>";
-    dpContainer.addEventListener("click", function () {
-        console.log(constructInitialCondition_1.mainController.getObjectById(htmlObject.getDataPointer()));
-    });
-    var apContainer = document.createElement("div");
-    apContainer.innerHTML += "AP:" + htmlObject.getAccessPointer() + "<br>";
-    apContainer.addEventListener("click", function () {
-        console.log(constructInitialCondition_1.mainController.getObjectById(htmlObject.getAccessPointer()), htmlObject, htmlObject.stylesheet);
-    });
-    containerInfo.append(dpContainer, apContainer);
-    controller.appendChild(containerInfo);
-}
-//@auto-fold here
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate) {
-    var linkArrayInfo = document.createElement("div");
-    linkArrayInfo.classList.add("linkArrayInfo");
-    controller.appendChild(linkArrayInfo);
-    var saveButton = document.createElement("button");
-    saveButton.innerHTML = "save";
-    saveButton.addEventListener("click", function (e) {
-        var s = constructInitialCondition_1.mainController.saveMainDoc();
-        socketFunction_1.socket.emit("saveMainDocToDisk", s);
-        console.log(constructInitialCondition_1.mainController.mainDoc);
-    });
-    var loadButton = document.createElement("button");
-    loadButton.innerHTML = "load";
-    loadButton.addEventListener("click", function (e) {
-        socketFunction_1.socket.emit("loadMainDoc");
-    });
-    controller.appendChild(saveButton);
-    controller.appendChild(loadButton);
-    //
-    contentContainer = document.createElement("div");
-    contentContainer.classList.add("contentContainer");
-    contentContainer.style.background = "silver";
-    // contentContainer.addEventListener("click", (e)=>{
-    //     console.log(e)
-    // })
-    contentContainer.addEventListener("mousedown", function (e) {
-        console.log(e);
-    });
-    document.body.appendChild(contentContainer);
-    attributeController = document.createElement("div");
-    attributeController.classList.add("attributeController");
-    attributeController.style.width = "90%";
-    attributeController.style.minHeight = "200px";
-    attributeController.style.border = "2px black solid";
-    attributeController.style.margin = "20px auto";
-    var attributeControllerBar = document.createElement("div");
-    attributeControllerBar.style.height = "35px";
-    attributeControllerBar.style.marginBottom = "10px";
-    attributeControllerBar.style.background = "yellow";
-    attributeController.append(attributeControllerBar);
-    metaDataController = document.createElement("div");
-    metaDataController.classList.add("metaDataController");
-    metaDataController.style.width = "90%";
-    metaDataController.style.minHeight = "200px";
-    metaDataController.style.border = "2px black solid";
-    metaDataController.style.margin = "20px auto";
-    var metaDataControllerBar = document.createElement("div");
-    metaDataControllerBar.style.height = "35px";
-    metaDataControllerBar.style.marginBottom = "10px";
-    metaDataControllerBar.style.background = "yellow";
-    metaDataController.appendChild(metaDataControllerBar);
-    controller.append(attributeController, metaDataController);
-    bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId);
-    bigFourContainer.appendTo(contentContainer);
-}
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && toolBoxTest) {
-    attributeController;
-}
-var attributeControllerObject = new ControllerModel.AttributeControllerClass();
-var mouseClickTest = true;
-//@auto-fold here
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && mouseClickTest) {
-    // choice controller
-    var divControllerContainer = attributeControllerObject.createDivControllerContainer();
-    var svgCircleContainer = attributeControllerObject.createSvgCircleControllerContainer();
-    // append controller
-    attributeController.append(divControllerContainer, svgCircleContainer);
-    // ================ div ================//
-    var div = document.createElement("div");
-    div.style.width = "100px";
-    div.style.height = "100px";
-    div.style.background = "blue";
-    contentContainer.append(div);
-    divControllerContainer.attachTo(div);
-    // ============== svg ============== //
-    var svg = GreatNoteSvgDataClass.GNSvg("svg", "", false, false, false);
-    svg.appendToContainer(contentContainer);
-    // ============== svgCircle ============ //
-    var svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false);
-    svgCircle.appendTo(svg);
-    svgCircleContainer.attachTo(svgCircle.node);
-    console.log(svgCircleContainer.targetHTMLType);
-}
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && toolBoxTest) {
-    var toolBoxModel = new ToolBoxModel.ToolBoxClass();
-    var toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject();
-    attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController);
-    toolBoxHtmlObject.createToolBoxItem("Apple");
-    toolBoxHtmlObject.createToolBoxItem("Boy");
-    toolBoxHtmlObject.createToolBoxItem("Rashida");
-}
-// =============================  svgElementTest
-////@auto-fold here
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && svgElementTest) {
-    var svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId);
-    // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
-    svgObject.appendToContainer(contentContainer);
-    var svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId);
-    svgCircleElement.applyStyle({ "r": 5, "cx": 200, "cy": 200 });
-    svgCircleElement.appendTo(svgObject);
-    var svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId);
-    svgRectElement.applyStyle({ "x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver" });
-    svgRectElement.appendTo(svgObject);
-    // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
-    // svgLineElement.applyStyle(
-    //   {"points": [20, 20, 100, 400],
-    //   "attribute":{"stroke": "blue", "width":1 }})
-    // svgLineElement.appendTo(svgObject)
-    var svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId);
-    svgPolyLineElement.applyStyle({ "points": [10, 10, 50, 100, 40, 60, 90, 100],
-        "attribute": { "stroke": "blue", "width": 1, "fill": "none" } });
-    console.log(svgPolyLineElement);
-    svgPolyLineElement.appendTo(svgObject);
-    var svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId);
-    svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg");
-    console.log(131, svgImageElement);
-    svgImageElement.appendTo(svgObject);
-    svgImageElement.width("300px");
-    svgImageElement.height("200px");
-    // svgObject.createSVGObject()
-    // contentContainer.append(svgObject)
-    //
-    // let circle = GreatNoteSvgDataClass.GNSvgCircle("circle", bookmarkArrayId)
-    // circle.appendTo(svgObject)
-}
-// =============================  inputFieldTest
-////@auto-fold here
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && inputFieldTest) {
-    var inpuField1_1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer());
-    inpuField1_1.appendTo(bigFourContainer);
-    addAccessPointerAndDataPointerDiv(inpuField1_1);
-    function createInputField() {
-        var inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1_1.getDataPointer());
-        inpuField2.appendTo(bigFourContainer);
-        addAccessPointerAndDataPointerDiv(inpuField2);
-    }
-    var number = 20;
-    for (var i = 0; i < number; i++) {
-        createInputField();
-    }
-}
-// =============================  button Test
-////@auto-fold here
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && buttonTest) {
-    console.log(1289);
-    var clickEvent_1 = function (_object) {
-        var triggerEvent = new Event("changeStatusEvent");
-        var currentIndex = _object.statusList.indexOf(_object.innerText);
-        var nextIndex = (currentIndex + 1) % _object.statusList.length;
-        _object.innerText = _object.statusList[nextIndex];
-        console.log(98, _object, _object.statusList, currentIndex);
-        _object.dispatchEvent(triggerEvent);
-    };
-    var selectObject_1 = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer());
-    selectObject_1.addClickEvent(clickEvent_1);
-    selectObject_1.appendTo(bigFourContainer);
-    addAccessPointerAndDataPointerDiv(selectObject_1);
-    function createHTMLObject() {
-        var _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject_1.getDataPointer());
-        _object.addClickEvent(clickEvent_1);
-        _object.appendTo(bigFourContainer);
-        addAccessPointerAndDataPointerDiv(_object);
-    }
-    var number = 20;
-    for (var i = 0; i < number; i++) {
-        createHTMLObject();
-    }
-}
-////@auto-fold here
-if (!constructInitialCondition_1.mainController.applyMainDocTemplate && divTest) {
-    var firstContainer_1;
-    Object.entries(constructInitialCondition_1.mainController.mainDocArray).forEach(function (_a, index) {
-        var arrayName = _a[0], accessPointer = _a[1];
-        // let container =
-        // if ()
-        var containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer_1 === null || firstContainer_1 === void 0 ? void 0 : firstContainer_1.getDataPointer());
-        if (index == 0) {
-            firstContainer_1 = containerEditable;
-        }
-        var containerInfo = document.createElement("div");
-        containerInfo.innerHTML += "=========================<br>";
-        var dpContainer = document.createElement("div");
-        dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>";
-        dpContainer.addEventListener("click", function () {
-            console.log(constructInitialCondition_1.mainController.getObjectById(containerEditable.getDataPointer()));
-        });
-        var apContainer = document.createElement("div");
-        apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>";
-        apContainer.addEventListener("click", function () {
-            console.log(constructInitialCondition_1.mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet);
-        });
-        containerInfo.append(dpContainer, apContainer);
-        controller.appendChild(containerInfo);
-        // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
-        var styleList = {
-            "width": "95%",
-            "height": "200px",
-            "border": "2px black solid",
-            "margin": "20px auto"
-        };
-        containerEditable.applyStyle(styleList);
-        console.log(containerEditable.stylesheet);
-        bigFourContainer.appendChild(containerEditable);
-    });
-}
+// let divTest = false
+// let inputFieldTest = false
+// let buttonTest = false
+// let svgElementTest = false
+// let toolBoxTest = true
+//
+//
+// let bigFourContainer
+// let contentContainer
+// let attributeController
+// let metaDataController
+// let widthController
+// let fillController
+//
+//
+// //@auto-fold here
+// mainController.GNDataStructureMapping = {
+//     GNInputField: GreatNoteDataClass.GNInputField,
+//     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
+//     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
+//     GNImage: GreatNoteDataClass.GNImage,
+//     GNDivPage: GreatNoteDataClass.GNDivPage
+// }
+//
+// document.body.style.display = "grid"
+// document.body.style.gridTemplateColumns = "1fr 3fr"
+//
+// let bookmarkArrayId = mainController.mainDocArray["bookmark"]
+//
+// //@auto-fold here
+// let controllerStyleList = {
+//     "width": "95%",
+//     "height": "100vh",
+//     "border": "2px black solid",
+//     "margin": "20px auto"
+// }
+// //
+// let controller = document.createElement("div")
+// controller.classList.add("controller")
+// controller.innerHTML = "king"
+// controller.style.width = "95%"
+// controller.style.height = "100vh"
+// controller.style.margin = "20px auto"
+// document.body.appendChild(controller)
+//
+//
+// //@auto-fold here
+// function addAccessPointerAndDataPointerDiv(htmlObject){
+//     let containerInfo = document.createElement("div")
+//     containerInfo.innerHTML +=  "=========================<br>"
+//     let dpContainer = document.createElement("div")
+//
+//     dpContainer.innerHTML += "DP:" + htmlObject.getDataPointer() + "<br>"
+//     dpContainer.addEventListener("click", function(){
+//         console.log(mainController.getObjectById(htmlObject.getDataPointer()))
+//     })
+//
+//     let apContainer = document.createElement("div")
+//     apContainer.innerHTML += "AP:" + htmlObject.getAccessPointer() + "<br>"
+//     apContainer.addEventListener("click", function(){
+//         console.log(mainController.getObjectById(htmlObject.getAccessPointer()), htmlObject, htmlObject.stylesheet)
+//     })
+//
+//     containerInfo.append(dpContainer, apContainer)
+//     controller.appendChild(containerInfo)
+// }
+//
+//
+// //@auto-fold here
+// if (!mainController.applyMainDocTemplate){
+//     let linkArrayInfo = document.createElement("div")
+//     linkArrayInfo.classList.add("linkArrayInfo")
+//     controller.appendChild(linkArrayInfo)
+//
+//     let saveButton = document.createElement("button")
+//     saveButton.innerHTML = "save"
+//     saveButton.addEventListener("click", (e)=>{
+//         let s = mainController.saveMainDoc()
+//         socket.emit("saveMainDocToDisk", s)
+//         console.log(mainController.mainDoc)
+//     })
+//     let loadButton = document.createElement("button")
+//     loadButton.innerHTML = "load"
+//     loadButton.addEventListener("click", (e)=>{
+//         socket.emit("loadMainDoc")
+//     })
+//     controller.appendChild(saveButton)
+//     controller.appendChild(loadButton)
+//     //
+//     contentContainer = document.createElement("div")
+//     contentContainer.classList.add("contentContainer")
+//     contentContainer.style.background = "silver"
+//     contentContainer.style.position = "relative"
+//     // EventModel.addMovingEvent(contentContainer)
+//
+//     let positionMonitor = document.createElement("div")
+//     positionMonitor.classList.add("positionMonitor")
+//     positionMonitor.style.width = "90%"
+//     positionMonitor.style.minHeight = "200px"
+//     positionMonitor.style.border = "2px black solid"
+//     positionMonitor.style.margin = "20px auto"
+//     let relativeX = document.createElement("div")
+//     let relativeY = document.createElement("div")
+//     relativeX.innerText = "relativeX = "
+//     relativeY.innerText = "relativeY = "
+//     positionMonitor.append(relativeX, relativeY)
+//     controller.appendChild(positionMonitor)
+//
+//
+//
+//
+//     document.body.appendChild(contentContainer)
+//
+//     attributeController = document.createElement("div")
+//     attributeController.classList.add("attributeController")
+//     attributeController.style.width = "90%"
+//     attributeController.style.minHeight = "200px"
+//     attributeController.style.border = "2px black solid"
+//     attributeController.style.margin = "20px auto"
+//
+//     let attributeControllerBar = document.createElement("div")
+//     attributeControllerBar.style.height = "35px"
+//     attributeControllerBar.style.marginBottom = "10px"
+//     attributeControllerBar.style.background = "yellow"
+//
+//     attributeController.append(attributeControllerBar)
+//
+//
+//     metaDataController  = document.createElement("div")
+//     metaDataController.classList.add("metaDataController")
+//     metaDataController.style.width = "90%"
+//     metaDataController.style.minHeight = "200px"
+//     metaDataController.style.border = "2px black solid"
+//     metaDataController.style.margin = "20px auto"
+//
+//     let metaDataControllerBar = document.createElement("div")
+//     metaDataControllerBar.style.height = "35px"
+//     metaDataControllerBar.style.marginBottom = "10px"
+//     metaDataControllerBar.style.background = "yellow"
+//     metaDataController.appendChild(metaDataControllerBar)
+//
+//     controller.append(attributeController, metaDataController)
+//
+//     bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId)
+//     bigFourContainer.appendTo(contentContainer)
+// }
+//
+//
+// if (!mainController.applyMainDocTemplate && toolBoxTest){
+//     attributeController
+// }
+//
+// let attributeControllerObject = new ControllerModel.AttributeControllerClass()
+// let mouseClickTest = true
+// //@auto-fold here
+// if (!mainController.applyMainDocTemplate && mouseClickTest){
+//     // choice controller
+//     let divControllerContainer = attributeControllerObject.createDivControllerContainer()
+//
+//     let svgCircleContainer = attributeControllerObject.createSvgCircleControllerContainer()
+//
+//     // append controller
+//     attributeController.append(divControllerContainer, svgCircleContainer)
+//
+//     // ================ div ================//
+//     let div = document.createElement("div")
+//     div.style.width = "100px"
+//     div.style.height = "100px"
+//     div.style.background = "blue"
+//     EventModel.addMovingEvent(div)
+//     contentContainer.append(div)
+//     divControllerContainer.attachTo(div)
+//
+//
+//     // ============== svg ============== //
+//     let svg = GreatNoteSvgDataClass.GNSvg("svg", "", false, false, false)
+//     svg.appendToContainer(contentContainer)
+//     EventModel.addMovingEvent(svg.svgNode)
+//
+//     // ============== svgCircle ============ //
+//     let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false)
+//     svgCircle.appendTo(svg)
+//     svgCircleContainer.attachTo(svgCircle.node)
+//     console.log(svgCircleContainer.targetHTMLType)
+//     // EventModel.addMovingEvent(svgCircle.node)
+// }
+//
+//
+// if (!mainController.applyMainDocTemplate && toolBoxTest){
+//     let toolBoxModel = new ToolBoxModel.ToolBoxClass()
+//     let toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject()
+//     attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController)
+//     toolBoxHtmlObject.createToolBoxItem("Apple")
+//     toolBoxHtmlObject.createToolBoxItem("Boy")
+//     toolBoxHtmlObject.createToolBoxItem("Rashida")
+// }
+//
+//
+//
+//
+// // =============================  svgElementTest
+// ////@auto-fold here
+// if (!mainController.applyMainDocTemplate && svgElementTest){
+//     let svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+//     // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+//     svgObject.appendToContainer(contentContainer)
+//
+//     let svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId)
+//     svgCircleElement.applyStyle({"r": 5, "cx": 200, "cy": 200})
+//     svgCircleElement.appendTo(svgObject)
+//
+//     let svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId)
+//     svgRectElement.applyStyle({"x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver"})
+//     svgRectElement.appendTo(svgObject)
+//
+//     // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
+//     // svgLineElement.applyStyle(
+//     //   {"points": [20, 20, 100, 400],
+//     //   "attribute":{"stroke": "blue", "width":1 }})
+//     // svgLineElement.appendTo(svgObject)
+//
+//     let svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId)
+//     svgPolyLineElement.applyStyle(
+//       {"points": [10, 10, 50, 100, 40, 60, 90, 100],
+//       "attribute":{"stroke": "blue", "width":1 , "fill":"none"}})
+//     console.log(svgPolyLineElement)
+//     svgPolyLineElement.appendTo(svgObject)
+//
+//     let svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId)
+//
+//     svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg")
+//     console.log(131, svgImageElement)
+//
+//     svgImageElement.appendTo(svgObject)
+//     svgImageElement.width("300px")
+//     svgImageElement.height("200px")
+//
+//     // svgObject.createSVGObject()
+//     // contentContainer.append(svgObject)
+// //
+//     // let circle = GreatNoteSvgDataClass.GNSvgCircle("circle", bookmarkArrayId)
+//     // circle.appendTo(svgObject)
+//
+// }
+//
+// // =============================  inputFieldTest
+// ////@auto-fold here
+// if (!mainController.applyMainDocTemplate && inputFieldTest){
+//     let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
+//     inpuField1.appendTo(bigFourContainer)
+//     addAccessPointerAndDataPointerDiv(inpuField1)
+//
+//     function createInputField(){
+//       let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
+//       inpuField2.appendTo(bigFourContainer)
+//       addAccessPointerAndDataPointerDiv(inpuField2)
+//     }
+//
+//     let number = 20
+//     for (let i = 0; i< number; i++){
+//       createInputField()
+//     }
+// }
+//
+// // =============================  button Test
+// ////@auto-fold here
+// if (!mainController.applyMainDocTemplate && buttonTest){
+//     console.log(1289)
+//     let clickEvent = function(_object){
+//         let triggerEvent = new Event("changeStatusEvent")
+//         let currentIndex = _object.statusList.indexOf(_object.innerText)
+//         let nextIndex = (currentIndex + 1) % _object.statusList.length
+//         _object.innerText = _object.statusList[nextIndex]
+//         console.log(98, _object, _object.statusList, currentIndex)
+//
+//         _object.dispatchEvent(triggerEvent)
+//     }
+//
+//     let selectObject = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
+//     selectObject.addClickEvent(clickEvent)
+//     selectObject.appendTo(bigFourContainer)
+//     addAccessPointerAndDataPointerDiv(selectObject)
+//
+//     function createHTMLObject(){
+//       let _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
+//       _object.addClickEvent(clickEvent)
+//       _object.appendTo(bigFourContainer)
+//       addAccessPointerAndDataPointerDiv(_object)
+//     }
+//
+//     let number = 20
+//     for (let i = 0; i< number; i++){
+//       createHTMLObject()
+//     }
+// }
+//
+//
+// ////@auto-fold here
+// if (!mainController.applyMainDocTemplate && divTest){
+//     let firstContainer
+//     Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
+//         // let container =
+//         // if ()
+//         let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
+//
+//         if (index==0){
+//           firstContainer = containerEditable
+//         }
+//
+//
+//         let containerInfo = document.createElement("div")
+//         containerInfo.innerHTML +=  "=========================<br>"
+//         let dpContainer = document.createElement("div")
+//
+//         dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
+//         dpContainer.addEventListener("click", function(){
+//             console.log(mainController.getObjectById(containerEditable.getDataPointer()))
+//         })
+//
+//         let apContainer = document.createElement("div")
+//         apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
+//         apContainer.addEventListener("click", function(){
+//             console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
+//         })
+//
+//
+//
+//         containerInfo.append(dpContainer, apContainer)
+//         controller.appendChild(containerInfo)
+//
+//
+//         // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
+//         let styleList = {
+//             "width": "95%",
+//             "height": "200px",
+//             "border": "2px black solid",
+//             "margin": "20px auto"
+//         }
+//         containerEditable.applyStyle(styleList)
+//         console.log(containerEditable.stylesheet)
+//
+//         bigFourContainer.appendChild(containerEditable)
+//     });
+//
+// }
 
-},{"./GNSvgObjectDataStructure":44,"./GreatNoteDataClass":46,"./GreatNoteSvgDataClass":47,"./constructInitialCondition":49,"./dbtest":51,"./socketFunction":53}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27119,7 +27310,7 @@ exports.socket.on("processInitialData", function (data) {
     // mainController.loadMainDoc(data.initialData)
 });
 
-},{"./constructInitialCondition":49,"socket.io-client":27}],54:[function(require,module,exports){
+},{"./constructInitialCondition":51,"socket.io-client":27}],56:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -27271,7 +27462,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -29052,7 +29243,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":54,"buffer":55,"ieee754":56}],56:[function(require,module,exports){
+},{"base64-js":56,"buffer":57,"ieee754":58}],58:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -29139,7 +29330,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -29325,4 +29516,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[45,46,48,49,50,51,52,53]);
+},{}]},{},[44,45,46,47,48,49,50,51,52,53,54,55]);
