@@ -21,6 +21,7 @@ export interface communicationDataStructure{
 //@auto-fold here
 export interface MainControllerInterface {
     mainDoc: any
+    applyMainDocTemplate:boolean
     previousDoc: any
     mainDocArray: any
     baseArrayID: string
@@ -63,7 +64,7 @@ export class MainController implements MainControllerInterface{
         this.initializeRootArray()
         this.initalizeMainDoc()
         this.applyMainDocTemplate = false
-        this.applyMainDocTemplate = true
+        // this.applyMainDocTemplate = true
         if (this.applyMainDocTemplate){
             this.initializeHTMLBackground()
         }

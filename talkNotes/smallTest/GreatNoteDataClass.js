@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.GNTemplate = exports.GNDropdownList = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
+exports.superGNObject = exports.GNTemplate = exports.GNDropdownList = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
 //@auto-fold here
 function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
@@ -334,3 +334,4 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         _object.editEvent(editEvent);
     }
 }
+exports.superGNObject = superGNObject;

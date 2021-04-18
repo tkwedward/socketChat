@@ -1,148 +1,336 @@
+import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
+import * as GreatNoteDataClass from "./GreatNoteDataClass"
 
-// let bookmarkArrayId = mainController.mainDocArray[MainDocArrayEnum.bookmark]
-//
-// let [data1, node1] = mainController.createDummyData("Rashida", 29, "F")
-// let [data2, node2] = mainController.createDummyData("Mike", 39, "M")
-// let [data3, node3] = mainController.createDummyData("Chess", 12, "L")
-// let [data4, node4] = mainController.createDummyData("Cook", 39, "M")
-
-// let htmlObject1
-// mainController.addData(bookmarkArrayId, data1, node1)
+interface ControllerInterface extends HTMLDivElement{
+    controllerTarget: HTMLElement
+    setControllerTarget(target: HTMLElement)
+    updateObject(item?:any)
+    clear()
+}
 
 
+interface choiceControllerInterface extends ControllerInterface{
+    updateObject(item)
+}
+
+interface dropdownListControllerInterface extends ControllerInterface{
+    updateObject(item?:any)
+}
+
 //
-// database.push = function(array, data){
-//   database[array].push(data)
-// }
-//
-// function createInputField(name){
-//     let inputField = document.createElement("input")
-//     inputField.placeholder = name
-//     inputField.style.margin = "10px"
-//     // inputField.addEventListener("")
-//     controlPanel.append(inputField)
-//     return inputField
-//
-// }
-//
-//
-// function createHTMLObject(data_object, parent){
-//    let node = document.createElement("div")
-//    node.parent = parent
-//    node.style.background =data_object.itemStylesheet.background
-//    node.style.width = "200px"
-//    node.style.height = "70px"
-//    node.style.padding = "20px"
-//
-//
-//    node.itemName = data_object.itemName
-//    node.itemIdentity = data_object.itemIdentity
-//    node.classList.add(`item_${node.itemIdentity.accessPointer}`)
-//
-//    node.innerHTML = `arrayName:
-//      ${node.itemName}<br>accessPointer: ${node.itemIdentity.accessPointer}<br>dataPointer: ${node.itemIdentity.dataPointer}<br>parentPointer: ${node.parent.itemIdentity.parentPointer}`
-//
-//
-//    node.getData = function(){
-//       return data_object
-//    }
-//
-//    node.addEventListener("click", function(){
-//       controlPannelTitle.innerHTML = "Append to " + node.itemName
-//       console.log("current node is " + node.itemName)
-//       controlPanel.currentNode = node
-//    })
-//
-//    if (!parent){
-//       nodeContainer.append(node)
-//    } else {
-//       parent.append(node)
-//    }
-//    return node
-// }
-//
-//
-// document.body.style.display = "grid"
-// document.body.style.gridTemplateColumns = "4fr 1fr"
-//
-// let controlPanel = document.createElement("div")
-// controlPanel.style.background = "pink"
-// controlPanel.style.height = "100vh"
-//
-// let controlPannelTitle = document.createElement("div")
-// controlPannelTitle.innerHTML = "Title"
-// controlPannelTitle.style.fontSize = "20px"
-// controlPannelTitle.style.margin = "10px"
-// controlPannelTitle.style.display = "block"
-// controlPanel.currentNode = null
-// controlPanel.append(controlPannelTitle)
-//
-// let nameInputField = createInputField("name")
-// let apInputField = createInputField("apInputField")
-// let dpInputField = createInputField("dpInputField")
-// let submitButton = document.createElement("input")
-//
-// submitButton.style.margin = "10px"
-// submitButton.style.display = "block"
-// submitButton.type = "submit"
-//
-// submitButton.addEventListener("click", function(){
-//     let nameValue = nameInputField.value
-//     let apValue = apInputField.value
-//     let dpValue= dpInputField.value
-//
-//     let newData =
-//     controlPanel.currentNode
-//     console.log(nameValue, apValue, dpValue)
-//
-//
-// })
-//
-// controlPanel.append(submitButton)
-//
-// let getAccessChainOfNodeButton = document.createElement("button")
-// getAccessChainOfNodeButton.innerText = "getAccessChain"
-// getAccessChainOfNodeButton.style.margin = "10px"
-// getAccessChainOfNodeButton.addEventListener("click", function(){
-//     if (controlPanel.currentNode){
-//         let accessChain = getAccessChain(controlPanel.currentNode)
-//         console.log(179, accessChain)
-//     }
-// })
-// controlPanel.append(getAccessChainOfNodeButton)
-//
-//
-// let nodeContainer = document.createElement("div")
-// nodeContainer.style.background = "gold"
-// nodeContainer.style.height = "100vh"
-// nodeContainer.itemIdentity = {
-//       "accessPointer": 0,
-//       "dataPointer": 0,
-//       "parentPointer": null
-// }
-//
-//
-// // initialize thee dataa
-// document.body.append(nodeContainer, controlPanel)
-// let r = createHTMLObject(database["root"], nodeContainer)
-// r.style.position = "absolute"
-//
-//
-// // methods to access the database
-// function getItem(accessPointer){
-//   return document.querySelector(".item_" + accessPointer)
-// }
-//
-// function getAccessChain(htmlNode, accessChain = []){
-//     console.log(htmlNode)
-//     accessChain.unshift(htmlNode.itemIdentity.accessPointer)
-//     console.log(accessChain)
-//     if (htmlNode.parent && htmlNode.parent.itemIdentity){
-//         return getAccessChain(htmlNode.parent, accessChain)
-//     } else {
-//         return accessChain
-//     }
-// }
-//
-// window.getItem = getItem
-// // r.style.marginRight = "auto"
+let widthController
+let heightController
+let backgroundColorController
+
+let radiusController
+let circleCenterXController
+let circleCenterYController
+let fillController
+
+let allController = {
+    divController: [widthController, heightController, backgroundColorController],
+    svgCircleController: [radiusController, circleCenterXController, circleCenterYController, fillController]
+
+}
+
+interface ControllerOptionInterface {
+    attributeName:string
+    controllerType: any
+    prototype?: HTMLElement
+}
+
+interface LengthControllerOptionInterface extends ControllerOptionInterface{
+    unitOptions: string[]
+}
+
+interface dropdownListControllerOptionInterface extends ControllerOptionInterface{
+    selectionList: string[]
+}
+
+export function controllerCreater(name:string, controllerOptions: LengthControllerOptionInterface|dropdownListControllerOptionInterface){
+    let controllerContainer = document.createElement("div")
+    controllerContainer.classList.add(name)
+    controllerContainer.style.width = "90%"
+    controllerContainer.style.minHeight = "200px"
+    controllerContainer.style.border = "2px black solid"
+    controllerContainer.style.margin = "20px auto"
+
+    let controllerType = controllerOptions["controllerType"]
+    let attributeName = controllerOptions["attributeName"]
+    let unitOptions = controllerOptions["unitOptions"]
+    let selectionList = controllerOptions["selectionList"]
+
+    if (unitOptions) return controllerType(attributeName, unitOptions)
+    if (selectionList) return controllerType(attributeName, selectionList)
+}
+
+
+export class AttributeControllerClass {
+    GNObjectControllerArray: any[]
+    // @auto-fold here
+    constructor(){
+        this.GNObjectControllerArray = []
+    }
+
+    createDivControllerContainer():HTMLObjectControllerInterface{
+        let divControllerContainer = <HTMLObjectControllerInterface> document.createElement("div")
+        divControllerContainer.classList.add("divController")
+        divControllerContainer.targetHTMLType = "DIV"
+
+
+        // color controller
+        let colorSquare = document.createElement("div")
+        colorSquare.style.display = "inline-block"
+        colorSquare.style["width"] = "50px"
+        colorSquare.style["height"] = "50px"
+        colorSquare.style["margin"] = "10px"
+        let backgroundColorController = choiceController("background", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorSquare)
+
+        // width Controller
+        let widthController = controllerCreater("widthController", {
+            attributeName: "width",
+            unitOptions: ["px", "vw", "%"],
+            controllerType: inputFieldAndDropdownListController
+        })
+
+        let heightController = controllerCreater("widthController", {
+            attributeName: "height",
+            unitOptions: ["px", "vw", "%"],
+            controllerType: inputFieldAndDropdownListController
+        })
+
+        let positionController = controllerCreater("positionController", {
+            attributeName: "position",
+            selectionList: ["none", "relative", "absolute"],
+            controllerType: dropdownListController
+        })
+
+
+        divControllerContainer.controllerArray = [widthController, heightController, positionController, backgroundColorController]
+        divControllerContainer.append(...divControllerContainer.controllerArray)
+
+        this.superController(divControllerContainer)
+
+        this.GNObjectControllerArray.push(divControllerContainer)
+        return divControllerContainer
+    }
+
+
+     createSvgCircleControllerContainer():HTMLObjectControllerInterface{
+        let svgCircleContainer = <HTMLObjectControllerInterface> document.createElement("div")
+
+        svgCircleContainer.classList.add("svgCircleContainer")
+        svgCircleContainer.targetHTMLType = "circle"
+
+        let radiusController = inputFieldAndDropdownListController("r", ["px", "vw", "%"])
+
+        let circleCenterXController = controllerCreater("cxController", {
+            attributeName: "cx",
+            unitOptions: ["px", "vw", "%"],
+            controllerType: inputFieldAndDropdownListController
+        })
+
+        let circleCenterYController = controllerCreater("cyController", {
+            attributeName: "cy",
+            unitOptions: ["px", "vw", "%"],
+            controllerType: inputFieldAndDropdownListController
+        })
+
+        let colorSquare = document.createElement("div")
+        colorSquare.style.display = "inline-block"
+        colorSquare.style["width"] = "50px"
+        colorSquare.style["height"] = "50px"
+        colorSquare.style["margin"] = "10px"
+
+        let fillController = choiceController("fill", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorSquare)
+
+        svgCircleContainer.controllerArray = [radiusController, circleCenterXController, circleCenterYController, fillController]
+
+        svgCircleContainer.append(...svgCircleContainer.controllerArray)
+        this.superController(svgCircleContainer)
+
+        this.GNObjectControllerArray.push(svgCircleContainer)
+        return svgCircleContainer
+    }
+
+    superController(controllerContainer){
+          let self = this
+
+          controllerContainer.style.display = "none"
+
+          controllerContainer.responseToHtmlType = function (htmlObject){
+              console.log(htmlObject.tagName, controllerContainer.targetHTMLType)
+              if (htmlObject.tagName != controllerContainer.targetHTMLType){
+                  console.log("none")
+                  controllerContainer.style.display = "none"
+              } else {
+                  console.log("visible")
+                  controllerContainer.style.display = "block"
+              }
+          }
+
+          controllerContainer.attachTo = function (htmlObject){
+              self.initializeContainerAndControllerEvent(htmlObject, controllerContainer.controllerArray)
+          }
+
+    }
+
+
+    initializeContainerAndControllerEvent( htmlObject:HTMLElement, controllerArray:any[]){
+        htmlObject.addEventListener("click", (e)=>{
+            this.GNObjectControllerArray.forEach(p=>p.responseToHtmlType(htmlObject))
+            console.log(177, this.GNObjectControllerArray)
+            e.stopPropagation()
+            controllerArray.forEach(p=>{
+                p.clear()
+                p.setControllerTarget(htmlObject)
+            })
+        }, false)
+    }
+
+}
+
+
+
+
+
+// @auto-fold here
+export function inputFieldAndDropdownListController(attributeName, unitOptions){
+    let controllerContainer = <ControllerInterface> document.createElement("div")
+    controllerContainer.style.display = "grid"
+    controllerContainer.style.gridTemplateColumns = "1fr 3fr 1fr"
+
+    controllerContainer.classList.add(attributeName + "Controller")
+    let title = document.createElement("span")
+    title.innerText = attributeName
+    title.style.textAlign = "center"
+
+    let inputField = document.createElement("input")
+    let dropdownList = document.createElement("select")
+
+    unitOptions.forEach(unit=>{
+        let option = document.createElement("option")
+        option.value = unit
+        option.innerText = unit
+        dropdownList.appendChild(option)
+    })
+
+    dropdownList.addEventListener("change", (e)=> controllerContainer.updateObject())
+
+    inputField.addEventListener("input", (e)=> controllerContainer.updateObject())
+
+    // to update the value according to the controller values
+    // @auto-fold her
+    controllerContainer.updateObject = function (){
+        if (controllerContainer.controllerTarget){
+            controllerContainer.controllerTarget.style[attributeName] = inputField.value + dropdownList.value
+        }
+    }
+
+    // functions
+    controllerContainer.setControllerTarget = function (object){
+        controllerContainer.controllerTarget = object
+    }
+
+    /** to clear the controller's data when it is dismissed. */
+    controllerContainer.clear = function (){
+        controllerContainer.setControllerTarget(null)
+    }
+
+    controllerContainer.append(title, inputField, dropdownList)
+
+    return controllerContainer
+}// inputFieldAndDropdownListController
+
+// @auto-fold here
+export function dropdownListController(attributeName:string, selectionList:string[]):dropdownListControllerInterface{
+    let controllerContainer = <dropdownListControllerInterface> document.createElement("div")
+
+    let title = attributeName
+    let dropdownList = document.createElement("select")
+
+    selectionList.forEach(unit=>{
+        let option = document.createElement("option")
+        option.value = unit
+        option.innerText = unit
+        dropdownList.appendChild(option)
+    })
+
+    dropdownList.addEventListener("change", (e)=> controllerContainer.updateObject())
+
+    controllerContainer.updateObject = function (){
+        if (controllerContainer.controllerTarget){
+            controllerContainer.controllerTarget.style[attributeName] = dropdownList.value
+        }
+    }
+
+    // functions
+    controllerContainer.setControllerTarget = function (object){
+        controllerContainer.controllerTarget = object
+    }
+
+    /** to clear the controller's data when it is dismissed. */
+    controllerContainer.clear = function (){
+        controllerContainer.setControllerTarget(null)
+    }
+
+    controllerContainer.append(title, dropdownList)
+
+
+    return controllerContainer
+}
+
+// @auto-fold here
+export function choiceController(attribute, choiceList, prototype:HTMLElement): choiceControllerInterface{
+    let controllerContainer = <choiceControllerInterface> document.createElement("div")
+    controllerContainer.style.display = "flex"
+    controllerContainer.style["align-items"] = "center"
+    controllerContainer.style["justify-content"] = "left"
+    controllerContainer.style["flex-wrap"] = "wrap"
+    controllerContainer.style.width = "300px"
+    controllerContainer.style.minHeight = "150px"
+    controllerContainer.classList.add(attribute + "Controller")
+
+    choiceList.forEach(choiceValue=>{
+        let item = prototype.cloneNode(true)
+
+        if (attribute=="fill"){
+            item["style"]["background"] = choiceValue
+        } else {
+            item["style"][attribute] = choiceValue
+        }
+
+        controllerContainer.appendChild(item)
+
+        item.addEventListener("click", (e)=>{
+            controllerContainer.updateObject(choiceValue)
+        })
+    })
+
+    /** to update the value according to the controller values */
+    controllerContainer.updateObject = function (itemValue){
+        if (controllerContainer.controllerTarget){
+            controllerContainer.controllerTarget.style[attribute] = itemValue
+        }
+    }
+
+    // functions
+    controllerContainer.setControllerTarget = function (object){
+        controllerContainer.controllerTarget = object
+    }
+    /** to clear the controller's data when it is dismissed. */
+    controllerContainer.clear = function (){
+        controllerContainer.setControllerTarget(null)
+    }
+
+
+    return controllerContainer
+}
+
+interface HTMLObjectControllerInterface extends HTMLDivElement{
+    controllerArray: HTMLDivElement[]
+    targetHTMLType: any
+    attachTo(htmlObject)
+    responseToHtmlType(htmlObject)
+    append(controllerArray?:any)
+}

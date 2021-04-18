@@ -35,7 +35,7 @@ var MainController = /** @class */ (function () {
         this.initializeRootArray();
         this.initalizeMainDoc();
         this.applyMainDocTemplate = false;
-        this.applyMainDocTemplate = true;
+        // this.applyMainDocTemplate = true
         if (this.applyMainDocTemplate) {
             this.initializeHTMLBackground();
         }

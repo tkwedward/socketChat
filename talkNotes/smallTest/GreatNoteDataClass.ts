@@ -9,9 +9,7 @@ export interface GNObjectInterface {
     _type: string
     _name: string // a name to describe the object
     stylesheet?: {}
-    mainController:any
-
-
+    
     // these two are used for extracting data and create dataObject
     _dataStructure?: string[]
     _styleStructure?: string[]
@@ -341,7 +339,7 @@ interface superGNObjectInterface {
 
 
 //@auto-fold here
-function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPosition:number|boolean, dataPointer:string|boolean, editEvent?:string){
+export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPosition:number|boolean, dataPointer:string|boolean, editEvent?:string){
     _object = <superGNObjectInterface>_object
 
 

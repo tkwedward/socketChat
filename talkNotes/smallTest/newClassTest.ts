@@ -1,48 +1,84 @@
 import * as Automerge from 'automerge'
 import {mainController} from "./constructInitialCondition"
 import * as GreatNoteDataClass from "./GreatNoteDataClass"
+import * as GreatNoteSvgDataClass from "./GreatNoteSvgDataClass"
 import * as GreatNoteControllerClass from "./GreatNoteControllerClass"
 import {MainDocArrayEnum}  from "./constructInitialCondition"
 import {socket} from "./socketFunction"
+import * as ControllerModel from "./dbtest"
+
+import * as ToolBoxModel from "./GNSvgObjectDataStructure"
+
+let divTest = false
+let inputFieldTest = false
+let buttonTest = false
+let svgElementTest = false
+let toolBoxTest = true
 
 
+let bigFourContainer
+let contentContainer
+let attributeController
+let metaDataController
+let widthController
+let fillController
 
 
-let GNDataStructureMapping
+//@auto-fold here
 mainController.GNDataStructureMapping = {
     GNInputField: GreatNoteDataClass.GNInputField,
     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
     GNImage: GreatNoteDataClass.GNImage,
     GNDivPage: GreatNoteDataClass.GNDivPage
-    GNButton: GreatNoteDataClass.GNButton
 }
-console.log(mainController.GNDataStructureMapping)
-// socket.emit("loadMainDoc")
 
-// to create a controller
+document.body.style.display = "grid"
+document.body.style.gridTemplateColumns = "1fr 3fr"
+
+let bookmarkArrayId = mainController.mainDocArray["bookmark"]
+
+//@auto-fold here
+let controllerStyleList = {
+    "width": "95%",
+    "height": "100vh",
+    "border": "2px black solid",
+    "margin": "20px auto"
+}
+//
+let controller = document.createElement("div")
+controller.classList.add("controller")
+controller.innerHTML = "king"
+controller.style.width = "95%"
+controller.style.height = "100vh"
+controller.style.margin = "20px auto"
+document.body.appendChild(controller)
+
+
+//@auto-fold here
+function addAccessPointerAndDataPointerDiv(htmlObject){
+    let containerInfo = document.createElement("div")
+    containerInfo.innerHTML +=  "=========================<br>"
+    let dpContainer = document.createElement("div")
+
+    dpContainer.innerHTML += "DP:" + htmlObject.getDataPointer() + "<br>"
+    dpContainer.addEventListener("click", function(){
+        console.log(mainController.getObjectById(htmlObject.getDataPointer()))
+    })
+
+    let apContainer = document.createElement("div")
+    apContainer.innerHTML += "AP:" + htmlObject.getAccessPointer() + "<br>"
+    apContainer.addEventListener("click", function(){
+        console.log(mainController.getObjectById(htmlObject.getAccessPointer()), htmlObject, htmlObject.stylesheet)
+    })
+
+    containerInfo.append(dpContainer, apContainer)
+    controller.appendChild(containerInfo)
+}
+
+
+//@auto-fold here
 if (!mainController.applyMainDocTemplate){
-    document.body.style.display = "grid"
-    document.body.style.gridTemplateColumns = "1fr 3fr"
-
-    let bookmarkArrayId = mainController.mainDocArray["bookmark"]
-
-    let controllerStyleList = {
-        "width": "95%",
-        "height": "100vh",
-        "border": "2px black solid",
-        "margin": "20px auto"
-    }
-    //
-    let controller = document.createElement("div")
-    controller.classList.add("controller")
-    controller.innerHTML = "king"
-    controller.style.width = "95%"
-    controller.style.height = "100vh"
-    controller.style.border = "2px black solid"
-    controller.style.margin = "20px auto"
-    document.body.appendChild(controller)
-    //
     let linkArrayInfo = document.createElement("div")
     linkArrayInfo.classList.add("linkArrayInfo")
     controller.appendChild(linkArrayInfo)
@@ -62,36 +98,172 @@ if (!mainController.applyMainDocTemplate){
     controller.appendChild(saveButton)
     controller.appendChild(loadButton)
     //
-    let contentContainer = document.createElement("div")
+    contentContainer = document.createElement("div")
     contentContainer.classList.add("contentContainer")
+    contentContainer.style.background = "silver"
+    // contentContainer.addEventListener("click", (e)=>{
+    //     console.log(e)
+    // })
+
+    contentContainer.addEventListener("mousedown", (e)=>{
+        console.log(e)
+    })
+
     document.body.appendChild(contentContainer)
 
+    attributeController = document.createElement("div")
+    attributeController.classList.add("attributeController")
+    attributeController.style.width = "90%"
+    attributeController.style.minHeight = "200px"
+    attributeController.style.border = "2px black solid"
+    attributeController.style.margin = "20px auto"
 
-    function addAccessPointerAndDataPointerDiv(htmlObject){
-      let containerInfo = document.createElement("div")
-      containerInfo.innerHTML +=  "=========================<br>"
-      let dpContainer = document.createElement("div")
+    let attributeControllerBar = document.createElement("div")
+    attributeControllerBar.style.height = "35px"
+    attributeControllerBar.style.marginBottom = "10px"
+    attributeControllerBar.style.background = "yellow"
 
-      dpContainer.innerHTML += "DP:" + htmlObject.getDataPointer() + "<br>"
-      dpContainer.addEventListener("click", function(){
-          console.log(mainController.getObjectById(htmlObject.getDataPointer()))
-      })
+    attributeController.append(attributeControllerBar)
 
-      let apContainer = document.createElement("div")
-      apContainer.innerHTML += "AP:" + htmlObject.getAccessPointer() + "<br>"
-      apContainer.addEventListener("click", function(){
-          console.log(mainController.getObjectById(htmlObject.getAccessPointer()), htmlObject, htmlObject.stylesheet)
-      })
 
-      containerInfo.append(dpContainer, apContainer)
-      controller.appendChild(containerInfo)
+    metaDataController  = document.createElement("div")
+    metaDataController.classList.add("metaDataController")
+    metaDataController.style.width = "90%"
+    metaDataController.style.minHeight = "200px"
+    metaDataController.style.border = "2px black solid"
+    metaDataController.style.margin = "20px auto"
+
+    let metaDataControllerBar = document.createElement("div")
+    metaDataControllerBar.style.height = "35px"
+    metaDataControllerBar.style.marginBottom = "10px"
+    metaDataControllerBar.style.background = "yellow"
+    metaDataController.appendChild(metaDataControllerBar)
+
+    controller.append(attributeController, metaDataController)
+
+    bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId)
+    bigFourContainer.appendTo(contentContainer)
+}
+
+
+if (!mainController.applyMainDocTemplate && toolBoxTest){
+    attributeController
+}
+
+let attributeControllerObject = new ControllerModel.AttributeControllerClass()
+let mouseClickTest = true
+//@auto-fold here
+if (!mainController.applyMainDocTemplate && mouseClickTest){
+    // choice controller
+    let divControllerContainer = attributeControllerObject.createDivControllerContainer()
+
+    let svgCircleContainer = attributeControllerObject.createSvgCircleControllerContainer()
+
+    // append controller
+    attributeController.append(divControllerContainer, svgCircleContainer)
+
+
+
+    // ================ div ================//
+    let div = document.createElement("div")
+    div.style.width = "100px"
+    div.style.height = "100px"
+    div.style.background = "blue"
+    contentContainer.append(div)
+    divControllerContainer.attachTo(div)
+
+    // ============== svg ============== //
+    let svg = GreatNoteSvgDataClass.GNSvg("svg", "", false, false, false)
+    svg.appendToContainer(contentContainer)
+
+    // ============== svgCircle ============ //
+    let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false)
+    svgCircle.appendTo(svg)
+    svgCircleContainer.attachTo(svgCircle.node)
+    console.log(svgCircleContainer.targetHTMLType)
+}
+
+
+if (!mainController.applyMainDocTemplate && toolBoxTest){
+    let toolBoxModel = new ToolBoxModel.ToolBoxClass()
+    let toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject()
+    attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController)
+    toolBoxHtmlObject.createToolBoxItem("Apple")
+    toolBoxHtmlObject.createToolBoxItem("Boy")
+    toolBoxHtmlObject.createToolBoxItem("Rashida")
+}
+
+
+
+
+// =============================  svgElementTest
+////@auto-fold here
+if (!mainController.applyMainDocTemplate && svgElementTest){
+    let svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+    // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+    svgObject.appendToContainer(contentContainer)
+
+    let svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId)
+    svgCircleElement.applyStyle({"r": 5, "cx": 200, "cy": 200})
+    svgCircleElement.appendTo(svgObject)
+
+    let svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId)
+    svgRectElement.applyStyle({"x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver"})
+    svgRectElement.appendTo(svgObject)
+
+    // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
+    // svgLineElement.applyStyle(
+    //   {"points": [20, 20, 100, 400],
+    //   "attribute":{"stroke": "blue", "width":1 }})
+    // svgLineElement.appendTo(svgObject)
+
+    let svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId)
+    svgPolyLineElement.applyStyle(
+      {"points": [10, 10, 50, 100, 40, 60, 90, 100],
+      "attribute":{"stroke": "blue", "width":1 , "fill":"none"}})
+    console.log(svgPolyLineElement)
+    svgPolyLineElement.appendTo(svgObject)
+
+    let svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId)
+
+    svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg")
+    console.log(131, svgImageElement)
+
+    svgImageElement.appendTo(svgObject)
+    svgImageElement.width("300px")
+    svgImageElement.height("200px")
+
+    // svgObject.createSVGObject()
+    // contentContainer.append(svgObject)
+//
+    // let circle = GreatNoteSvgDataClass.GNSvgCircle("circle", bookmarkArrayId)
+    // circle.appendTo(svgObject)
+
+}
+
+// =============================  inputFieldTest
+////@auto-fold here
+if (!mainController.applyMainDocTemplate && inputFieldTest){
+    let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
+    inpuField1.appendTo(bigFourContainer)
+    addAccessPointerAndDataPointerDiv(inpuField1)
+
+    function createInputField(){
+      let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
+      inpuField2.appendTo(bigFourContainer)
+      addAccessPointerAndDataPointerDiv(inpuField2)
     }
 
+    let number = 20
+    for (let i = 0; i< number; i++){
+      createInputField()
+    }
+}
 
-    let bigFourContainer = GreatNoteDataClass.GNContainerDiv("bigFourContainer", bookmarkArrayId)
-    bigFourContainer.appendTo(contentContainer)
-
-
+// =============================  button Test
+////@auto-fold here
+if (!mainController.applyMainDocTemplate && buttonTest){
+    console.log(1289)
     let clickEvent = function(_object){
         let triggerEvent = new Event("changeStatusEvent")
         let currentIndex = _object.statusList.indexOf(_object.innerText)
@@ -121,50 +293,51 @@ if (!mainController.applyMainDocTemplate){
 }
 
 
+////@auto-fold here
+if (!mainController.applyMainDocTemplate && divTest){
+    let firstContainer
+    Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
+        // let container =
+        // if ()
+        let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
+
+        if (index==0){
+          firstContainer = containerEditable
+        }
+
+
+        let containerInfo = document.createElement("div")
+        containerInfo.innerHTML +=  "=========================<br>"
+        let dpContainer = document.createElement("div")
+
+        dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
+        dpContainer.addEventListener("click", function(){
+            console.log(mainController.getObjectById(containerEditable.getDataPointer()))
+        })
+
+        let apContainer = document.createElement("div")
+        apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
+        apContainer.addEventListener("click", function(){
+            console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
+        })
 
 
 
-// let firstContainer
-// Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
-//     // let container =
-//     // if ()
-//     let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
-//
-//     if (index==0){
-//       firstContainer = containerEditable
-//     }
-//
-//
-//     let containerInfo = document.createElement("div")
-//     containerInfo.innerHTML +=  "=========================<br>"
-//     let dpContainer = document.createElement("div")
-//
-//     dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
-//     dpContainer.addEventListener("click", function(){
-//         console.log(mainController.getObjectById(containerEditable.getDataPointer()))
-//     })
-//
-//     let apContainer = document.createElement("div")
-//     apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
-//     apContainer.addEventListener("click", function(){
-//         console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
-//     })
-//
-//
-//
-//     containerInfo.append(dpContainer, apContainer)
-//     controller.appendChild(containerInfo)
-//
-//
-//     // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
-//     let styleList = {
-//         "width": "95%",
-//         "height": "200px",
-//         "border": "2px black solid",
-//         "margin": "20px auto"
-//     }
-//     containerEditable.applyStyle(styleList)
-//     console.log(containerEditable.stylesheet)
-//
-//     bigFourContainer.appendChild(containerEditable)
-// });
+        containerInfo.append(dpContainer, apContainer)
+        controller.appendChild(containerInfo)
+
+
+        // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
+        let styleList = {
+            "width": "95%",
+            "height": "200px",
+            "border": "2px black solid",
+            "margin": "20px auto"
+        }
+        containerEditable.applyStyle(styleList)
+        console.log(containerEditable.stylesheet)
+
+        bigFourContainer.appendChild(containerEditable)
+    });
+
+}

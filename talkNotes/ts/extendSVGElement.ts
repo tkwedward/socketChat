@@ -11,9 +11,6 @@ export function SuperClass(svgObject:HTMLElement):HTMLElement{
 
 export function SuperCircle(circle){
     circle = SuperClass(circle)
-    // circle._new_tell_me_yourName = ()=>{
-    //     console.log("I am a ")
-    // }
 
     circle.exportData = ()=>{
       let result = {
