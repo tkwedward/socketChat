@@ -54,6 +54,7 @@ exports.GNSvg = GNSvg;
 function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var svgObject = new svg_js_1["default"].Circle();
+    console.log(119, svgObject);
     var html = document.createElement("div");
     svgObject.radius(75);
     svgObject.fill("red");
@@ -65,14 +66,16 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        Object.entries(attrList).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            svgObject.node.style[key] = value;
-        });
+        svgObject.attr(attrList);
+    };
+    svgObject.appendTo = function (parentSVGContainer) {
+        //self.targetPage.svgNode.appendChild(eraser.node)
+        console.log(139, parentSVGContainer, svgObject);
+        parentSVGContainer.svgNode.appendChild(svgObject.node);
     };
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    // SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
     return svgObject;
 }
 exports.GNSvgCircle = GNSvgCircle;
@@ -88,6 +91,7 @@ function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
+        console.log(attrList);
         Object.entries(attrList).forEach(function (_a, _) {
             var key = _a[0], value = _a[1];
             svgObject.node.style[key] = value;

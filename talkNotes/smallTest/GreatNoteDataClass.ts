@@ -9,14 +9,15 @@ export interface GNObjectInterface {
     _type: string
     _name: string // a name to describe the object
     stylesheet?: {}
-    
+
     // these two are used for extracting data and create dataObject
     _dataStructure?: string[]
     _styleStructure?: string[]
 
     _identity?: {
       "accessPointer": string,
-      "dataPointer": string
+      "dataPointer": string,
+      "linkArray": string
     }
 
     appendTo(_parent:HTMLElement)
@@ -152,7 +153,7 @@ export function GNContainerDiv(name:string, arrayID: string, insertPosition?: nu
     }
 
     _object.extract = () => _object.createDataObject()
-
+    console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer)
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer)
 
@@ -341,8 +342,7 @@ interface superGNObjectInterface {
 //@auto-fold here
 export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPosition:number|boolean, dataPointer:string|boolean, editEvent?:string){
     _object = <superGNObjectInterface>_object
-
-
+    console.log(345, _object)
     /** important function to extract data from individual elements*/
     _object.createDataObject = function(){
         let dataObject = {
@@ -369,7 +369,7 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
         if (_object.stylesheet){
             Object.entries(_object.stylesheet).forEach(([key,_], i)=> dataObject["stylesheet"][key] = _object["style"][key])
         }
-
+        console.log(372, _object, _object._identity, _object._dataStructure, _object.stylesheet)
         return dataObject
     }
 
@@ -473,6 +473,7 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
 
 
     _object.getDataPointer = function(){
+       console.log(476, _object._identity)
         return _object._identity.dataPointer
     }
 
@@ -500,6 +501,8 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
     }
 
     if (saveToDatabase){
+        console.log(503, _object, saveToDatabase)
+        console.log(504, _object._identity)
         _object.addToDatabase(arrayID, insertPosition, dataPointer)
         _object.editEvent(editEvent)
     }

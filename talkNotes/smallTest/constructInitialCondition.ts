@@ -43,13 +43,16 @@ export interface MainControllerInterface {
     getObjectById(objectID: string, doc?:any)
 
     /** internode functions*/
+
+    /**
+    input: array in the mainDoc
+    function: To render the data stored in the mainDoc to HTML Elements.*/
     renderDataToHTML(data: any, arrayHTMLObject:HTMLElement|GNObjectInterface)
+    /** To save the mainDoc as text file*/
     saveMainDoc()
+    /** To load string into the mainDoc */
     loadMainDoc(data:string)
-
 }
-
-
 
 export class MainController implements MainControllerInterface{
   mainDocArray: any;
@@ -66,7 +69,7 @@ export class MainController implements MainControllerInterface{
         this.applyMainDocTemplate = false
         // this.applyMainDocTemplate = true
         if (this.applyMainDocTemplate){
-            this.initializeHTMLBackground()
+            // this.initializeHTMLBackground()
         }
         //
     }
@@ -178,7 +181,6 @@ export class MainController implements MainControllerInterface{
     //@auto-fold here
     addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?):[any, string]{
       // Step 1: register an accessPointer in the database
-        htmlObject.mainController = this
 
         //@auto-fold here
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
@@ -204,7 +206,6 @@ export class MainController implements MainControllerInterface{
         if (dataPointer){
             objectData._identity.dataPointer = dataPointer
         }
-        )
 
 
         // Step 3: put real data into the database
@@ -225,8 +226,8 @@ export class MainController implements MainControllerInterface{
         })
 
         htmlObject._identity = objectData._identity
-        console.log(htmlObject, accessPointer)
-        console.log(190, htmlObject, accessPointer)
+
+        console.log(190, htmlObject._identity, accessPointer)
         return [htmlObject, accessPointer]
     }// addData
 
@@ -272,8 +273,10 @@ export class MainController implements MainControllerInterface{
     }
 
     //@auto-fold here
+    /** when ever the htmlObject is updated, we fetch newData from the HTMLObjectt, and then go to the database and update the relevant data*/ 
     saveHTMLObjectToDatabase(htmlObject:GNObjectInterface){
         let newData = htmlObject.extract()
+        console.log(279, newData, htmlObject)
         let dataPointer = htmlObject.getDataPointer()
         let accessPointer = htmlObject.getAccessPointer()
 
@@ -333,7 +336,7 @@ export class MainController implements MainControllerInterface{
           newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
       }
 
-
+        console.log(336, data)
         newHTMLObject.applyStyle(data.stylesheet)
 
         arrayHTMLObject.appendChild(newHTMLObject)

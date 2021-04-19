@@ -17315,7 +17315,7 @@ class WS extends Transport {
 module.exports = WS;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":57,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
+},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":59,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
     if (obj.hasOwnProperty(k)) {
@@ -17640,7 +17640,7 @@ formatters.j = function (v) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./common":18,"_process":59}],18:[function(require,module,exports){
+},{"./common":18,"_process":61}],18:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -19437,7 +19437,7 @@ exports.url = url;
 
 },{"debug":33,"parseuri":26}],33:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":34,"_process":59,"dup":17}],34:[function(require,module,exports){
+},{"./common":34,"_process":61,"dup":17}],34:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":35}],35:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -19864,7 +19864,7 @@ exports.hasBinary = hasBinary;
 
 },{}],39:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":40,"_process":59,"dup":17}],40:[function(require,module,exports){
+},{"./common":40,"_process":61,"dup":17}],40:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":41}],41:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -25547,6 +25547,7 @@ exports.addMovingEvent = void 0;
 function addMovingEvent(htmlObject) {
     var attributeX;
     var attributeY;
+    // choice a suitable attribute name according to the htmlObject selected
     switch (htmlObject.tagName) {
         case "circle":
             attributeX = "cx";
@@ -25559,58 +25560,55 @@ function addMovingEvent(htmlObject) {
         default:
             attributeX = "left";
             attributeY = "top";
+            htmlObject.style.position = "relative";
     }
-    htmlObject.style.position = "relative";
     htmlObject.addEventListener("mousedown", function (e) {
         // to stop any event not related to this element
         if (e.target !== e.currentTarget)
             return;
-        // e.stopPropagation()
         // to allow mouse to move into other elements
-        Array.from(htmlObject.parentNode.children).forEach(function (p) {
+        Array.from(htmlObject.parentNode["children"]).forEach(function (p) {
             if (p != htmlObject)
-                p.style.pointerEvents = "none";
-            // })
-            var startX = e["screenX"];
-            var startY = e["screenY"];
-            var objectInitialX = 0;
-            var objectInitialY = 0;
-            var initialLeftValue = parseInt(htmlObject.style[attributeX].replace("px", "")) || 0;
-            var initialTopValue = parseInt(htmlObject.style[attributeY].replace("px", "")) || 0;
-            console.log(initialLeftValue, initialTopValue);
-            var currentX;
-            var currentY;
-            var deltaX = 0;
-            var deltaY = 0;
-            var mousemoveFunction = function (e) {
-                currentY = e.screenY;
-                currentX = e.screenX;
-                deltaX = currentX - startX;
-                deltaY = currentY - startY;
-                var newX = htmlObject.style[attributeX] = initialLeftValue + deltaX + "px";
-                htmlObject.style[attributeY] = initialTopValue + deltaY + "px";
-            };
-            htmlObject.addEventListener("mousemove", mousemoveFunction, false);
-            function endDragEvent(e) {
-                console.log(htmlObject.parentNode["children"]);
-                Array.from(htmlObject.parentNode["children"]).forEach(function (p) {
-                    console.log(p);
-                    p["style"]["pointerEvents"] = "inherit";
-                });
-                var endX = e["screenX"];
-                var endY = e["screenY"];
-                htmlObject.removeEventListener("mousemove", mousemoveFunction);
-                console.log("end at = (" + endX + ", " + endY + ")");
-            }
-            htmlObject.addEventListener("mouseup", function (e) {
-                endDragEvent(e);
-            }, false);
-            htmlObject.addEventListener("mouseout", function (e) {
-                endDragEvent(e);
-            }, false);
+                p["style"]["pointerEvents"] = "none";
+        });
+        var startX = e["screenX"];
+        var startY = e["screenY"];
+        var objectInitialX = 0;
+        var objectInitialY = 0;
+        var initialLeftValue = parseInt(htmlObject.style[attributeX].replace("px", "")) || 0;
+        var initialTopValue = parseInt(htmlObject.style[attributeY].replace("px", "")) || 0;
+        var currentX;
+        var currentY;
+        var deltaX = 0;
+        var deltaY = 0;
+        var mousemoveFunction = function (e) {
+            currentY = e.screenY;
+            currentX = e.screenX;
+            deltaX = currentX - startX;
+            deltaY = currentY - startY;
+            var newX = htmlObject.style[attributeX] = initialLeftValue + deltaX + "px";
+            htmlObject.style[attributeY] = initialTopValue + deltaY + "px";
+        };
+        htmlObject.addEventListener("mousemove", mousemoveFunction, false);
+        function endDragEvent(e) {
+            console.log(htmlObject.parentNode["children"]);
+            Array.from(htmlObject.parentNode["children"]).forEach(function (p) {
+                console.log(p);
+                p["style"]["pointerEvents"] = "inherit";
+            });
+            var endX = e["screenX"];
+            var endY = e["screenY"];
+            htmlObject.removeEventListener("mousemove", mousemoveFunction);
+            console.log("end at = (" + endX + ", " + endY + ")");
+        }
+        htmlObject.addEventListener("mouseup", function (e) {
+            endDragEvent(e);
         }, false);
-    });
-}
+        htmlObject.addEventListener("mouseout", function (e) {
+            endDragEvent(e);
+        }, false); // mouseUp event to remove the drag event
+    }, false); // mousedown event
+} // } // addMovingEvent
 exports.addMovingEvent = addMovingEvent;
 
 },{}],45:[function(require,module,exports){
@@ -25633,6 +25631,7 @@ var ToolBoxClass = /** @class */ (function () {
             var toolBoxItem = self.createToolBoxItem(name, toolBoxHtmlObject);
             toolBoxHtmlObject.itemArray.push(toolBoxItem);
             toolBoxHtmlObject.appendChild(toolBoxItem);
+            return toolBoxItem;
         };
         return toolBoxHtmlObject;
     };
@@ -25890,6 +25889,7 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
         Object.values(_object.childrenList).forEach(function (p) { return p.loadFromData(data[p._name]); });
     };
     _object.extract = function () { return _object.createDataObject(); };
+    console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer);
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
     return _object;
@@ -26016,6 +26016,7 @@ exports.GNTemplate = GNTemplate;
 //@auto-fold here
 function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, editEvent) {
     _object = _object;
+    console.log(345, _object);
     /** important function to extract data from individual elements*/
     _object.createDataObject = function () {
         var dataObject = {
@@ -26040,6 +26041,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
                 return dataObject["stylesheet"][key] = _object["style"][key];
             });
         }
+        console.log(372, _object, _object._identity, _object._dataStructure, _object.stylesheet);
         return dataObject;
     };
     // when the data is first created, add it to the database
@@ -26127,6 +26129,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     // =======   for database acces    ========
     // ========================================
     _object.getDataPointer = function () {
+        console.log(476, _object._identity);
         return _object._identity.dataPointer;
     };
     _object.setDataPointer = function (dataPointer) {
@@ -26146,13 +26149,15 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         return constructInitialCondition_1.mainController.getObjectById(_object.getDataPointer());
     };
     if (saveToDatabase) {
+        console.log(503, _object, saveToDatabase);
+        console.log(504, _object._identity);
         _object.addToDatabase(arrayID, insertPosition, dataPointer);
         _object.editEvent(editEvent);
     }
 }
 exports.superGNObject = superGNObject;
 
-},{"./constructInitialCondition":51}],48:[function(require,module,exports){
+},{"./constructInitialCondition":53}],48:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -26209,6 +26214,7 @@ exports.GNSvg = GNSvg;
 function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var svgObject = new svg_js_1["default"].Circle();
+    console.log(119, svgObject);
     var html = document.createElement("div");
     svgObject.radius(75);
     svgObject.fill("red");
@@ -26220,14 +26226,16 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        Object.entries(attrList).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            svgObject.node.style[key] = value;
-        });
+        svgObject.attr(attrList);
+    };
+    svgObject.appendTo = function (parentSVGContainer) {
+        //self.targetPage.svgNode.appendChild(eraser.node)
+        console.log(139, parentSVGContainer, svgObject);
+        parentSVGContainer.svgNode.appendChild(svgObject.node);
     };
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    // SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
     return svgObject;
 }
 exports.GNSvgCircle = GNSvgCircle;
@@ -26243,6 +26251,7 @@ function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
+        console.log(attrList);
         Object.entries(attrList).forEach(function (_a, _) {
             var key = _a[0], value = _a[1];
             svgObject.node.style[key] = value;
@@ -26331,6 +26340,8 @@ function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabas
 }
 
 },{"svg.js":42}],49:[function(require,module,exports){
+arguments[4][48][0].apply(exports,arguments)
+},{"dup":48,"svg.js":42}],50:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26352,39 +26363,258 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-var EventModel = __importStar(require("./EventModel"));
+exports.ToolBoxClass = void 0;
+var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSVGDataClass"));
+var ToolBoxClass = /** @class */ (function () {
+    function ToolBoxClass() {
+    }
+    ToolBoxClass.prototype.createToolboxHtmlObject = function () {
+        var self = this;
+        var toolBoxContainer = document.createElement("div");
+        toolBoxContainer.classList.add("toolBoxHtml");
+        toolBoxContainer.style.height = "80px";
+        toolBoxContainer.style.background = "silver";
+        toolBoxContainer.style.width = "90vw";
+        toolBoxContainer.style.margin = "0 auto";
+        toolBoxContainer.style.display = "grid";
+        toolBoxContainer.style.gridTemplateColumns = "4fr 3fr";
+        // toolBoxHtmlObject.style.width = "90%"
+        toolBoxContainer.itemArray = [];
+        var toolBoxSelectionHtmlObject = document.createElement("div");
+        var toolBoxOptionHtmlObject = document.createElement("div");
+        toolBoxOptionHtmlObject.classList.add("toolBoxOption");
+        toolBoxOptionHtmlObject.style.height = "80px";
+        toolBoxOptionHtmlObject.style.background = "lightBlue";
+        toolBoxContainer.selectionHTMLObject = toolBoxSelectionHtmlObject;
+        toolBoxContainer.optionHTMLObject = toolBoxOptionHtmlObject;
+        toolBoxContainer.appendChild(toolBoxSelectionHtmlObject);
+        // toolBoxContainer.appendChild(toolBoxOptionHtmlObject)
+        return toolBoxContainer;
+    };
+    ToolBoxClass.prototype.createToolBoxItem = function (name, toolBoxContainer) {
+        var toolBoxItem = document.createElement("div");
+        // the html style part
+        toolBoxItem.style.display = "inline-block";
+        toolBoxItem.classList.add("toolBoxItem");
+        toolBoxItem.innerText = name[0];
+        toolBoxItem.style.background = "gold";
+        // toolBoxItem.style.display = "flex"
+        toolBoxItem.style.margin = "10px 5px";
+        toolBoxItem.style["align-items"] = "center";
+        toolBoxItem.style["justify-content"] = "center";
+        var squreLength = "40px";
+        toolBoxItem.style.width = squreLength;
+        toolBoxItem.style.height = squreLength;
+        // internaal variable part
+        toolBoxItem.status = false;
+        toolBoxItem.resetButton = function () {
+            toolBoxItem.status = false;
+        };
+        toolBoxItem._parent = toolBoxContainer.selectionHTMLObject;
+        toolBoxContainer.itemArray.push(toolBoxItem);
+        toolBoxContainer.selectionHTMLObject.appendChild(toolBoxItem);
+        toolBoxItem.addEventListener(toolBoxItem.eventName, toolBoxItem.eventFunction);
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.createNewPolyLineItemButton = function (toolBoxHtmlObject) {
+        var self = this;
+        var toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject);
+        toolBoxItem.eventName = "mousedown";
+        function polyLineOption() {
+        }
+        toolBoxItem.eventFunction = function () {
+            console.log("polyline item button is activated");
+            console.log(event);
+            var strokeWidth = "15px";
+            var strokeColor = "black";
+            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", "", false, false, false);
+            polyline.plot([[event["offsetX"], event["offsetY"]]]);
+            polyline.appendTo(self.targetPage);
+            polyline.attr({ "stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth });
+            function updatePolyLine(e) {
+                var newPoint = polyline.array().value;
+                newPoint.push([event["offsetX"], event["offsetY"]]);
+                console.log(newPoint);
+                polyline.plot(newPoint);
+            }
+            self.targetPage.addEventListener("mousemove", updatePolyLine);
+            self.targetPage.addEventListener("mouseup", function (e) {
+                self.targetPage.removeEventListener("mousemove", updatePolyLine);
+            });
+        };
+        toolBoxItem.addEventListener("click", function () {
+            console.log("polyline item button is activated");
+            self.activateButtonFunction(toolBoxItem);
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.createEraserItemButton = function (toolBoxHtmlObject) {
+        var _this = this;
+        var self = this;
+        var toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject);
+        toolBoxItem.eventName = "mousedown";
+        toolBoxItem.eventFunction = function () {
+            console.log(event);
+            var cx = event.offsetX + "px";
+            var cy = event.offsetY + "px";
+            var r = "10px";
+            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", "", false, false, false);
+            console.log(164, eraser);
+            eraser.applyStyle({ "cx": cx, "cy": cy, "r": r });
+            function updateEraserPosition(e) {
+                cx = event["offsetX"] + "px";
+                cy = event["offsetY"] + "px";
+                eraser.applyStyle({ "cx": cx, "cy": cy });
+            }
+            _this.targetPage.addEventListener("mousemove", updateEraserPosition);
+            _this.targetPage.addEventListener("mouseup", function (e) {
+                _this.targetPage.removeEventListener("mousemove", updateEraserPosition);
+                eraser.remove();
+            });
+            _this.targetPage.addEventListener("mouseout", function (e) {
+                // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
+                console.log("You are out of the boundary");
+            });
+            console.log(183, self.targetPage);
+            console.log(eraser.appendTo);
+            // self.targetPage.svgController
+            self.targetPage.svgNode.appendChild(eraser.node);
+            // eraser.appendTo(self.targetPage)
+            // this.targetPage.appendChild(eraser.node)
+        };
+        toolBoxItem.addEventListener("click", function () {
+            console.log("eraser button is activated");
+            self.activateButtonFunction(toolBoxItem);
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.activateButtonFunction = function (toolBoxItem) {
+        if (this.currentActiveButton) {
+            console.log("clear the toolbox button status");
+            this.currentActiveButton.style.background = "gold";
+            this.targetPage.removeEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
+        }
+        toolBoxItem.style.background = "red";
+        this.currentActiveButton = toolBoxItem;
+        this.currentActiveEventName = toolBoxItem.eventName;
+        this.currentActiveEventFunction = toolBoxItem.eventFunction;
+        // this.activateToolboxItem(toolBoxItem)
+        console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction);
+        this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
+    };
+    return ToolBoxClass;
+}());
+exports.ToolBoxClass = ToolBoxClass;
+
+},{"./GreatNoteSVGDataClass":48}],51:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
 var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
-console.log("Basic event model");
+var ToolBoxModel = __importStar(require("./ToolBoxModel"));
+var constructInitialCondition_1 = require("./constructInitialCondition");
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var toolBoxController = new ToolBoxModel.ToolBoxClass();
+// let pageViewController = document.querySelector(".pageViewController")
+// let addButton = document.querySelector(".navBara .addButton")
+// let pageDiv = fetch('../templates/pageTemplate/pageDiv.ejs')
+//   .then(response => response.text())
+//   .then(data => {
+//       let template = document.createElement("template")
+//       template.innerHTML = data
+//
+//       var newNode = document.importNode(template.content, true)
+//
+//       pageViewController.appendChild(newNode)
+//   });
+var eventStatus = document.createElement("div");
+eventStatus.style.display = "flexbox";
+eventStatus.style.margin = "10px 5px";
+eventStatus.style["align-items"] = "center";
+eventStatus.style["justify-content"] = "center";
+eventStatus.style.width = "90vw";
+eventStatus.style.height = "80px";
+eventStatus.style.margin = "auto";
+eventStatus.style.background = "pink";
+console.log(constructInitialCondition_1.mainController.mainDocArray["bookmark"]);
+var currentEventNameDiv = document.createElement("div");
+currentEventNameDiv.innerText = "Current Event Name: ";
+var currentEventFunctionDiv = document.createElement("div");
+currentEventFunctionDiv.innerText = "Current Event Functions: ";
+var printMainDocButton = document.createElement("button");
+printMainDocButton.innerText = "print mainDoc";
+printMainDocButton.addEventListener("click", function (e) {
+    console.log(constructInitialCondition_1.mainController.mainDoc["array"][1]["array"]);
+    console.log(constructInitialCondition_1.mainController.mainDoc["array"][1]["array"].length);
+});
+var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
+console.log(45, bookmarkArrayId);
+GreatNoteDataClass.GNContainerDiv("div", bookmarkArrayId, false, false, true);
+eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton);
+toolBoxController.eventNameDiv = currentEventNameDiv;
+toolBoxController.eventFunctionDiv = currentEventFunctionDiv;
+document.body.appendChild(eventStatus);
+var toolBoxHtmlObject = toolBoxController.createToolboxHtmlObject();
+var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
+console.log(30, bookmarkArrayId);
 var basicDiv = document.createElement("div");
 basicDiv.style.width = "90vw";
 basicDiv.style.height = "80vh";
 basicDiv.style.background = "gold";
-EventModel.addMovingEvent(basicDiv);
-var insideDiv1 = document.createElement("div");
-insideDiv1.style.width = "10vw";
-insideDiv1.style.height = "10vh";
-insideDiv1.style.background = "red";
-EventModel.addMovingEvent(insideDiv1);
-// svg div board
-var svgBoard = GreatNoteSvgDataClass.GNSvg("", "", false, false, false);
+// // svg div board
+var svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false);
 svgBoard.appendToContainer(basicDiv);
-console.log(22, svgBoard.svgNode);
-svgBoard.svgNode.style.background = "blue";
-EventModel.addMovingEvent(svgBoard.svgNode);
-basicDiv.appendChild(insideDiv1);
+toolBoxController.targetPage = svgBoard;
+svgBoard.svgNode.style.background = "pink";
+console.log(constructInitialCondition_1.mainController.mainDoc);
+var newPolyLineItemButton = toolBoxController.createNewPolyLineItemButton(toolBoxHtmlObject);
+var newEraserItemButton = toolBoxController.createEraserItemButton(toolBoxHtmlObject);
+console.log(newPolyLineItemButton);
+console.log(toolBoxHtmlObject);
+document.body.appendChild(toolBoxHtmlObject);
 document.body.appendChild(basicDiv);
-var svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false);
-svgCircle.appendTo(svgBoard);
-console.log(svgCircle);
-EventModel.addMovingEvent(svgCircle.node);
-var svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, false);
-svgRect.applyStyle({ "x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill": "pink" });
-svgRect.appendTo(svgBoard);
-EventModel.addMovingEvent(svgRect.node);
+// EventModel.addMovingEvent(svgBoard.svgNode)
+// EventModel.addMovingEvent(basicDiv)
+//
+// let insideDiv1 = document.createElement("div")
+// insideDiv1.style.width = "10vw"
+// insideDiv1.style.height = "10vh"
+// insideDiv1.style.background = "red"
+// EventModel.addMovingEvent(insideDiv1)
+// basicDiv.appendChild(insideDiv1)
+//
+//
+// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false)
+// svgCircle.appendTo(svgBoard)
+// console.log(svgCircle)
+// EventModel.addMovingEvent(svgCircle.node)
+//
+// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, false)
+// svgRect.applyStyle({"x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill":"pink"})
+// svgRect.appendTo(svgBoard)
+// EventModel.addMovingEvent(svgRect.node)
 
-},{"./EventModel":44,"./GreatNoteSvgDataClass":48}],50:[function(require,module,exports){
+},{"./GreatNoteDataClass":47,"./GreatNoteSvgDataClass":49,"./ToolBoxModel":50,"./constructInitialCondition":53}],52:[function(require,module,exports){
 
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26424,7 +26654,7 @@ var MainController = /** @class */ (function () {
         this.applyMainDocTemplate = false;
         // this.applyMainDocTemplate = true
         if (this.applyMainDocTemplate) {
-            this.initializeHTMLBackground();
+            // this.initializeHTMLBackground()
         }
         //
     }
@@ -26517,9 +26747,8 @@ var MainController = /** @class */ (function () {
     */
     //@auto-fold here
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
-        var _this = this;
         // Step 1: register an accessPointer in the database
-        htmlObject.mainController = this;
+        var _this = this;
         //@auto-fold here
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
@@ -26555,8 +26784,7 @@ var MainController = /** @class */ (function () {
             }
         });
         htmlObject._identity = objectData._identity;
-        console.log(htmlObject, accessPointer);
-        console.log(190, htmlObject, accessPointer);
+        console.log(190, htmlObject._identity, accessPointer);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
@@ -26601,8 +26829,10 @@ var MainController = /** @class */ (function () {
         return _dummyData;
     };
     //@auto-fold here
+    /** when ever the htmlObject is updated, we fetch newData from the HTMLObjectt, and then go to the database and update the relevant data*/
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
         var newData = htmlObject.extract();
+        console.log(279, newData, htmlObject);
         var dataPointer = htmlObject.getDataPointer();
         var accessPointer = htmlObject.getAccessPointer();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -26659,6 +26889,7 @@ var MainController = /** @class */ (function () {
         else {
             newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
         }
+        console.log(336, data);
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {
@@ -26671,9 +26902,9 @@ var MainController = /** @class */ (function () {
 exports.MainController = MainController;
 exports.mainController = new MainController();
 
-},{"./socketFunction":55,"automerge":1}],52:[function(require,module,exports){
-arguments[4][50][0].apply(exports,arguments)
-},{"dup":50}],53:[function(require,module,exports){
+},{"./socketFunction":57,"automerge":1}],54:[function(require,module,exports){
+arguments[4][52][0].apply(exports,arguments)
+},{"dup":52}],55:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = exports.AttributeControllerClass = exports.controllerCreater = void 0;
@@ -26912,10 +27143,9 @@ function choiceController(attribute, choiceList, prototype) {
 }
 exports.choiceController = choiceController;
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
-//
 // let divTest = false
 // let inputFieldTest = false
 // let buttonTest = false
@@ -26982,7 +27212,6 @@ exports.__esModule = true;
 //     containerInfo.append(dpContainer, apContainer)
 //     controller.appendChild(containerInfo)
 // }
-//
 //
 // //@auto-fold here
 // if (!mainController.applyMainDocTemplate){
@@ -27103,55 +27332,55 @@ exports.__esModule = true;
 //     // EventModel.addMovingEvent(svgCircle.node)
 // }
 //
-//
-// if (!mainController.applyMainDocTemplate && toolBoxTest){
-//     let toolBoxModel = new ToolBoxModel.ToolBoxClass()
-//     let toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject()
-//     attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController)
-//     toolBoxHtmlObject.createToolBoxItem("Apple")
-//     toolBoxHtmlObject.createToolBoxItem("Boy")
-//     toolBoxHtmlObject.createToolBoxItem("Rashida")
-// }
-//
+// //
+// // if (!mainController.applyMainDocTemplate && toolBoxTest){
+// //     let toolBoxModel = new ToolBoxModel.ToolBoxClass()
+// //     let toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject()
+// //     attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController)
+// //     toolBoxHtmlObject.createToolBoxItem("Apple")
+// //     toolBoxHtmlObject.createToolBoxItem("Boy")
+// //     toolBoxHtmlObject.createToolBoxItem("Rashida")
+// // }
+// //
 //
 //
 //
 // // =============================  svgElementTest
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && svgElementTest){
-//     let svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
-//     // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
-//     svgObject.appendToContainer(contentContainer)
-//
-//     let svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId)
-//     svgCircleElement.applyStyle({"r": 5, "cx": 200, "cy": 200})
-//     svgCircleElement.appendTo(svgObject)
-//
-//     let svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId)
-//     svgRectElement.applyStyle({"x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver"})
-//     svgRectElement.appendTo(svgObject)
-//
-//     // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
-//     // svgLineElement.applyStyle(
-//     //   {"points": [20, 20, 100, 400],
-//     //   "attribute":{"stroke": "blue", "width":1 }})
-//     // svgLineElement.appendTo(svgObject)
-//
-//     let svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId)
-//     svgPolyLineElement.applyStyle(
-//       {"points": [10, 10, 50, 100, 40, 60, 90, 100],
-//       "attribute":{"stroke": "blue", "width":1 , "fill":"none"}})
-//     console.log(svgPolyLineElement)
-//     svgPolyLineElement.appendTo(svgObject)
-//
-//     let svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId)
-//
-//     svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg")
-//     console.log(131, svgImageElement)
-//
-//     svgImageElement.appendTo(svgObject)
-//     svgImageElement.width("300px")
-//     svgImageElement.height("200px")
+// // if (!mainController.applyMainDocTemplate && svgElementTest){
+// //     let svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+// //     // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+// //     svgObject.appendToContainer(contentContainer)
+// //
+// //     let svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId)
+// //     svgCircleElement.applyStyle({"r": 5, "cx": 200, "cy": 200})
+// //     svgCircleElement.appendTo(svgObject)
+// //
+// //     let svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId)
+// //     svgRectElement.applyStyle({"x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver"})
+// //     svgRectElement.appendTo(svgObject)
+// //
+// //     // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
+// //     // svgLineElement.applyStyle(
+// //     //   {"points": [20, 20, 100, 400],
+// //     //   "attribute":{"stroke": "blue", "width":1 }})
+// //     // svgLineElement.appendTo(svgObject)
+// //
+// //     let svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId)
+// //     svgPolyLineElement.applyStyle(
+// //       {"points": [10, 10, 50, 100, 40, 60, 90, 100],
+// //       "attribute":{"stroke": "blue", "width":1 , "fill":"none"}})
+// //     console.log(svgPolyLineElement)
+// //     svgPolyLineElement.appendTo(svgObject)
+// //
+// //     let svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId)
+// //
+// //     svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg")
+// //     console.log(131, svgImageElement)
+// //
+// //     svgImageElement.appendTo(svgObject)
+// //     svgImageElement.width("300px")
+// //     svgImageElement.height("200px")
 //
 //     // svgObject.createSVGObject()
 //     // contentContainer.append(svgObject)
@@ -27163,106 +27392,106 @@ exports.__esModule = true;
 //
 // // =============================  inputFieldTest
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && inputFieldTest){
-//     let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
-//     inpuField1.appendTo(bigFourContainer)
-//     addAccessPointerAndDataPointerDiv(inpuField1)
-//
-//     function createInputField(){
-//       let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
-//       inpuField2.appendTo(bigFourContainer)
-//       addAccessPointerAndDataPointerDiv(inpuField2)
-//     }
-//
-//     let number = 20
-//     for (let i = 0; i< number; i++){
-//       createInputField()
-//     }
-// }
+// // if (!mainController.applyMainDocTemplate && inputFieldTest){
+// //     let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
+// //     inpuField1.appendTo(bigFourContainer)
+// //     addAccessPointerAndDataPointerDiv(inpuField1)
+// //
+// //     function createInputField(){
+// //       let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
+// //       inpuField2.appendTo(bigFourContainer)
+// //       addAccessPointerAndDataPointerDiv(inpuField2)
+// //     }
+// //
+// //     let number = 20
+// //     for (let i = 0; i< number; i++){
+// //       createInputField()
+// //     }
+// // }
 //
 // // =============================  button Test
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && buttonTest){
-//     console.log(1289)
-//     let clickEvent = function(_object){
-//         let triggerEvent = new Event("changeStatusEvent")
-//         let currentIndex = _object.statusList.indexOf(_object.innerText)
-//         let nextIndex = (currentIndex + 1) % _object.statusList.length
-//         _object.innerText = _object.statusList[nextIndex]
-//         console.log(98, _object, _object.statusList, currentIndex)
-//
-//         _object.dispatchEvent(triggerEvent)
-//     }
-//
-//     let selectObject = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
-//     selectObject.addClickEvent(clickEvent)
-//     selectObject.appendTo(bigFourContainer)
-//     addAccessPointerAndDataPointerDiv(selectObject)
-//
-//     function createHTMLObject(){
-//       let _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
-//       _object.addClickEvent(clickEvent)
-//       _object.appendTo(bigFourContainer)
-//       addAccessPointerAndDataPointerDiv(_object)
-//     }
-//
-//     let number = 20
-//     for (let i = 0; i< number; i++){
-//       createHTMLObject()
-//     }
-// }
+// // if (!mainController.applyMainDocTemplate && buttonTest){
+// //     console.log(1289)
+// //     let clickEvent = function(_object){
+// //         let triggerEvent = new Event("changeStatusEvent")
+// //         let currentIndex = _object.statusList.indexOf(_object.innerText)
+// //         let nextIndex = (currentIndex + 1) % _object.statusList.length
+// //         _object.innerText = _object.statusList[nextIndex]
+// //         console.log(98, _object, _object.statusList, currentIndex)
+// //
+// //         _object.dispatchEvent(triggerEvent)
+// //     }
+// //
+// //     let selectObject = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
+// //     selectObject.addClickEvent(clickEvent)
+// //     selectObject.appendTo(bigFourContainer)
+// //     addAccessPointerAndDataPointerDiv(selectObject)
+// //
+// //     function createHTMLObject(){
+// //       let _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
+// //       _object.addClickEvent(clickEvent)
+// //       _object.appendTo(bigFourContainer)
+// //       addAccessPointerAndDataPointerDiv(_object)
+// //     }
+// //
+// //     let number = 20
+// //     for (let i = 0; i< number; i++){
+// //       createHTMLObject()
+// //     }
+// // }
 //
 //
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && divTest){
-//     let firstContainer
-//     Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
-//         // let container =
-//         // if ()
-//         let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
-//
-//         if (index==0){
-//           firstContainer = containerEditable
-//         }
-//
-//
-//         let containerInfo = document.createElement("div")
-//         containerInfo.innerHTML +=  "=========================<br>"
-//         let dpContainer = document.createElement("div")
-//
-//         dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
-//         dpContainer.addEventListener("click", function(){
-//             console.log(mainController.getObjectById(containerEditable.getDataPointer()))
-//         })
-//
-//         let apContainer = document.createElement("div")
-//         apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
-//         apContainer.addEventListener("click", function(){
-//             console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
-//         })
-//
-//
-//
-//         containerInfo.append(dpContainer, apContainer)
-//         controller.appendChild(containerInfo)
-//
-//
-//         // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
-//         let styleList = {
-//             "width": "95%",
-//             "height": "200px",
-//             "border": "2px black solid",
-//             "margin": "20px auto"
-//         }
-//         containerEditable.applyStyle(styleList)
-//         console.log(containerEditable.stylesheet)
-//
-//         bigFourContainer.appendChild(containerEditable)
-//     });
-//
-// }
+// // if (!mainController.applyMainDocTemplate && divTest){
+// //     let firstContainer
+// //     Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
+// //         // let container =
+// //         // if ()
+// //         let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
+// //
+// //         if (index==0){
+// //           firstContainer = containerEditable
+// //         }
+// //
+// //
+// //         let containerInfo = document.createElement("div")
+// //         containerInfo.innerHTML +=  "=========================<br>"
+// //         let dpContainer = document.createElement("div")
+// //
+// //         dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
+// //         dpContainer.addEventListener("click", function(){
+// //             console.log(mainController.getObjectById(containerEditable.getDataPointer()))
+// //         })
+// //
+// //         let apContainer = document.createElement("div")
+// //         apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
+// //         apContainer.addEventListener("click", function(){
+// //             console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
+// //         })
+// //
+// //
+// //
+// //         containerInfo.append(dpContainer, apContainer)
+// //         controller.appendChild(containerInfo)
+// //
+// //
+// //         // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
+// //         let styleList = {
+// //             "width": "95%",
+// //             "height": "200px",
+// //             "border": "2px black solid",
+// //             "margin": "20px auto"
+// //         }
+// //         containerEditable.applyStyle(styleList)
+// //         console.log(containerEditable.stylesheet)
+// //
+// //         bigFourContainer.appendChild(containerEditable)
+// //     });
+// //
+// // }
 
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27310,7 +27539,7 @@ exports.socket.on("processInitialData", function (data) {
     // mainController.loadMainDoc(data.initialData)
 });
 
-},{"./constructInitialCondition":51,"socket.io-client":27}],56:[function(require,module,exports){
+},{"./constructInitialCondition":53,"socket.io-client":27}],58:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -27462,7 +27691,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -29243,7 +29472,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":56,"buffer":57,"ieee754":58}],58:[function(require,module,exports){
+},{"base64-js":58,"buffer":59,"ieee754":60}],60:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -29330,7 +29559,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -29516,4 +29745,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[44,45,46,47,48,49,50,51,52,53,54,55]);
+},{}]},{},[44,45,46,47,49,50,51,52,53,54,55,56,57]);

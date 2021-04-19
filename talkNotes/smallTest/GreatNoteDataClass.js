@@ -74,6 +74,7 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
         Object.values(_object.childrenList).forEach(function (p) { return p.loadFromData(data[p._name]); });
     };
     _object.extract = function () { return _object.createDataObject(); };
+    console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer);
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
     return _object;
@@ -200,6 +201,7 @@ exports.GNTemplate = GNTemplate;
 //@auto-fold here
 function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, editEvent) {
     _object = _object;
+    console.log(345, _object);
     /** important function to extract data from individual elements*/
     _object.createDataObject = function () {
         var dataObject = {
@@ -224,6 +226,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
                 return dataObject["stylesheet"][key] = _object["style"][key];
             });
         }
+        console.log(372, _object, _object._identity, _object._dataStructure, _object.stylesheet);
         return dataObject;
     };
     // when the data is first created, add it to the database
@@ -311,6 +314,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     // =======   for database acces    ========
     // ========================================
     _object.getDataPointer = function () {
+        console.log(476, _object._identity);
         return _object._identity.dataPointer;
     };
     _object.setDataPointer = function (dataPointer) {
@@ -330,6 +334,8 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         return constructInitialCondition_1.mainController.getObjectById(_object.getDataPointer());
     };
     if (saveToDatabase) {
+        console.log(503, _object, saveToDatabase);
+        console.log(504, _object._identity);
         _object.addToDatabase(arrayID, insertPosition, dataPointer);
         _object.editEvent(editEvent);
     }

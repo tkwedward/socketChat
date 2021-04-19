@@ -1,6 +1,5 @@
 "use strict";
 exports.__esModule = true;
-//
 // let divTest = false
 // let inputFieldTest = false
 // let buttonTest = false
@@ -67,7 +66,6 @@ exports.__esModule = true;
 //     containerInfo.append(dpContainer, apContainer)
 //     controller.appendChild(containerInfo)
 // }
-//
 //
 // //@auto-fold here
 // if (!mainController.applyMainDocTemplate){
@@ -188,55 +186,55 @@ exports.__esModule = true;
 //     // EventModel.addMovingEvent(svgCircle.node)
 // }
 //
-//
-// if (!mainController.applyMainDocTemplate && toolBoxTest){
-//     let toolBoxModel = new ToolBoxModel.ToolBoxClass()
-//     let toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject()
-//     attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController)
-//     toolBoxHtmlObject.createToolBoxItem("Apple")
-//     toolBoxHtmlObject.createToolBoxItem("Boy")
-//     toolBoxHtmlObject.createToolBoxItem("Rashida")
-// }
-//
+// //
+// // if (!mainController.applyMainDocTemplate && toolBoxTest){
+// //     let toolBoxModel = new ToolBoxModel.ToolBoxClass()
+// //     let toolBoxHtmlObject = toolBoxModel.createToolboxHtmlObject()
+// //     attributeController.parentNode.insertBefore(toolBoxHtmlObject, attributeController)
+// //     toolBoxHtmlObject.createToolBoxItem("Apple")
+// //     toolBoxHtmlObject.createToolBoxItem("Boy")
+// //     toolBoxHtmlObject.createToolBoxItem("Rashida")
+// // }
+// //
 //
 //
 //
 // // =============================  svgElementTest
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && svgElementTest){
-//     let svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
-//     // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
-//     svgObject.appendToContainer(contentContainer)
-//
-//     let svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId)
-//     svgCircleElement.applyStyle({"r": 5, "cx": 200, "cy": 200})
-//     svgCircleElement.appendTo(svgObject)
-//
-//     let svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId)
-//     svgRectElement.applyStyle({"x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver"})
-//     svgRectElement.appendTo(svgObject)
-//
-//     // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
-//     // svgLineElement.applyStyle(
-//     //   {"points": [20, 20, 100, 400],
-//     //   "attribute":{"stroke": "blue", "width":1 }})
-//     // svgLineElement.appendTo(svgObject)
-//
-//     let svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId)
-//     svgPolyLineElement.applyStyle(
-//       {"points": [10, 10, 50, 100, 40, 60, 90, 100],
-//       "attribute":{"stroke": "blue", "width":1 , "fill":"none"}})
-//     console.log(svgPolyLineElement)
-//     svgPolyLineElement.appendTo(svgObject)
-//
-//     let svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId)
-//
-//     svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg")
-//     console.log(131, svgImageElement)
-//
-//     svgImageElement.appendTo(svgObject)
-//     svgImageElement.width("300px")
-//     svgImageElement.height("200px")
+// // if (!mainController.applyMainDocTemplate && svgElementTest){
+// //     let svgObject = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+// //     // let svgObject2 = GreatNoteSvgDataClass.GNSvg("bigFourContainer", bookmarkArrayId)
+// //     svgObject.appendToContainer(contentContainer)
+// //
+// //     let svgCircleElement = GreatNoteSvgDataClass.GNSvgCircle("bigFourContainer", bookmarkArrayId)
+// //     svgCircleElement.applyStyle({"r": 5, "cx": 200, "cy": 200})
+// //     svgCircleElement.appendTo(svgObject)
+// //
+// //     let svgRectElement = GreatNoteSvgDataClass.GNSvgRect("bigFourContainer", bookmarkArrayId)
+// //     svgRectElement.applyStyle({"x": 500, "y": 100, "width": 100, "height": 400, "fill": "silver"})
+// //     svgRectElement.appendTo(svgObject)
+// //
+// //     // let svgLineElement = GreatNoteSvgDataClass.GNSvgLine("bigFourContainer", bookmarkArrayId)
+// //     // svgLineElement.applyStyle(
+// //     //   {"points": [20, 20, 100, 400],
+// //     //   "attribute":{"stroke": "blue", "width":1 }})
+// //     // svgLineElement.appendTo(svgObject)
+// //
+// //     let svgPolyLineElement = GreatNoteSvgDataClass.GNSvgPolyLine("bigFourContainer", bookmarkArrayId)
+// //     svgPolyLineElement.applyStyle(
+// //       {"points": [10, 10, 50, 100, 40, 60, 90, 100],
+// //       "attribute":{"stroke": "blue", "width":1 , "fill":"none"}})
+// //     console.log(svgPolyLineElement)
+// //     svgPolyLineElement.appendTo(svgObject)
+// //
+// //     let svgImageElement = GreatNoteSvgDataClass.GNSvgImage("bigFourContainer", bookmarkArrayId)
+// //
+// //     svgImageElement.setImgSrc("https://multi-canvas-art.com/wp-content/uploads/2019/12/Raichu-Pikachu-and-Pichu-1.jpg")
+// //     console.log(131, svgImageElement)
+// //
+// //     svgImageElement.appendTo(svgObject)
+// //     svgImageElement.width("300px")
+// //     svgImageElement.height("200px")
 //
 //     // svgObject.createSVGObject()
 //     // contentContainer.append(svgObject)
@@ -248,101 +246,101 @@ exports.__esModule = true;
 //
 // // =============================  inputFieldTest
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && inputFieldTest){
-//     let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
-//     inpuField1.appendTo(bigFourContainer)
-//     addAccessPointerAndDataPointerDiv(inpuField1)
-//
-//     function createInputField(){
-//       let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
-//       inpuField2.appendTo(bigFourContainer)
-//       addAccessPointerAndDataPointerDiv(inpuField2)
-//     }
-//
-//     let number = 20
-//     for (let i = 0; i< number; i++){
-//       createInputField()
-//     }
-// }
+// // if (!mainController.applyMainDocTemplate && inputFieldTest){
+// //     let inpuField1 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer())
+// //     inpuField1.appendTo(bigFourContainer)
+// //     addAccessPointerAndDataPointerDiv(inpuField1)
+// //
+// //     function createInputField(){
+// //       let inpuField2 = GreatNoteDataClass.GNInputField("inputField1", bigFourContainer.getAccessPointer(), false, inpuField1.getDataPointer())
+// //       inpuField2.appendTo(bigFourContainer)
+// //       addAccessPointerAndDataPointerDiv(inpuField2)
+// //     }
+// //
+// //     let number = 20
+// //     for (let i = 0; i< number; i++){
+// //       createInputField()
+// //     }
+// // }
 //
 // // =============================  button Test
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && buttonTest){
-//     console.log(1289)
-//     let clickEvent = function(_object){
-//         let triggerEvent = new Event("changeStatusEvent")
-//         let currentIndex = _object.statusList.indexOf(_object.innerText)
-//         let nextIndex = (currentIndex + 1) % _object.statusList.length
-//         _object.innerText = _object.statusList[nextIndex]
-//         console.log(98, _object, _object.statusList, currentIndex)
-//
-//         _object.dispatchEvent(triggerEvent)
-//     }
-//
-//     let selectObject = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
-//     selectObject.addClickEvent(clickEvent)
-//     selectObject.appendTo(bigFourContainer)
-//     addAccessPointerAndDataPointerDiv(selectObject)
-//
-//     function createHTMLObject(){
-//       let _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
-//       _object.addClickEvent(clickEvent)
-//       _object.appendTo(bigFourContainer)
-//       addAccessPointerAndDataPointerDiv(_object)
-//     }
-//
-//     let number = 20
-//     for (let i = 0; i< number; i++){
-//       createHTMLObject()
-//     }
-// }
+// // if (!mainController.applyMainDocTemplate && buttonTest){
+// //     console.log(1289)
+// //     let clickEvent = function(_object){
+// //         let triggerEvent = new Event("changeStatusEvent")
+// //         let currentIndex = _object.statusList.indexOf(_object.innerText)
+// //         let nextIndex = (currentIndex + 1) % _object.statusList.length
+// //         _object.innerText = _object.statusList[nextIndex]
+// //         console.log(98, _object, _object.statusList, currentIndex)
+// //
+// //         _object.dispatchEvent(triggerEvent)
+// //     }
+// //
+// //     let selectObject = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer())
+// //     selectObject.addClickEvent(clickEvent)
+// //     selectObject.appendTo(bigFourContainer)
+// //     addAccessPointerAndDataPointerDiv(selectObject)
+// //
+// //     function createHTMLObject(){
+// //       let _object = GreatNoteDataClass.GNButton("inputField1", ["yes", "no"], bigFourContainer.getAccessPointer(), false, selectObject.getDataPointer())
+// //       _object.addClickEvent(clickEvent)
+// //       _object.appendTo(bigFourContainer)
+// //       addAccessPointerAndDataPointerDiv(_object)
+// //     }
+// //
+// //     let number = 20
+// //     for (let i = 0; i< number; i++){
+// //       createHTMLObject()
+// //     }
+// // }
 //
 //
 // ////@auto-fold here
-// if (!mainController.applyMainDocTemplate && divTest){
-//     let firstContainer
-//     Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
-//         // let container =
-//         // if ()
-//         let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
-//
-//         if (index==0){
-//           firstContainer = containerEditable
-//         }
-//
-//
-//         let containerInfo = document.createElement("div")
-//         containerInfo.innerHTML +=  "=========================<br>"
-//         let dpContainer = document.createElement("div")
-//
-//         dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
-//         dpContainer.addEventListener("click", function(){
-//             console.log(mainController.getObjectById(containerEditable.getDataPointer()))
-//         })
-//
-//         let apContainer = document.createElement("div")
-//         apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
-//         apContainer.addEventListener("click", function(){
-//             console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
-//         })
-//
-//
-//
-//         containerInfo.append(dpContainer, apContainer)
-//         controller.appendChild(containerInfo)
-//
-//
-//         // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
-//         let styleList = {
-//             "width": "95%",
-//             "height": "200px",
-//             "border": "2px black solid",
-//             "margin": "20px auto"
-//         }
-//         containerEditable.applyStyle(styleList)
-//         console.log(containerEditable.stylesheet)
-//
-//         bigFourContainer.appendChild(containerEditable)
-//     });
-//
-// }
+// // if (!mainController.applyMainDocTemplate && divTest){
+// //     let firstContainer
+// //     Object.entries(mainController.mainDocArray).forEach(([arrayName, accessPointer], index) => {
+// //         // let container =
+// //         // if ()
+// //         let containerEditable = GreatNoteDataClass.GNEditableDiv("editable", bigFourContainer.getAccessPointer(), false, firstContainer?.getDataPointer())
+// //
+// //         if (index==0){
+// //           firstContainer = containerEditable
+// //         }
+// //
+// //
+// //         let containerInfo = document.createElement("div")
+// //         containerInfo.innerHTML +=  "=========================<br>"
+// //         let dpContainer = document.createElement("div")
+// //
+// //         dpContainer.innerHTML += "DP:" + containerEditable.getDataPointer() + "<br>"
+// //         dpContainer.addEventListener("click", function(){
+// //             console.log(mainController.getObjectById(containerEditable.getDataPointer()))
+// //         })
+// //
+// //         let apContainer = document.createElement("div")
+// //         apContainer.innerHTML += "AP:" + containerEditable.getAccessPointer() + "<br>"
+// //         apContainer.addEventListener("click", function(){
+// //             console.log(mainController.getObjectById(containerEditable.getAccessPointer()), containerEditable, containerEditable.stylesheet)
+// //         })
+// //
+// //
+// //
+// //         containerInfo.append(dpContainer, apContainer)
+// //         controller.appendChild(containerInfo)
+// //
+// //
+// //         // let container = GreatNoteDataClass.GNEditableDiv(arrayName)
+// //         let styleList = {
+// //             "width": "95%",
+// //             "height": "200px",
+// //             "border": "2px black solid",
+// //             "margin": "20px auto"
+// //         }
+// //         containerEditable.applyStyle(styleList)
+// //         console.log(containerEditable.stylesheet)
+// //
+// //         bigFourContainer.appendChild(containerEditable)
+// //     });
+// //
+// // }

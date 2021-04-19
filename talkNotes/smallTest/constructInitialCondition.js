@@ -37,7 +37,7 @@ var MainController = /** @class */ (function () {
         this.applyMainDocTemplate = false;
         // this.applyMainDocTemplate = true
         if (this.applyMainDocTemplate) {
-            this.initializeHTMLBackground();
+            // this.initializeHTMLBackground()
         }
         //
     }
@@ -130,9 +130,8 @@ var MainController = /** @class */ (function () {
     */
     //@auto-fold here
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
-        var _this = this;
         // Step 1: register an accessPointer in the database
-        htmlObject.mainController = this;
+        var _this = this;
         //@auto-fold here
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
@@ -168,8 +167,7 @@ var MainController = /** @class */ (function () {
             }
         });
         htmlObject._identity = objectData._identity;
-        console.log(htmlObject, accessPointer);
-        console.log(190, htmlObject, accessPointer);
+        console.log(190, htmlObject._identity, accessPointer);
         return [htmlObject, accessPointer];
     }; // addData
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
@@ -214,8 +212,10 @@ var MainController = /** @class */ (function () {
         return _dummyData;
     };
     //@auto-fold here
+    /** when ever the htmlObject is updated, we fetch newData from the HTMLObjectt, and then go to the database and update the relevant data*/
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
         var newData = htmlObject.extract();
+        console.log(279, newData, htmlObject);
         var dataPointer = htmlObject.getDataPointer();
         var accessPointer = htmlObject.getAccessPointer();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
@@ -272,6 +272,7 @@ var MainController = /** @class */ (function () {
         else {
             newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
         }
+        console.log(336, data);
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {

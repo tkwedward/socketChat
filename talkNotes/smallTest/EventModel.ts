@@ -1,7 +1,9 @@
+import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
+
 export function addMovingEvent(htmlObject:HTMLElement|HTMLDivElement){
     let attributeX
     let attributeY
-
+    // choice a suitable attribute name according to the htmlObject selected
     switch(htmlObject.tagName){
         case "circle":
             attributeX = "cx"
@@ -14,31 +16,24 @@ export function addMovingEvent(htmlObject:HTMLElement|HTMLDivElement){
         default:
             attributeX = "left"
             attributeY = "top"
-
+            htmlObject.style.position = "relative"
     }
 
-
-
-    htmlObject.style.position = "relative"
-
-
-
     htmlObject.addEventListener("mousedown", (e)=>{
-      // to stop any event not related to this element
-
+        // to stop any event not related to this element
         if(e.target !== e.currentTarget) return;
-        // e.stopPropagation()
+
         // to allow mouse to move into other elements
-         Array.from(htmlObject.parentNode.children).forEach(p=>{
-          if (p!=htmlObject) p.style.pointerEvents = "none"
-        // })
+        Array.from(htmlObject.parentNode["children"]).forEach(p=>{
+           if (p!=htmlObject) p["style"]["pointerEvents"] = "none"
+        })
+
         let startX = e["screenX"]
         let startY = e["screenY"]
         let objectInitialX =  0
         let objectInitialY =  0
         let initialLeftValue = parseInt(htmlObject.style[attributeX].replace("px", "")) || 0
         let initialTopValue = parseInt(htmlObject.style[attributeY].replace("px", "")) || 0
-        console.log(initialLeftValue, initialTopValue)
         let currentX
         let currentY
         let deltaX = 0
@@ -73,10 +68,6 @@ export function addMovingEvent(htmlObject:HTMLElement|HTMLDivElement){
         }, false)
         htmlObject.addEventListener("mouseout", (e)=>{
             endDragEvent(e)
-        }, false)
-
-
-
-
-    }, false)
-}
+        }, false) // mouseUp event to remove the drag event
+    }, false) // mousedown event
+} // } // addMovingEvent

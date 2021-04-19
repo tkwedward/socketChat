@@ -17,6 +17,7 @@ var ToolBoxClass = /** @class */ (function () {
             var toolBoxItem = self.createToolBoxItem(name, toolBoxHtmlObject);
             toolBoxHtmlObject.itemArray.push(toolBoxItem);
             toolBoxHtmlObject.appendChild(toolBoxItem);
+            return toolBoxItem;
         };
         return toolBoxHtmlObject;
     };

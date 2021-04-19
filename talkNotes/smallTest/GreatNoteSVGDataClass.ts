@@ -19,7 +19,6 @@ export interface GNSvgContainerInterface extends HTMLDivElement{
     svgNode: SVG.LinkedHTMLElement
 
     applyStyle(attrList: any)
-    // appendTo(parentSVGObject)
     appendToContainer(parentDiv)
     createDataObject()
 
@@ -116,8 +115,8 @@ export interface GNSvgCircleData {
 //@auto-fold here
 export function GNSvgCircle(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase: boolean=true) : GNSvgCircleInterface {
     let svgObject = <GNSvgCircleInterface> new SVG.Circle()
+    console.log(119, svgObject)
     let html = document.createElement("div")
-
     svgObject.radius(75)
     svgObject.fill("red")
 
@@ -131,15 +130,19 @@ export function GNSvgCircle(name:string, arrayID: string, insertPosition?: numbe
 
     svgObject.extract = () => svgObject.createDataObject()
 
-    svgObject.applyStyle = function(attrList:GNSvgRectData){
-        Object.entries(attrList).forEach(([key, value], _)=>{
-            svgObject.node.style[key] = value
-        })
+    svgObject.applyStyle = function(attrList:GNSvgCircleData){
+        svgObject.attr(attrList)
+    }
+
+    svgObject.appendTo = function (parentSVGContainer){
+      //self.targetPage.svgNode.appendChild(eraser.node)
+        console.log(139, parentSVGContainer, svgObject)
+        parentSVGContainer.svgNode.appendChild(svgObject.node)
     }
 
     // add extra funcitons to the object
     // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
+    // SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
     return svgObject
 }
 
@@ -173,9 +176,13 @@ export function GNSvgRect(name:string, arrayID: string, insertPosition?: number|
     svgObject.extract = () => svgObject.createDataObject()
 
     svgObject.applyStyle = function(attrList:GNSvgRectData){
+        console.log(attrList)
         Object.entries(attrList).forEach(([key, value], _)=>{
             svgObject.node.style[key] = value
+
         })
+
+
     }
 
     // add extra funcitons to the object
