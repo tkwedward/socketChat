@@ -1,29 +1,51 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 exports.__esModule = true;
-// let divTest = false
-// let inputFieldTest = false
-// let buttonTest = false
-// let svgElementTest = false
-// let toolBoxTest = true
-//
-//
-// let bigFourContainer
-// let contentContainer
-// let attributeController
-// let metaDataController
-// let widthController
-// let fillController
-//
-//
-// //@auto-fold here
-// mainController.GNDataStructureMapping = {
-//     GNInputField: GreatNoteDataClass.GNInputField,
-//     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-//     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
-//     GNImage: GreatNoteDataClass.GNImage,
-//     GNDivPage: GreatNoteDataClass.GNDivPage
-// }
-//
+var constructInitialCondition_1 = require("./constructInitialCondition");
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
+var divTest = false;
+var inputFieldTest = false;
+var buttonTest = false;
+var svgElementTest = false;
+var toolBoxTest = true;
+var bigFourContainer;
+var contentContainer;
+var attributeController;
+var metaDataController;
+var widthController;
+var fillController;
+//@auto-fold here
+constructInitialCondition_1.mainController.GNDataStructureMapping = {
+    GNInputField: GreatNoteDataClass.GNInputField,
+    GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
+    GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
+    GNImage: GreatNoteDataClass.GNImage,
+    GNDivPage: GreatNoteDataClass.GNDivPage,
+    // svg
+    GNSvg: GreatNoteSvgDataClass.GNSvg,
+    GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
+    GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
+    GNSvgRect: GreatNoteSvgDataClass.GNSvgRect
+};
 // document.body.style.display = "grid"
 // document.body.style.gridTemplateColumns = "1fr 3fr"
 //

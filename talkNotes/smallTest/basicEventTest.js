@@ -23,6 +23,7 @@ var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
 var ToolBoxModel = __importStar(require("./ToolBoxModel"));
 var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var socketFunction_1 = require("./socketFunction");
 var toolBoxController = new ToolBoxModel.ToolBoxClass();
 // let pageViewController = document.querySelector(".pageViewController")
 // let addButton = document.querySelector(".navBara .addButton")
@@ -50,6 +51,18 @@ var currentEventNameDiv = document.createElement("div");
 currentEventNameDiv.innerText = "Current Event Name: ";
 var currentEventFunctionDiv = document.createElement("div");
 currentEventFunctionDiv.innerText = "Current Event Functions: ";
+var saveButton = document.createElement("button");
+saveButton.innerHTML = "save";
+saveButton.addEventListener("click", function (e) {
+    var s = constructInitialCondition_1.mainController.saveMainDoc();
+    socketFunction_1.socket.emit("saveMainDocToDisk", s);
+    console.log(constructInitialCondition_1.mainController.mainDoc);
+});
+var loadButton = document.createElement("button");
+loadButton.innerHTML = "load";
+loadButton.addEventListener("click", function (e) {
+    socketFunction_1.socket.emit("loadMainDoc");
+});
 var printMainDocButton = document.createElement("button");
 printMainDocButton.innerText = "print mainDoc";
 printMainDocButton.addEventListener("click", function (e) {
@@ -59,27 +72,26 @@ printMainDocButton.addEventListener("click", function (e) {
 var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
 console.log(45, bookmarkArrayId);
 GreatNoteDataClass.GNContainerDiv("div", bookmarkArrayId, false, false, true);
-eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton);
+eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton, saveButton, loadButton);
 toolBoxController.eventNameDiv = currentEventNameDiv;
 toolBoxController.eventFunctionDiv = currentEventFunctionDiv;
 document.body.appendChild(eventStatus);
 var toolBoxHtmlObject = toolBoxController.createToolboxHtmlObject();
+//
+//
 var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
 console.log(30, bookmarkArrayId);
 var basicDiv = document.createElement("div");
 basicDiv.style.width = "90vw";
 basicDiv.style.height = "80vh";
 basicDiv.style.background = "gold";
-// // svg div board
-var svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false);
+// svg div board
+var svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false, false);
 svgBoard.appendToContainer(basicDiv);
 toolBoxController.targetPage = svgBoard;
 svgBoard.svgNode.style.background = "pink";
-console.log(constructInitialCondition_1.mainController.mainDoc);
 var newPolyLineItemButton = toolBoxController.createNewPolyLineItemButton(toolBoxHtmlObject);
 var newEraserItemButton = toolBoxController.createEraserItemButton(toolBoxHtmlObject);
-console.log(newPolyLineItemButton);
-console.log(toolBoxHtmlObject);
 document.body.appendChild(toolBoxHtmlObject);
 document.body.appendChild(basicDiv);
 // EventModel.addMovingEvent(svgBoard.svgNode)
@@ -91,14 +103,11 @@ document.body.appendChild(basicDiv);
 // insideDiv1.style.background = "red"
 // EventModel.addMovingEvent(insideDiv1)
 // basicDiv.appendChild(insideDiv1)
-//
-//
-// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false)
+// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", bookmarkArrayId, false, false, true)
 // svgCircle.appendTo(svgBoard)
-// console.log(svgCircle)
-// EventModel.addMovingEvent(svgCircle.node)
-//
-// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, false)
+// // console.log(svgCircle)
+// EventModel.addMovingEvent(svgCircle)
+// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, true)
 // svgRect.applyStyle({"x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill":"pink"})
 // svgRect.appendTo(svgBoard)
 // EventModel.addMovingEvent(svgRect.node)

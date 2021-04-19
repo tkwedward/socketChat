@@ -44,11 +44,24 @@ export interface GNObjectInterface {
     addToDatabase(arrayID, insertPosition?:number|boolean, dataPointer?)
 }
 
+
+function createDummyData(){
+    return {
+        "data": {},
+        "array": [],
+        "GNType": "",
+        "_identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
+        "stylesheet": {}
+    }
+}
+
 // GNInputFieldInterface
 //@auto-fold here
 export interface GNInputFieldInterface extends GNObjectInterface, HTMLInputElement {
     _parent?:any
+    _identity?: any
 }
+
 
 //@auto-fold here
 export function GNInputField(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true) : GNInputFieldInterface {
@@ -62,6 +75,27 @@ export function GNInputField(name:string, arrayID: string, insertPosition?: numb
     // functions
     _object.loadFromData = (data)=>{ _object.value = data }
 
+
+
+    _object.createDataObject = function(){
+        let dataObject = createDummyData()
+
+        // data structure
+        dataObject["GNType"] = _object._type
+        if (_object._identity) dataObject["_identity"] = _object._identity
+
+        _object._dataStructure.forEach(p=>{
+          dataObject["data"][p] = _object[p]
+        })
+
+        // stylesheet data
+        _object._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = _object["style"][p]
+        })
+
+        return dataObject
+    }
+
     _object.extract = () => _object.createDataObject()
 
     // add extra funcitons to the object
@@ -74,6 +108,7 @@ export function GNInputField(name:string, arrayID: string, insertPosition?: numb
 //@auto-fold here
 export interface GNButtonInterface extends HTMLButtonElement, GNObjectInterface {
     _parent?: any
+    _identity: any
     status: any
     statusList: string[]
     addClickEvent(clickFunction)
@@ -89,11 +124,33 @@ export function GNButton(_name:string, statusList: string[], arrayID: string, in
     _object._type = GNButton.name
     _object.statusList = statusList
     _object._dataStructure = ["innerText"]
+    _object._styleStructure = []
     _object.innerHTML = statusList[0]
 
 
     // functions
     _object.loadFromData = (data) => { _object.innerHTML = data }
+
+    _object.createDataObject = function(){
+        let dataObject = createDummyData()
+
+        // data structure
+        dataObject["GNType"] = _object._type
+        if (_object._identity) dataObject["_identity"] = _object._identity
+
+        _object._dataStructure.forEach(p=>{
+          dataObject["data"][p] = _object[p]
+        })
+
+        // stylesheet data
+        _object._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = _object["style"][p]
+        })
+
+        return dataObject
+    }
+
+
     _object.extract = () => _object.createDataObject()
     _object.addClickEvent = function(clickFunction){
         _object.addEventListener("click", (e)=>{
@@ -120,6 +177,7 @@ export function GNButton(_name:string, statusList: string[], arrayID: string, in
 //@auto-fold here
 export interface GNContainerDivInterface extends HTMLDivElement, GNObjectInterface {
     _parent?: any
+    _identity?: any
     childrenList?: {string:GNObjectInterface}|{}
     applyStyle(data)
     loadFromData(data)
@@ -152,6 +210,24 @@ export function GNContainerDiv(name:string, arrayID: string, insertPosition?: nu
         Object.values(_object.childrenList).forEach(p=>p.loadFromData(data[p._name]))
     }
 
+    _object.createDataObject = function(){
+        let dataObject = createDummyData()
+
+        dataObject["GNType"] = _object._type
+        if (_object._identity) dataObject["_identity"] = _object._identity
+
+        // data structure
+
+        // stylesheet data
+        _object._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = _object["style"][p]
+        })
+
+        return dataObject
+    }
+
+
+
     _object.extract = () => _object.createDataObject()
     console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer)
     // add extra funcitons to the object
@@ -176,6 +252,27 @@ export function GNEditableDiv(_name:string, arrayID: string, insertPosition?: nu
     _object._name = _name
     _object._type = GNEditableDiv.name
     _object._dataStructure = ["innerHTML"]
+    _object._styleStructure = ["background", "width"]
+
+    _object.createDataObject = function(){
+        let dataObject = createDummyData()
+
+        // data structure
+        dataObject["GNType"] = _object._type
+        if (_object._identity) dataObject["_identity"] = _object._identity
+
+        _object._dataStructure.forEach(p=>{
+          dataObject["data"][p] = _object[p]
+        })
+
+        // stylesheet data
+        _object._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = _object["style"][p]
+        })
+
+        return dataObject
+    }
+
 
     _object.extract = () => {
       let _dummyData = _object.createDataObject()
@@ -206,6 +303,28 @@ export function GNImage(_name, imgsrc):GNImageInterface{
     _object._styleStructure = ["width", "height"]
 
     _object.loadFromData = (data) => {data}
+
+    _object.createDataObject = function(){
+        let dataObject = createDummyData()
+
+        // identity
+        dataObject["GNType"] = _object._type
+        if (_object._identity) dataObject["_identity"] = _object._identity
+
+        // data structure
+        _object._dataStructure.forEach(p=>{
+          dataObject["data"][p] = _object[p]
+        })
+
+        // stylesheet data
+        _object._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = _object["style"][p]
+        })
+
+        return dataObject
+    }
+
+
     _object.extract = () => _object.createDataObject()
 
     _object.addEventListener("eventName", (e)=>{
@@ -339,39 +458,14 @@ interface superGNObjectInterface {
 }
 
 
+
+
 //@auto-fold here
 export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, insertPosition:number|boolean, dataPointer:string|boolean, editEvent?:string){
     _object = <superGNObjectInterface>_object
     console.log(345, _object)
     /** important function to extract data from individual elements*/
-    _object.createDataObject = function(){
-        let dataObject = {
-            "data": {},
-            "array": [],
-            "GNType": "",
-            "_identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
-            "stylesheet": {}
-        }
 
-
-        dataObject["GNType"] = _object._type
-
-        if (_object._identity){
-            dataObject["_identity"] = _object._identity
-        }
-
-        if (_object._dataStructure){
-            _object._dataStructure.forEach(property=> {
-                 dataObject["data"][property] = _object[property]
-            })
-        }
-
-        if (_object.stylesheet){
-            Object.entries(_object.stylesheet).forEach(([key,_], i)=> dataObject["stylesheet"][key] = _object["style"][key])
-        }
-        console.log(372, _object, _object._identity, _object._dataStructure, _object.stylesheet)
-        return dataObject
-    }
 
     // when the data is first created, add it to the database
     _object.addToDatabase = function(arrayID, insertPosition?:number|boolean, dataPointer?){
@@ -502,7 +596,6 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
 
     if (saveToDatabase){
         console.log(503, _object, saveToDatabase)
-        console.log(504, _object._identity)
         _object.addToDatabase(arrayID, insertPosition, dataPointer)
         _object.editEvent(editEvent)
     }

@@ -145,9 +145,12 @@ var MainController = /** @class */ (function () {
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
         // create new object data
         var objectData = htmlObject.extract();
+        console.log(2004, objectData);
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
         objectData._identity.linkArray.push(accessPointer);
+        console.log(184, arrayID, htmlObject, insertPosition, dataPointer, objectData);
+        console.log(185, htmlObject, objectData);
         if (dataPointer) {
             objectData._identity.dataPointer = dataPointer;
         }
@@ -156,6 +159,7 @@ var MainController = /** @class */ (function () {
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             // add the data to the object
             var objectInDatabase = Automerge.getObjectById(doc, accessPointer);
+            console.log(220, objectData);
             Object.entries(objectData).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
                 objectInDatabase[key] = value;
@@ -179,8 +183,8 @@ var MainController = /** @class */ (function () {
         var _this = this;
         if (dataPointerType === void 0) { dataPointerType = true; }
         var htmlObjectData = _object.extract();
-        var accessPointer = htmlObjectData["identity"]["accessPointer"];
-        var dataPointer = htmlObjectData["identity"]["dataPointer"];
+        var accessPointer = _object.getAccessPointer();
+        var dataPointer = _object.getDataPointer();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             var dataPointerObject = Automerge.getObjectById(doc, dataPointer);
             Object.entries(htmlObjectData["data"])
@@ -197,6 +201,7 @@ var MainController = /** @class */ (function () {
         });
     };
     //@auto-fold here
+    /** to initiate the data so that you can store the data to the db*/
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
         var _dummyData = {
@@ -212,7 +217,7 @@ var MainController = /** @class */ (function () {
         return _dummyData;
     };
     //@auto-fold here
-    /** when ever the htmlObject is updated, we fetch newData from the HTMLObjectt, and then go to the database and update the relevant data*/
+    /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
         var newData = htmlObject.extract();
         console.log(279, newData, htmlObject);
@@ -245,15 +250,38 @@ var MainController = /** @class */ (function () {
         var object = Automerge.getObjectById(doc, objectID);
         return object;
     };
+    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
+    MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
+        var _this = this;
+        console.log(data.GNType);
+        var newHTMLObject;
+        if (data.GNType == "GNButton") {
+            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
+        }
+        else if (data.GNType == "GNSvg") {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer).svgNode;
+            console.log(325, newHTMLObject);
+        }
+        else {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+        }
+        console.log(336, data, arrayHTMLObject.tagName, newHTMLObject);
+        newHTMLObject.applyStyle(data.stylesheet);
+        arrayHTMLObject.appendChild(newHTMLObject);
+        data.array.forEach(function (_data) {
+            console.log(334, _data);
+            _this.renderDataToHTML(_data, newHTMLObject);
+        });
+    };
     //@auto-fold here
     MainController.prototype.saveMainDoc = function () {
-        return Automerge.save(this.mainDoc);
+        var saveData = Automerge.save(this.mainDoc);
+        return saveData;
     };
     //@auto-fold here
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
         this.mainDoc = Automerge.load(data);
-        console.log(this.mainDoc);
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];
@@ -262,24 +290,7 @@ var MainController = /** @class */ (function () {
                 _this.renderDataToHTML(elem, contentContainer);
             });
         });
-    };
-    MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
-        var _this = this;
-        var newHTMLObject;
-        if (data.GNType == "GNButton") {
-            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
-        }
-        else {
-            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
-        }
-        console.log(336, data);
-        newHTMLObject.applyStyle(data.stylesheet);
-        arrayHTMLObject.appendChild(newHTMLObject);
-        data.array.forEach(function (_data) {
-            console.log(334, _data);
-            _this.renderDataToHTML(_data, newHTMLObject);
-        });
-    };
+    }; // loadMain
     return MainController;
 }());
 exports.MainController = MainController;

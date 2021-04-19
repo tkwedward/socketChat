@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.ToolBoxClass = void 0;
 var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSVGDataClass"));
+var constructInitialCondition_1 = require("./constructInitialCondition");
 var ToolBoxClass = /** @class */ (function () {
     function ToolBoxClass() {
     }
@@ -83,19 +84,20 @@ var ToolBoxClass = /** @class */ (function () {
             console.log(event);
             var strokeWidth = "15px";
             var strokeColor = "black";
-            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", "", false, false, false);
-            polyline.plot([[event["offsetX"], event["offsetY"]]]);
+            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false);
+            polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
             polyline.appendTo(self.targetPage);
-            polyline.attr({ "stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth });
+            polyline.soul.attr({ "stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth });
             function updatePolyLine(e) {
-                var newPoint = polyline.array().value;
+                var newPoint = polyline.soul.array().value;
                 newPoint.push([event["offsetX"], event["offsetY"]]);
                 console.log(newPoint);
-                polyline.plot(newPoint);
+                polyline.soul.plot(newPoint);
             }
             self.targetPage.addEventListener("mousemove", updatePolyLine);
             self.targetPage.addEventListener("mouseup", function (e) {
                 self.targetPage.removeEventListener("mousemove", updatePolyLine);
+                console.log(constructInitialCondition_1.mainController.mainDoc);
             });
         };
         toolBoxItem.addEventListener("click", function () {
@@ -114,8 +116,8 @@ var ToolBoxClass = /** @class */ (function () {
             var cx = event.offsetX + "px";
             var cy = event.offsetY + "px";
             var r = "10px";
-            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", "", false, false, false);
-            console.log(164, eraser);
+            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", constructInitialCondition_1.mainController.mainDocArray["bookmark"], false, false);
+            console.log(164, eraser, constructInitialCondition_1.mainController.mainDoc["array"][1]);
             eraser.applyStyle({ "cx": cx, "cy": cy, "r": r });
             function updateEraserPosition(e) {
                 cx = event["offsetX"] + "px";
@@ -132,9 +134,9 @@ var ToolBoxClass = /** @class */ (function () {
                 console.log("You are out of the boundary");
             });
             console.log(183, self.targetPage);
-            console.log(eraser.appendTo);
+            console.log(constructInitialCondition_1.mainController.mainDoc["array"]);
             // self.targetPage.svgController
-            self.targetPage.svgNode.appendChild(eraser.node);
+            self.targetPage.svgNode.appendChild(eraser);
             // eraser.appendTo(self.targetPage)
             // this.targetPage.appendChild(eraser.node)
         };

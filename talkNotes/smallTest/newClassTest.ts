@@ -9,30 +9,36 @@ import * as ControllerModel from "./dbtest"
 import * as EventModel from "./EventModel"
 import * as ToolBoxModel from "./ToolBoxModel"
 
-// let divTest = false
-// let inputFieldTest = false
-// let buttonTest = false
-// let svgElementTest = false
-// let toolBoxTest = true
-//
-//
-// let bigFourContainer
-// let contentContainer
-// let attributeController
-// let metaDataController
-// let widthController
-// let fillController
-//
-//
-// //@auto-fold here
-// mainController.GNDataStructureMapping = {
-//     GNInputField: GreatNoteDataClass.GNInputField,
-//     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-//     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
-//     GNImage: GreatNoteDataClass.GNImage,
-//     GNDivPage: GreatNoteDataClass.GNDivPage
-// }
-//
+let divTest = false
+let inputFieldTest = false
+let buttonTest = false
+let svgElementTest = false
+let toolBoxTest = true
+
+
+let bigFourContainer
+let contentContainer
+let attributeController
+let metaDataController
+let widthController
+let fillController
+
+
+//@auto-fold here
+mainController.GNDataStructureMapping = {
+    GNInputField: GreatNoteDataClass.GNInputField,
+    GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
+    GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
+    GNImage: GreatNoteDataClass.GNImage,
+    GNDivPage: GreatNoteDataClass.GNDivPage,
+
+    // svg
+    GNSvg: GreatNoteSvgDataClass.GNSvg,
+    GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
+    GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
+    GNSvgRect: GreatNoteSvgDataClass.GNSvgRect
+}
+
 // document.body.style.display = "grid"
 // document.body.style.gridTemplateColumns = "1fr 3fr"
 //

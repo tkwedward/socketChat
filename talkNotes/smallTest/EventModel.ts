@@ -4,6 +4,7 @@ export function addMovingEvent(htmlObject:HTMLElement|HTMLDivElement){
     let attributeX
     let attributeY
     // choice a suitable attribute name according to the htmlObject selected
+    console.log(789, htmlObject)
     switch(htmlObject.tagName){
         case "circle":
             attributeX = "cx"

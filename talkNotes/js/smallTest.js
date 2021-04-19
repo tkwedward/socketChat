@@ -17315,7 +17315,7 @@ class WS extends Transport {
 module.exports = WS;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":59,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
+},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":58,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
     if (obj.hasOwnProperty(k)) {
@@ -17640,7 +17640,7 @@ formatters.j = function (v) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./common":18,"_process":61}],18:[function(require,module,exports){
+},{"./common":18,"_process":60}],18:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -19437,7 +19437,7 @@ exports.url = url;
 
 },{"debug":33,"parseuri":26}],33:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":34,"_process":61,"dup":17}],34:[function(require,module,exports){
+},{"./common":34,"_process":60,"dup":17}],34:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":35}],35:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -19864,7 +19864,7 @@ exports.hasBinary = hasBinary;
 
 },{}],39:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":40,"_process":61,"dup":17}],40:[function(require,module,exports){
+},{"./common":40,"_process":60,"dup":17}],40:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":41}],41:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -25548,6 +25548,7 @@ function addMovingEvent(htmlObject) {
     var attributeX;
     var attributeY;
     // choice a suitable attribute name according to the htmlObject selected
+    console.log(789, htmlObject);
     switch (htmlObject.tagName) {
         case "circle":
             attributeX = "cx";
@@ -25612,56 +25613,6 @@ function addMovingEvent(htmlObject) {
 exports.addMovingEvent = addMovingEvent;
 
 },{}],45:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-exports.ToolBoxClass = void 0;
-var ToolBoxClass = /** @class */ (function () {
-    function ToolBoxClass() {
-    }
-    ToolBoxClass.prototype.createToolboxHtmlObject = function () {
-        var self = this;
-        var toolBoxHtmlObject = document.createElement("div");
-        toolBoxHtmlObject.classList.add("toolBoxHtml");
-        toolBoxHtmlObject.style.height = "200px";
-        toolBoxHtmlObject.style.background = "silver";
-        toolBoxHtmlObject.style.width = "90%";
-        toolBoxHtmlObject.style.margin = "10px auto";
-        toolBoxHtmlObject.itemArray = [];
-        toolBoxHtmlObject.createToolBoxItem = function (name) {
-            var toolBoxItem = self.createToolBoxItem(name, toolBoxHtmlObject);
-            toolBoxHtmlObject.itemArray.push(toolBoxItem);
-            toolBoxHtmlObject.appendChild(toolBoxItem);
-            return toolBoxItem;
-        };
-        return toolBoxHtmlObject;
-    };
-    ToolBoxClass.prototype.createToolBoxItem = function (name, toolBoxHtmlObject) {
-        var toolBoxItem = document.createElement("div");
-        // the html style part
-        toolBoxItem.classList.add("toolBoxItem");
-        toolBoxItem.innerText = name[0];
-        toolBoxItem.style.background = "gold";
-        toolBoxItem.style.display = "flex";
-        toolBoxItem.style.margin = "10px 5px";
-        toolBoxItem.style["align-items"] = "center";
-        toolBoxItem.style["justify-content"] = "center";
-        var squreLength = "40px";
-        toolBoxItem.style.width = squreLength;
-        toolBoxItem.style.height = squreLength;
-        // internaal variable part
-        toolBoxItem.status = false;
-        toolBoxItem.resetButton = function () {
-            toolBoxItem.status = false;
-        };
-        toolBoxItem.addEventListener("click", function () {
-        });
-        return toolBoxItem;
-    };
-    return ToolBoxClass;
-}());
-exports.ToolBoxClass = ToolBoxClass;
-
-},{}],46:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.GNTemplate = exports.GNImageController = exports.GNTextController = exports.GNController = exports.GNControllerItem = void 0;
@@ -25812,11 +25763,20 @@ function GNTemplate(_name, _parent) {
 }
 exports.GNTemplate = GNTemplate;
 
-},{"./GreatNoteDataClass":47}],47:[function(require,module,exports){
+},{"./GreatNoteDataClass":46}],46:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.superGNObject = exports.GNTemplate = exports.GNDropdownList = exports.GNDivPage = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
+function createDummyData() {
+    return {
+        "data": {},
+        "array": [],
+        "GNType": "",
+        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+        "stylesheet": {}
+    };
+}
 //@auto-fold here
 function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
@@ -25827,6 +25787,21 @@ function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase
     _object._styleStructure = [];
     // functions
     _object.loadFromData = function (data) { _object.value = data; };
+    _object.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = _object._type;
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        _object._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = _object[p];
+        });
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
+        return dataObject;
+    };
     _object.extract = function () { return _object.createDataObject(); };
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
@@ -25842,9 +25817,25 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     _object._type = GNButton.name;
     _object.statusList = statusList;
     _object._dataStructure = ["innerText"];
+    _object._styleStructure = [];
     _object.innerHTML = statusList[0];
     // functions
     _object.loadFromData = function (data) { _object.innerHTML = data; };
+    _object.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = _object._type;
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        _object._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = _object[p];
+        });
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
+        return dataObject;
+    };
     _object.extract = function () { return _object.createDataObject(); };
     _object.addClickEvent = function (clickFunction) {
         _object.addEventListener("click", function (e) {
@@ -25888,6 +25879,18 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
     _object.loadFromData = function (data) {
         Object.values(_object.childrenList).forEach(function (p) { return p.loadFromData(data[p._name]); });
     };
+    _object.createDataObject = function () {
+        var dataObject = createDummyData();
+        dataObject["GNType"] = _object._type;
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        // data structure
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
+        return dataObject;
+    };
     _object.extract = function () { return _object.createDataObject(); };
     console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer);
     // add extra funcitons to the object
@@ -25904,6 +25907,22 @@ function GNEditableDiv(_name, arrayID, insertPosition, dataPointer, saveToDataba
     _object._name = _name;
     _object._type = GNEditableDiv.name;
     _object._dataStructure = ["innerHTML"];
+    _object._styleStructure = ["background", "width"];
+    _object.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = _object._type;
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        _object._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = _object[p];
+        });
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
+        return dataObject;
+    };
     _object.extract = function () {
         var _dummyData = _object.createDataObject();
         return _dummyData;
@@ -25923,6 +25942,22 @@ function GNImage(_name, imgsrc) {
     _object._dataStructure = ["src"];
     _object._styleStructure = ["width", "height"];
     _object.loadFromData = function (data) { data; };
+    _object.createDataObject = function () {
+        var dataObject = createDummyData();
+        // identity
+        dataObject["GNType"] = _object._type;
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        // data structure
+        _object._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = _object[p];
+        });
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
+        return dataObject;
+    };
     _object.extract = function () { return _object.createDataObject(); };
     _object.addEventListener("eventName", function (e) {
         // do something
@@ -26018,32 +26053,6 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     _object = _object;
     console.log(345, _object);
     /** important function to extract data from individual elements*/
-    _object.createDataObject = function () {
-        var dataObject = {
-            "data": {},
-            "array": [],
-            "GNType": "",
-            "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-            "stylesheet": {}
-        };
-        dataObject["GNType"] = _object._type;
-        if (_object._identity) {
-            dataObject["_identity"] = _object._identity;
-        }
-        if (_object._dataStructure) {
-            _object._dataStructure.forEach(function (property) {
-                dataObject["data"][property] = _object[property];
-            });
-        }
-        if (_object.stylesheet) {
-            Object.entries(_object.stylesheet).forEach(function (_a, i) {
-                var key = _a[0], _ = _a[1];
-                return dataObject["stylesheet"][key] = _object["style"][key];
-            });
-        }
-        console.log(372, _object, _object._identity, _object._dataStructure, _object.stylesheet);
-        return dataObject;
-    };
     // when the data is first created, add it to the database
     _object.addToDatabase = function (arrayID, insertPosition, dataPointer) {
         constructInitialCondition_1.mainController.addData(arrayID, _object, insertPosition, dataPointer);
@@ -26150,26 +26159,60 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     };
     if (saveToDatabase) {
         console.log(503, _object, saveToDatabase);
-        console.log(504, _object._identity);
         _object.addToDatabase(arrayID, insertPosition, dataPointer);
         _object.editEvent(editEvent);
     }
 }
 exports.superGNObject = superGNObject;
 
-},{"./constructInitialCondition":53}],48:[function(require,module,exports){
+},{"./constructInitialCondition":52}],47:[function(require,module,exports){
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
 exports.GNSvgImage = exports.GNSvgPolyLine = exports.GNSvgLine = exports.GNSvgRect = exports.GNSvgCircle = exports.GNSvg = void 0;
 var svg_js_1 = __importDefault(require("svg.js"));
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+function createDummyData() {
+    return {
+        "data": {},
+        "array": [],
+        "GNType": "",
+        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+        "stylesheet": {}
+    };
+}
 //@auto-fold here
 function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
+    svgDivContainer._type = GNSvg.name;
+    svgDivContainer._name = name;
+    svgDivContainer._dataStructure = ["innerHTML"];
+    svgDivContainer._styleStructure = [];
+    // // functions
+    // svgObject.loadFromData = (data)=>{ svgObject.value = data }
     svgDivContainer.appendToContainer = function (parent) {
         parent.appendChild(svgDivContainer);
         var svgController = svg_js_1["default"](svgDivContainer);
@@ -26182,48 +26225,57 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgDivContainer.applyStyle = function () {
     };
     svgDivContainer.createDataObject = function () {
-        var dataObject = {
-            "data": {},
-            "array": [],
-            "GNType": "",
-            "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-            "stylesheet": {}
-        };
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgDivContainer._type;
+        if (svgDivContainer._identity)
+            dataObject["_identity"] = svgDivContainer._identity;
+        svgDivContainer._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgDivContainer[p];
+        });
+        // stylesheet data
+        svgDivContainer._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgDivContainer["style"][p];
+        });
+        return dataObject;
     };
-    // svgObject.style.width = "70vw";
-    // svgObject.style.height = "80vh";
-    // svgObject.style.margin = "20px";
-    // svgObject.style.background = "Aliceblue"
-    // // let svgController:SVG.Doc = SVG(svgObject)
     //
-    // svgObject._type = GNSvg.name
-    // svgObject._name = name
-    // svgObject._dataStructure = ["value"]
-    // svgObject._styleStructure = []
-    //
-    // // functions
-    // svgObject.loadFromData = (data)=>{ svgObject.value = data }
-    //
-    // svgObject.extract = () => svgObject.createDataObject()
+    svgDivContainer.extract = function () { return svgDivContainer.createDataObject(); };
     // add extra funcitons to the object
-    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    GreatNoteDataClass.superGNObject(svgDivContainer, saveToDatabase, arrayID, insertPosition, dataPointer);
     return svgDivContainer;
 }
 exports.GNSvg = GNSvg;
 //@auto-fold here
 function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = new svg_js_1["default"].Circle();
-    console.log(119, svgObject);
-    var html = document.createElement("div");
-    svgObject.radius(75);
-    svgObject.fill("red");
+    var svgObjectSoul = new svg_js_1["default"].Circle();
+    console.log(119, svgObjectSoul);
+    svgObjectSoul.radius(75);
+    svgObjectSoul.fill("red");
+    var svgObject = svgObjectSoul.node;
+    svgObject.soul = svgObjectSoul;
     svgObject._type = GNSvgCircle.name;
     svgObject._name = name;
-    svgObject._dataStructure = ["value"];
+    svgObject._dataStructure = ["cx", "cy", "r"];
     svgObject._styleStructure = [];
     // functions
     svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgDivContainer._type;
+        if (svgDivContainer._identity)
+            dataObject["_identity"] = _object._identity;
+        svgDivContainer._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgDivContainer[p];
+        });
+        // stylesheet data
+        svgDivContainer._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgDivContainer["style"][p];
+        });
+        return dataObject;
+    };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
         svgObject.attr(attrList);
@@ -26234,8 +26286,9 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
         parentSVGContainer.svgNode.appendChild(svgObject.node);
     };
     // add extra funcitons to the object
-    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    // SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
+    console.log(146, GreatNoteDataClass.superGNObject);
+    GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
     return svgObject;
 }
 exports.GNSvgCircle = GNSvgCircle;
@@ -26287,22 +26340,43 @@ exports.GNSvgLine = GNSvgLine;
 //@auto-fold here
 function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
-    console.log(234, svgObject);
+    var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
+    var svgObject = svgObjectSoul.node;
+    svgObject.soul = svgObjectSoul;
     svgObject._type = GNSvgPolyLine.name;
     svgObject._name = name;
-    svgObject._dataStructure = ["value"];
+    svgObject._dataStructure = ["points"];
     svgObject._styleStructure = [];
     // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.loadFromData = function (data) {
+        svgObject.soul.plot(data["points"]);
+    };
+    svgObject.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgObject._type;
+        if (svgObject._identity)
+            dataObject["_identity"] = svgObject._identity;
+        console.log(302, svgObject.soul.array().value);
+        svgObject._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgObject.soul.array().value.toString();
+        });
+        // stylesheet data
+        svgObject._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgObject["style"][p];
+        });
+        return dataObject;
+    };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        svgObject.plot(attrList["points"]);
-        svgObject.attr(attrList["attribute"]);
+        svgObject.soul.plot(attrList["points"]);
+        svgObject.soul.attr(attrList["attribute"]);
     };
-    // add extra funcitons to the object
-    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    // to share same data function
+    GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
     SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    // add extra funcitons to the object
+    console.log(234, svgObject);
     return svgObject;
 } //GNSvgPolyLine
 exports.GNSvgPolyLine = GNSvgPolyLine;
@@ -26331,7 +26405,9 @@ function GNSvgImage(name, arrayID, insertPosition, dataPointer, saveToDatabase) 
 exports.GNSvgImage = GNSvgImage;
 function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.appendTo = function (parentSVGContainer) {
-        svgObject.addTo(parentSVGContainer.svgController);
+        console.log(317, parentSVGContainer);
+        console.log(318, svgObject);
+        svgObject.soul.addTo(parentSVGContainer.svgController);
     };
     //
     // svgObject.applyStyle = function (attributeSheet){
@@ -26339,9 +26415,259 @@ function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabas
     // }
 }
 
-},{"svg.js":42}],49:[function(require,module,exports){
-arguments[4][48][0].apply(exports,arguments)
-},{"dup":48,"svg.js":42}],50:[function(require,module,exports){
+},{"./GreatNoteDataClass":46,"svg.js":42}],48:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+exports.__esModule = true;
+exports.GNSvgImage = exports.GNSvgPolyLine = exports.GNSvgLine = exports.GNSvgRect = exports.GNSvgCircle = exports.GNSvg = void 0;
+var svg_js_1 = __importDefault(require("svg.js"));
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+function createDummyData() {
+    return {
+        "data": {},
+        "array": [],
+        "GNType": "",
+        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+        "stylesheet": {}
+    };
+}
+//@auto-fold here
+function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgDivContainer = document.createElement("div");
+    svgDivContainer.id = "testSvgDiv";
+    svgDivContainer._type = GNSvg.name;
+    svgDivContainer._name = name;
+    svgDivContainer._dataStructure = ["innerHTML"];
+    svgDivContainer._styleStructure = [];
+    var svgBoard;
+    // // functions
+    // svgObject.loadFromData = (data)=>{ svgObject.value = data }
+    svgDivContainer.appendToContainer = function (parent) {
+        parent.appendChild(svgDivContainer);
+        var svgController = svg_js_1["default"](svgDivContainer);
+        svgController.width("800px");
+        svgController.height("300px");
+        svgDivContainer.svgController = svgController;
+        svgDivContainer.svgNode = svgController.node;
+        console.log(57, svgDivContainer.svgNode);
+        svgController.node.style.background = "gold";
+    };
+    svgDivContainer.applyStyle = function () {
+    };
+    svgDivContainer.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgDivContainer._type;
+        if (svgDivContainer._identity)
+            dataObject["_identity"] = svgDivContainer._identity;
+        svgDivContainer._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgDivContainer[p];
+        });
+        // stylesheet data
+        svgDivContainer._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgDivContainer["style"][p];
+        });
+        return dataObject;
+    };
+    //
+    svgDivContainer.extract = function () { return svgDivContainer.createDataObject(); };
+    // add extra funcitons to the object
+    GreatNoteDataClass.superGNObject(svgDivContainer, saveToDatabase, arrayID, insertPosition, dataPointer);
+    return svgDivContainer;
+}
+exports.GNSvg = GNSvg;
+//@auto-fold here
+function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObjectSoul = new svg_js_1["default"].Circle();
+    console.log(119, svgObjectSoul);
+    svgObjectSoul.radius(75);
+    svgObjectSoul.fill("red");
+    var svgObject = svgObjectSoul.node;
+    svgObject.soul = svgObjectSoul;
+    svgObject._type = GNSvgCircle.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["cx", "cy", "r"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgDivContainer._type;
+        if (svgDivContainer._identity)
+            dataObject["_identity"] = _object._identity;
+        svgDivContainer._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgDivContainer[p];
+        });
+        // stylesheet data
+        svgDivContainer._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgDivContainer["style"][p];
+        });
+        return dataObject;
+    };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject.attr(attrList);
+    };
+    svgObject.appendTo = function (parentSVGContainer) {
+        //self.targetPage.svgNode.appendChild(eraser.node)
+        console.log(139, parentSVGContainer, svgObject);
+        parentSVGContainer.svgNode.appendChild(svgObject.node);
+    };
+    // add extra funcitons to the object
+    console.log(146, GreatNoteDataClass.superGNObject);
+    GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgCircle = GNSvgCircle;
+//@auto-fold here
+function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObject = new svg_js_1["default"].Rect();
+    svgObject._type = GNSvgRect.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["value"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        console.log(attrList);
+        Object.entries(attrList).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgObject.node.style[key] = value;
+        });
+    };
+    // add extra funcitons to the object
+    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgRect = GNSvgRect;
+//@auto-fold here
+function GNSvgLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObject = new svg_js_1["default"].Line();
+    svgObject._type = GNSvgLine.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["value"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject.plot(attrList["points"]);
+        svgObject.attr(attrList["attribute"]);
+    };
+    // add extra funcitons to the object
+    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgLine = GNSvgLine;
+//@auto-fold here
+function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
+    var svgObject = svgObjectSoul.node;
+    svgObject.soul = svgObjectSoul;
+    svgObject._type = GNSvgPolyLine.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["points"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) {
+        svgObject.soul.plot(data["points"]);
+    };
+    svgObject.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgObject._type;
+        if (svgObject._identity)
+            dataObject["_identity"] = svgObject._identity;
+        console.log(302, svgObject.soul.array().value);
+        svgObject._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgObject.soul.array().value.toString();
+        });
+        // stylesheet data
+        svgObject._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgObject["style"][p];
+        });
+        return dataObject;
+    };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject.soul.plot(attrList["points"]);
+        svgObject.soul.attr(attrList["attribute"]);
+    };
+    // to share same data function
+    GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    // add extra funcitons to the object
+    console.log(234, svgObject);
+    return svgObject;
+} //GNSvgPolyLine
+exports.GNSvgPolyLine = GNSvgPolyLine;
+//@auto-fold here
+function GNSvgImage(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObject = svg_js_1["default"](document.createElement("image")).image();
+    svgObject.setImgSrc = function (src) {
+        svgObject.load(src);
+    };
+    svgObject._type = GNSvgImage.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["value"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject.attr(attrList["attribute"]);
+    };
+    // add extra funcitons to the object
+    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgImage = GNSvgImage;
+function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    svgObject.appendTo = function (parentSVGContainer) {
+        console.log(317, parentSVGContainer);
+        console.log(318, svgObject);
+        svgObject.soul.addTo(parentSVGContainer.svgController);
+    };
+    //
+    // svgObject.applyStyle = function (attributeSheet){
+    //
+    // }
+}
+
+},{"./GreatNoteDataClass":46,"svg.js":42}],49:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26365,6 +26691,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.ToolBoxClass = void 0;
 var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSVGDataClass"));
+var constructInitialCondition_1 = require("./constructInitialCondition");
 var ToolBoxClass = /** @class */ (function () {
     function ToolBoxClass() {
     }
@@ -26427,19 +26754,20 @@ var ToolBoxClass = /** @class */ (function () {
             console.log(event);
             var strokeWidth = "15px";
             var strokeColor = "black";
-            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", "", false, false, false);
-            polyline.plot([[event["offsetX"], event["offsetY"]]]);
+            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false);
+            polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
             polyline.appendTo(self.targetPage);
-            polyline.attr({ "stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth });
+            polyline.soul.attr({ "stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth });
             function updatePolyLine(e) {
-                var newPoint = polyline.array().value;
+                var newPoint = polyline.soul.array().value;
                 newPoint.push([event["offsetX"], event["offsetY"]]);
                 console.log(newPoint);
-                polyline.plot(newPoint);
+                polyline.soul.plot(newPoint);
             }
             self.targetPage.addEventListener("mousemove", updatePolyLine);
             self.targetPage.addEventListener("mouseup", function (e) {
                 self.targetPage.removeEventListener("mousemove", updatePolyLine);
+                console.log(constructInitialCondition_1.mainController.mainDoc);
             });
         };
         toolBoxItem.addEventListener("click", function () {
@@ -26458,8 +26786,8 @@ var ToolBoxClass = /** @class */ (function () {
             var cx = event.offsetX + "px";
             var cy = event.offsetY + "px";
             var r = "10px";
-            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", "", false, false, false);
-            console.log(164, eraser);
+            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", constructInitialCondition_1.mainController.mainDocArray["bookmark"], false, false);
+            console.log(164, eraser, constructInitialCondition_1.mainController.mainDoc["array"][1]);
             eraser.applyStyle({ "cx": cx, "cy": cy, "r": r });
             function updateEraserPosition(e) {
                 cx = event["offsetX"] + "px";
@@ -26476,9 +26804,9 @@ var ToolBoxClass = /** @class */ (function () {
                 console.log("You are out of the boundary");
             });
             console.log(183, self.targetPage);
-            console.log(eraser.appendTo);
+            console.log(constructInitialCondition_1.mainController.mainDoc["array"]);
             // self.targetPage.svgController
-            self.targetPage.svgNode.appendChild(eraser.node);
+            self.targetPage.svgNode.appendChild(eraser);
             // eraser.appendTo(self.targetPage)
             // this.targetPage.appendChild(eraser.node)
         };
@@ -26506,7 +26834,7 @@ var ToolBoxClass = /** @class */ (function () {
 }());
 exports.ToolBoxClass = ToolBoxClass;
 
-},{"./GreatNoteSVGDataClass":48}],51:[function(require,module,exports){
+},{"./GreatNoteSVGDataClass":47,"./constructInitialCondition":52}],50:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26532,6 +26860,7 @@ var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
 var ToolBoxModel = __importStar(require("./ToolBoxModel"));
 var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var socketFunction_1 = require("./socketFunction");
 var toolBoxController = new ToolBoxModel.ToolBoxClass();
 // let pageViewController = document.querySelector(".pageViewController")
 // let addButton = document.querySelector(".navBara .addButton")
@@ -26559,6 +26888,18 @@ var currentEventNameDiv = document.createElement("div");
 currentEventNameDiv.innerText = "Current Event Name: ";
 var currentEventFunctionDiv = document.createElement("div");
 currentEventFunctionDiv.innerText = "Current Event Functions: ";
+var saveButton = document.createElement("button");
+saveButton.innerHTML = "save";
+saveButton.addEventListener("click", function (e) {
+    var s = constructInitialCondition_1.mainController.saveMainDoc();
+    socketFunction_1.socket.emit("saveMainDocToDisk", s);
+    console.log(constructInitialCondition_1.mainController.mainDoc);
+});
+var loadButton = document.createElement("button");
+loadButton.innerHTML = "load";
+loadButton.addEventListener("click", function (e) {
+    socketFunction_1.socket.emit("loadMainDoc");
+});
 var printMainDocButton = document.createElement("button");
 printMainDocButton.innerText = "print mainDoc";
 printMainDocButton.addEventListener("click", function (e) {
@@ -26568,27 +26909,26 @@ printMainDocButton.addEventListener("click", function (e) {
 var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
 console.log(45, bookmarkArrayId);
 GreatNoteDataClass.GNContainerDiv("div", bookmarkArrayId, false, false, true);
-eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton);
+eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton, saveButton, loadButton);
 toolBoxController.eventNameDiv = currentEventNameDiv;
 toolBoxController.eventFunctionDiv = currentEventFunctionDiv;
 document.body.appendChild(eventStatus);
 var toolBoxHtmlObject = toolBoxController.createToolboxHtmlObject();
+//
+//
 var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
 console.log(30, bookmarkArrayId);
 var basicDiv = document.createElement("div");
 basicDiv.style.width = "90vw";
 basicDiv.style.height = "80vh";
 basicDiv.style.background = "gold";
-// // svg div board
-var svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false);
+// svg div board
+var svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false, false);
 svgBoard.appendToContainer(basicDiv);
 toolBoxController.targetPage = svgBoard;
 svgBoard.svgNode.style.background = "pink";
-console.log(constructInitialCondition_1.mainController.mainDoc);
 var newPolyLineItemButton = toolBoxController.createNewPolyLineItemButton(toolBoxHtmlObject);
 var newEraserItemButton = toolBoxController.createEraserItemButton(toolBoxHtmlObject);
-console.log(newPolyLineItemButton);
-console.log(toolBoxHtmlObject);
 document.body.appendChild(toolBoxHtmlObject);
 document.body.appendChild(basicDiv);
 // EventModel.addMovingEvent(svgBoard.svgNode)
@@ -26600,21 +26940,18 @@ document.body.appendChild(basicDiv);
 // insideDiv1.style.background = "red"
 // EventModel.addMovingEvent(insideDiv1)
 // basicDiv.appendChild(insideDiv1)
-//
-//
-// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false)
+// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", bookmarkArrayId, false, false, true)
 // svgCircle.appendTo(svgBoard)
-// console.log(svgCircle)
-// EventModel.addMovingEvent(svgCircle.node)
-//
-// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, false)
+// // console.log(svgCircle)
+// EventModel.addMovingEvent(svgCircle)
+// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, true)
 // svgRect.applyStyle({"x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill":"pink"})
 // svgRect.appendTo(svgBoard)
 // EventModel.addMovingEvent(svgRect.node)
 
-},{"./GreatNoteDataClass":47,"./GreatNoteSvgDataClass":49,"./ToolBoxModel":50,"./constructInitialCondition":53}],52:[function(require,module,exports){
+},{"./GreatNoteDataClass":46,"./GreatNoteSvgDataClass":48,"./ToolBoxModel":49,"./constructInitialCondition":52,"./socketFunction":56}],51:[function(require,module,exports){
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26762,9 +27099,12 @@ var MainController = /** @class */ (function () {
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
         // create new object data
         var objectData = htmlObject.extract();
+        console.log(2004, objectData);
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
         objectData._identity.linkArray.push(accessPointer);
+        console.log(184, arrayID, htmlObject, insertPosition, dataPointer, objectData);
+        console.log(185, htmlObject, objectData);
         if (dataPointer) {
             objectData._identity.dataPointer = dataPointer;
         }
@@ -26773,6 +27113,7 @@ var MainController = /** @class */ (function () {
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             // add the data to the object
             var objectInDatabase = Automerge.getObjectById(doc, accessPointer);
+            console.log(220, objectData);
             Object.entries(objectData).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
                 objectInDatabase[key] = value;
@@ -26796,8 +27137,8 @@ var MainController = /** @class */ (function () {
         var _this = this;
         if (dataPointerType === void 0) { dataPointerType = true; }
         var htmlObjectData = _object.extract();
-        var accessPointer = htmlObjectData["identity"]["accessPointer"];
-        var dataPointer = htmlObjectData["identity"]["dataPointer"];
+        var accessPointer = _object.getAccessPointer();
+        var dataPointer = _object.getDataPointer();
         this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
             var dataPointerObject = Automerge.getObjectById(doc, dataPointer);
             Object.entries(htmlObjectData["data"])
@@ -26814,6 +27155,7 @@ var MainController = /** @class */ (function () {
         });
     };
     //@auto-fold here
+    /** to initiate the data so that you can store the data to the db*/
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
         var _dummyData = {
@@ -26829,7 +27171,7 @@ var MainController = /** @class */ (function () {
         return _dummyData;
     };
     //@auto-fold here
-    /** when ever the htmlObject is updated, we fetch newData from the HTMLObjectt, and then go to the database and update the relevant data*/
+    /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     MainController.prototype.saveHTMLObjectToDatabase = function (htmlObject) {
         var newData = htmlObject.extract();
         console.log(279, newData, htmlObject);
@@ -26862,15 +27204,38 @@ var MainController = /** @class */ (function () {
         var object = Automerge.getObjectById(doc, objectID);
         return object;
     };
+    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
+    MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
+        var _this = this;
+        console.log(data.GNType);
+        var newHTMLObject;
+        if (data.GNType == "GNButton") {
+            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
+        }
+        else if (data.GNType == "GNSvg") {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer).svgNode;
+            console.log(325, newHTMLObject);
+        }
+        else {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+        }
+        console.log(336, data, arrayHTMLObject.tagName, newHTMLObject);
+        newHTMLObject.applyStyle(data.stylesheet);
+        arrayHTMLObject.appendChild(newHTMLObject);
+        data.array.forEach(function (_data) {
+            console.log(334, _data);
+            _this.renderDataToHTML(_data, newHTMLObject);
+        });
+    };
     //@auto-fold here
     MainController.prototype.saveMainDoc = function () {
-        return Automerge.save(this.mainDoc);
+        var saveData = Automerge.save(this.mainDoc);
+        return saveData;
     };
     //@auto-fold here
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
         this.mainDoc = Automerge.load(data);
-        console.log(this.mainDoc);
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];
@@ -26879,32 +27244,15 @@ var MainController = /** @class */ (function () {
                 _this.renderDataToHTML(elem, contentContainer);
             });
         });
-    };
-    MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
-        var _this = this;
-        var newHTMLObject;
-        if (data.GNType == "GNButton") {
-            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
-        }
-        else {
-            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
-        }
-        console.log(336, data);
-        newHTMLObject.applyStyle(data.stylesheet);
-        arrayHTMLObject.appendChild(newHTMLObject);
-        data.array.forEach(function (_data) {
-            console.log(334, _data);
-            _this.renderDataToHTML(_data, newHTMLObject);
-        });
-    };
+    }; // loadMain
     return MainController;
 }());
 exports.MainController = MainController;
 exports.mainController = new MainController();
 
-},{"./socketFunction":57,"automerge":1}],54:[function(require,module,exports){
-arguments[4][52][0].apply(exports,arguments)
-},{"dup":52}],55:[function(require,module,exports){
+},{"./socketFunction":56,"automerge":1}],53:[function(require,module,exports){
+arguments[4][51][0].apply(exports,arguments)
+},{"dup":51}],54:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = exports.AttributeControllerClass = exports.controllerCreater = void 0;
@@ -27143,33 +27491,55 @@ function choiceController(attribute, choiceList, prototype) {
 }
 exports.choiceController = choiceController;
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 exports.__esModule = true;
-// let divTest = false
-// let inputFieldTest = false
-// let buttonTest = false
-// let svgElementTest = false
-// let toolBoxTest = true
-//
-//
-// let bigFourContainer
-// let contentContainer
-// let attributeController
-// let metaDataController
-// let widthController
-// let fillController
-//
-//
-// //@auto-fold here
-// mainController.GNDataStructureMapping = {
-//     GNInputField: GreatNoteDataClass.GNInputField,
-//     GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-//     GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
-//     GNImage: GreatNoteDataClass.GNImage,
-//     GNDivPage: GreatNoteDataClass.GNDivPage
-// }
-//
+var constructInitialCondition_1 = require("./constructInitialCondition");
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
+var divTest = false;
+var inputFieldTest = false;
+var buttonTest = false;
+var svgElementTest = false;
+var toolBoxTest = true;
+var bigFourContainer;
+var contentContainer;
+var attributeController;
+var metaDataController;
+var widthController;
+var fillController;
+//@auto-fold here
+constructInitialCondition_1.mainController.GNDataStructureMapping = {
+    GNInputField: GreatNoteDataClass.GNInputField,
+    GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
+    GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
+    GNImage: GreatNoteDataClass.GNImage,
+    GNDivPage: GreatNoteDataClass.GNDivPage,
+    // svg
+    GNSvg: GreatNoteSvgDataClass.GNSvg,
+    GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
+    GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
+    GNSvgRect: GreatNoteSvgDataClass.GNSvgRect
+};
 // document.body.style.display = "grid"
 // document.body.style.gridTemplateColumns = "1fr 3fr"
 //
@@ -27491,7 +27861,7 @@ exports.__esModule = true;
 // //
 // // }
 
-},{}],57:[function(require,module,exports){
+},{"./GreatNoteDataClass":46,"./GreatNoteSvgDataClass":48,"./constructInitialCondition":52}],56:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27539,7 +27909,7 @@ exports.socket.on("processInitialData", function (data) {
     // mainController.loadMainDoc(data.initialData)
 });
 
-},{"./constructInitialCondition":53,"socket.io-client":27}],58:[function(require,module,exports){
+},{"./constructInitialCondition":52,"socket.io-client":27}],57:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -27691,7 +28061,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -29472,7 +29842,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":58,"buffer":59,"ieee754":60}],60:[function(require,module,exports){
+},{"base64-js":57,"buffer":58,"ieee754":59}],59:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -29559,7 +29929,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -29745,4 +30115,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[44,45,46,47,49,50,51,52,53,54,55,56,57]);
+},{}]},{},[44,45,46,48,49,50,51,52,53,54,55,56]);

@@ -197,12 +197,15 @@ export class MainController implements MainControllerInterface{
         let objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[<number>insertPosition])
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
 
-
         // create new object data
         let objectData  = htmlObject.extract()
+        console.log(2004, objectData)
+
         objectData._identity.accessPointer = accessPointer
         objectData._identity.dataPointer = accessPointer
         objectData._identity.linkArray.push(accessPointer)
+        console.log(184, arrayID, htmlObject, insertPosition, dataPointer, objectData)
+        console.log(185, htmlObject, objectData)
         if (dataPointer){
             objectData._identity.dataPointer = dataPointer
         }
@@ -213,7 +216,7 @@ export class MainController implements MainControllerInterface{
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             // add the data to the object
             let objectInDatabase = Automerge.getObjectById(doc, accessPointer)
-
+            console.log(220, objectData)
             Object.entries(objectData).forEach(([key, value], _)=>{
                 objectInDatabase[key] = value
             })
@@ -238,8 +241,8 @@ export class MainController implements MainControllerInterface{
     //@auto-fold here
     updateData(_object:GNObjectInterface, dataPointerType:boolean = true){
         let htmlObjectData = _object.extract()
-        let accessPointer:string = htmlObjectData["identity"]["accessPointer"]
-        let dataPointer:string = htmlObjectData["identity"]["dataPointer"]
+        let accessPointer:string = _object.getAccessPointer()
+        let dataPointer:string = _object.getDataPointer()
 
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             let dataPointerObject = Automerge.getObjectById(doc, dataPointer)
@@ -257,6 +260,7 @@ export class MainController implements MainControllerInterface{
     }
 
     //@auto-fold here
+    /** to initiate the data so that you can store the data to the db*/
     createDummyData(data = {}): any{
         let _dummyData:communicationDataStructure = {
             "data": data,
@@ -273,7 +277,7 @@ export class MainController implements MainControllerInterface{
     }
 
     //@auto-fold here
-    /** when ever the htmlObject is updated, we fetch newData from the HTMLObjectt, and then go to the database and update the relevant data*/ 
+    /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject:GNObjectInterface){
         let newData = htmlObject.extract()
         console.log(279, newData, htmlObject)
@@ -308,15 +312,42 @@ export class MainController implements MainControllerInterface{
         return object
     }
 
+
+    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
+    renderDataToHTML(data:communicationDataStructure, arrayHTMLObject){
+
+      console.log(data.GNType)
+      let newHTMLObject
+      if (data.GNType=="GNButton"){
+          newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
+      } else if (data.GNType=="GNSvg"){
+          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer).svgNode
+          console.log(325, newHTMLObject)
+
+      } else {
+          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+      }
+
+        console.log(336, data, arrayHTMLObject.tagName, newHTMLObject)
+        newHTMLObject.applyStyle(data.stylesheet)
+
+        arrayHTMLObject.appendChild(newHTMLObject)
+        data.array.forEach(_data=>{
+            console.log(334, _data)
+
+            this.renderDataToHTML(_data, newHTMLObject)
+        })
+    }
+
     //@auto-fold here
     saveMainDoc(){
-      return Automerge.save(this.mainDoc)
+      let saveData = Automerge.save(this.mainDoc)
+      return saveData
     }
 
     //@auto-fold here
     loadMainDoc(data){
       this.mainDoc = Automerge.load(data)
-      console.log(this.mainDoc)
       this.previousDoc = this.mainDoc
       let contentContainer = document.querySelector(".contentContainer")
 
@@ -326,28 +357,7 @@ export class MainController implements MainControllerInterface{
               this.renderDataToHTML(elem, contentContainer)
           })
       })
-    }
-
-    renderDataToHTML(data:communicationDataStructure, arrayHTMLObject){
-      let newHTMLObject
-      if (data.GNType=="GNButton"){
-          newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
-      } else {
-          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
-      }
-
-        console.log(336, data)
-        newHTMLObject.applyStyle(data.stylesheet)
-
-        arrayHTMLObject.appendChild(newHTMLObject)
-        data.array.forEach(_data=>{
-            console.log(334, _data)
-
-            this.renderDataToHTML(_data, newHTMLObject)
-        })
-
-
-    }
+    }// loadMain
 }
 
 export var mainController:MainControllerInterface

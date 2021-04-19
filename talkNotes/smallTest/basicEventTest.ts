@@ -3,7 +3,7 @@ import * as GreatNoteSvgDataClass from "./GreatNoteSvgDataClass"
 import * as ToolBoxModel from "./ToolBoxModel"
 import {mainController} from "./constructInitialCondition"
 import * as GreatNoteDataClass from "./GreatNoteDataClass"
-
+import {socket} from "./socketFunction"
 let toolBoxController = new ToolBoxModel.ToolBoxClass()
 
 
@@ -35,6 +35,20 @@ currentEventNameDiv.innerText = "Current Event Name: "
 let currentEventFunctionDiv = document.createElement("div")
 currentEventFunctionDiv.innerText = "Current Event Functions: "
 
+let saveButton = document.createElement("button")
+saveButton.innerHTML = "save"
+saveButton.addEventListener("click", (e)=>{
+    let s = mainController.saveMainDoc()
+    socket.emit("saveMainDocToDisk", s)
+    console.log(mainController.mainDoc)
+})
+
+let loadButton = document.createElement("button")
+loadButton.innerHTML = "load"
+loadButton.addEventListener("click", (e)=>{
+    socket.emit("loadMainDoc")
+})
+
 let printMainDocButton = document.createElement("button")
 printMainDocButton.innerText = "print mainDoc"
 printMainDocButton.addEventListener("click", (e)=>{
@@ -47,7 +61,7 @@ let bookmarkArrayId = mainController.mainDocArray["bookmark"]
 console.log(45, bookmarkArrayId)
 GreatNoteDataClass.GNContainerDiv("div", bookmarkArrayId, false, false, true)
 
-eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton)
+eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton, saveButton, loadButton)
 
 
 
@@ -57,8 +71,8 @@ toolBoxController.eventFunctionDiv = currentEventFunctionDiv
 document.body.appendChild(eventStatus)
 
 let toolBoxHtmlObject = toolBoxController.createToolboxHtmlObject()
-
-
+//
+//
 let bookmarkArrayId = mainController.mainDocArray["bookmark"]
 console.log(30, bookmarkArrayId)
 
@@ -66,21 +80,15 @@ let basicDiv = document.createElement("div")
 basicDiv.style.width = "90vw"
 basicDiv.style.height = "80vh"
 basicDiv.style.background = "gold"
-// // svg div board
-let svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false)
+// svg div board
+let svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false, false)
 svgBoard.appendToContainer(basicDiv)
 toolBoxController.targetPage = svgBoard
 svgBoard.svgNode.style.background = "pink"
 
-console.log(mainController.mainDoc)
-
 let newPolyLineItemButton = toolBoxController.createNewPolyLineItemButton(toolBoxHtmlObject)
 let newEraserItemButton = toolBoxController.createEraserItemButton(toolBoxHtmlObject)
 
-console.log(newPolyLineItemButton)
-
-
-console.log(toolBoxHtmlObject)
 document.body.appendChild(toolBoxHtmlObject)
 document.body.appendChild(basicDiv)
 
@@ -102,14 +110,14 @@ document.body.appendChild(basicDiv)
 // basicDiv.appendChild(insideDiv1)
 
 
-//
-//
-// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", "", false, false, false)
+
+
+// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", bookmarkArrayId, false, false, true)
 // svgCircle.appendTo(svgBoard)
-// console.log(svgCircle)
-// EventModel.addMovingEvent(svgCircle.node)
-//
-// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, false)
+// // console.log(svgCircle)
+// EventModel.addMovingEvent(svgCircle)
+
+// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, true)
 // svgRect.applyStyle({"x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill":"pink"})
 // svgRect.appendTo(svgBoard)
 // EventModel.addMovingEvent(svgRect.node)

@@ -1,6 +1,7 @@
 import * as EventModel from "./EventModel"
 import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
 import * as ControllerModel from "./dbtest"
+import {mainController} from "./constructInitialCondition"
 
 interface ToolBoxInterface extends HTMLDivElement{
     itemArray: any[]       // to mark the status of the button
@@ -117,23 +118,23 @@ export class ToolBoxClass implements ToolBoxInterface {
 
             let strokeWidth = "15px"
             let strokeColor = "black"
-
-            let polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", "", false, false, false)
-            polyline.plot([[event["offsetX"], event["offsetY"]]])
+            let polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false)
+            polyline.soul.plot([[event["offsetX"], event["offsetY"]]])
             polyline.appendTo(self.targetPage)
-            polyline.attr({"stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth})
+            polyline.soul.attr({"stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth})
 
             function updatePolyLine(e){
-                let newPoint = polyline.array().value
+                let newPoint = polyline.soul.array().value
                 newPoint.push([event["offsetX"], event["offsetY"]])
                 console.log(newPoint)
-                polyline.plot(newPoint)
+                polyline.soul.plot(newPoint)
             }
 
             self.targetPage.addEventListener("mousemove", updatePolyLine)
 
             self.targetPage.addEventListener("mouseup", (e)=>{
                 self.targetPage.removeEventListener("mousemove", updatePolyLine)
+                console.log(mainController.mainDoc)
             })
         }
 
@@ -160,8 +161,9 @@ export class ToolBoxClass implements ToolBoxInterface {
             let cx = event.offsetX + "px"
             let cy = event.offsetY + "px"
             let r = "10px"
-            let eraser = GreatNoteSvgDataClass.GNSvgCircle("123", "", false, false, false)
-            console.log(164, eraser)
+            let eraser = GreatNoteSvgDataClass.GNSvgCircle("123", mainController.mainDocArray["bookmark"], false, false)
+
+            console.log(164, eraser, mainController.mainDoc["array"][1])
             eraser.applyStyle({"cx": cx, "cy": cy, "r":r})
 
             function updateEraserPosition(e){
@@ -182,9 +184,9 @@ export class ToolBoxClass implements ToolBoxInterface {
                 console.log("You are out of the boundary")
             })
             console.log(183, self.targetPage)
-            console.log(eraser.appendTo)
+            console.log(mainController.mainDoc["array"])
             // self.targetPage.svgController
-            self.targetPage.svgNode.appendChild(eraser.node)
+            self.targetPage.svgNode.appendChild(eraser)
 
             // eraser.appendTo(self.targetPage)
             // this.targetPage.appendChild(eraser.node)
