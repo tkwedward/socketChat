@@ -1,5 +1,9 @@
 body {
   overflow-x: hidden;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin: 0px;
 }
 
 .pageWrapper{
@@ -16,7 +20,7 @@ body {
       position: relative;
       .divPage {
           width: 100%;
-          height: 100%;
+          height: 100vh;
           background: pink;
           position: absolute;
           left: 0;

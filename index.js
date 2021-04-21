@@ -153,6 +153,7 @@ io.on("connection", socket=>{
 
   socket.on("saveMainDocToDisk",async data => {
       let jsonFileLocation = path.join(__dirname, "./talkNotes/data/automergeData.txt")
+      console.log(data)
       await fs.writeFileSync(jsonFileLocation, data);
       await socket.emit("message", "save success")
   }) // saveMainDocToDisk

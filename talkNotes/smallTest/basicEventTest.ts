@@ -7,20 +7,24 @@ import {socket} from "./socketFunction"
 import * as pageViewHelperFunction from "./pageViewHelperFunction"
 
 let toolBoxController = new ToolBoxModel.ToolBoxClass()
-
+let pageArrayID = mainController.mainDocArray["mainArray_page"]
 // global htmlObjects
 let panelContainer = document.querySelector(".panelContainer")
 let pageContentContainer = document.querySelector(".pageContentContainer")
 panelContainer.style.zIndex = 100;
 
+// let fullPageModeDiv = GreatNoteDataClass.GNContainerDiv("fullPageModeDiv", pageArrayID)
+// let overviewModeDiv = GreatNoteDataClass.GNContainerDiv("overviewModeDiv", pageArrayID)
+let fullPageModeDiv = document.querySelector(".fullPageModeDiv")
+let overviewModeDiv = document.querySelector(".overviewModeDiv")
+
 let bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true)
 let bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent")
-let fullPageModeDiv = pageContentContainer.querySelector(".fullPageModeDiv")
-let overviewModeDiv = pageContentContainer.querySelector(".overviewModeDiv")
+
 let currentStatus = {
   "newPageNumber": 1,
   "newPageDirection": 1,
-
+  "htmlObject": GreatNoteDataClass.GNContainerDiv,
   "currentPage": 0,
   "previousPage": 0,
   "nextPage": 0,
@@ -59,19 +63,18 @@ let createNewDivButton = pageViewHelperFunction.functionButtonCreater(
 )
 let switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv)
 
-
-// pageViewHelperFunction.intializeFirstPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
-
-// function switch overview with fullpage view
+let saveButton = document.createElement("button")
+saveButton.innerHTML = "saveButton"
+saveButton.addEventListener("click", function(){
+    let saveData = mainController.saveMainDoc(true)
+})
 
 
 let createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function(e){
 
 })
 
-bookmarkSubPanelContent.append(pageDummyContent, createNewDivButton, createNewSvg, switchViewModeButton)
-
-
+bookmarkSubPanelContent.append(pageDummyContent, createNewDivButton, switchViewModeButton, saveButton)
 
 // commentSubPanel
 let commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false)
@@ -80,12 +83,18 @@ panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel)
 
 
 // initialize the first page
-currentStatus.fullPageSize = [1187, 720]
-currentStatus.overviewPageSize = [237.4, 144]
-let [newPage, smallView] = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
-pageViewHelperFunction.insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+// currentStatus.fullPageSize = [1187, 720]
+// currentStatus.overviewPageSize = [237.4, 144]
 
-
-let pageOneFullHtml = fullPageModeDiv.querySelector(`.divPage`)
-let pageOneOverviewHtml = overviewModeDiv.querySelector(`.divPageSmall`)
-let fullPageToOverviewScale = 0.2
+// let [newPage, smallView] = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
+// pageViewHelperFunction.insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+//
+//
+// let pageOneFullHtml = fullPageModeDiv.querySelector(`.divPage`)
+// let pageOneOverviewHtml = overviewModeDiv.querySelector(`.divPageSmall`)
+// let fullPageToOverviewScale = 0.2
+// mainController.getMainDocChange()
+// let saveFile = mainController.saveMainDoc()
+// mainController.sendSaveMessageToSocket(saveFile)
+mainController.getLoadDataFromSocket()
+// console.log("loadData", mainController.mainDoc)

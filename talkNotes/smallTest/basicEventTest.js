@@ -20,19 +20,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 exports.__esModule = true;
 var ToolBoxModel = __importStar(require("./ToolBoxModel"));
+var constructInitialCondition_1 = require("./constructInitialCondition");
+var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
 var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
 var toolBoxController = new ToolBoxModel.ToolBoxClass();
+var pageArrayID = constructInitialCondition_1.mainController.mainDocArray["mainArray_page"];
 // global htmlObjects
 var panelContainer = document.querySelector(".panelContainer");
 var pageContentContainer = document.querySelector(".pageContentContainer");
 panelContainer.style.zIndex = 100;
+// let fullPageModeDiv = GreatNoteDataClass.GNContainerDiv("fullPageModeDiv", pageArrayID)
+// let overviewModeDiv = GreatNoteDataClass.GNContainerDiv("overviewModeDiv", pageArrayID)
+var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
+var overviewModeDiv = document.querySelector(".overviewModeDiv");
 var bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true);
 var bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent");
-var fullPageModeDiv = pageContentContainer.querySelector(".fullPageModeDiv");
-var overviewModeDiv = pageContentContainer.querySelector(".overviewModeDiv");
 var currentStatus = {
     "newPageNumber": 1,
     "newPageDirection": 1,
+    "htmlObject": GreatNoteDataClass.GNContainerDiv,
     "currentPage": 0,
     "previousPage": 0,
     "nextPage": 0,
@@ -63,19 +69,29 @@ pageDummyContent.classList.add("pageDummyContent");
 pageDummyContent.style.margin = "0 auto";
 var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer, pageDummyContent));
 var switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
-// pageViewHelperFunction.intializeFirstPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
-// function switch overview with fullpage view
+var saveButton = document.createElement("button");
+saveButton.innerHTML = "saveButton";
+saveButton.addEventListener("click", function () {
+    var saveData = constructInitialCondition_1.mainController.saveMainDoc(true);
+});
 var createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function (e) {
 });
-bookmarkSubPanelContent.append(pageDummyContent, createNewDivButton, createNewSvg, switchViewModeButton);
+bookmarkSubPanelContent.append(pageDummyContent, createNewDivButton, switchViewModeButton, saveButton);
 // commentSubPanel
 var commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false);
 panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel);
 // initialize the first page
-currentStatus.fullPageSize = [1187, 720];
-currentStatus.overviewPageSize = [237.4, 144];
-var _a = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer), newPage = _a[0], smallView = _a[1];
-pageViewHelperFunction.insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
-var pageOneFullHtml = fullPageModeDiv.querySelector(".divPage");
-var pageOneOverviewHtml = overviewModeDiv.querySelector(".divPageSmall");
-var fullPageToOverviewScale = 0.2;
+// currentStatus.fullPageSize = [1187, 720]
+// currentStatus.overviewPageSize = [237.4, 144]
+// let [newPage, smallView] = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
+// pageViewHelperFunction.insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+//
+//
+// let pageOneFullHtml = fullPageModeDiv.querySelector(`.divPage`)
+// let pageOneOverviewHtml = overviewModeDiv.querySelector(`.divPageSmall`)
+// let fullPageToOverviewScale = 0.2
+// mainController.getMainDocChange()
+// let saveFile = mainController.saveMainDoc()
+// mainController.sendSaveMessageToSocket(saveFile)
+constructInitialCondition_1.mainController.getLoadDataFromSocket();
+// console.log("loadData", mainController.mainDoc)

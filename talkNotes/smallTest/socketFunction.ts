@@ -24,7 +24,7 @@ socket.on("askRootUserForInitialData", data=>{
 
 socket.on("serverResponseToLoadMainDocRequest", data=>{
     mainController.loadMainDoc(data)
-    console.log(mainController.mainDoc)
+    console.log(2700, "serverResponseToLoadMainDocRequest",mainController.mainDoc)
 
 })
 

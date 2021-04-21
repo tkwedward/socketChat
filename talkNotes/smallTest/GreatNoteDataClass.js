@@ -96,6 +96,7 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
     var _object = document.createElement("div");
     _object.childrenList = {};
     _object._type = GNContainerDiv.name;
+    _object.classList.add("GNContainerDiv");
     _object._dataStructure = ["innerHTML", "innerText"];
     _object._styleStructure = ["background", "width"];
     // functions
@@ -127,6 +128,7 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
     };
     _object.extract = function () { return _object.createDataObject(); };
     console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer);
+    console.log(constructInitialCondition_1.mainController.mainDoc);
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
     return _object;

@@ -39,7 +39,7 @@ exports.socket.on("askRootUserForInitialData", function (data) {
 });
 exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
     constructInitialCondition_1.mainController.loadMainDoc(data);
-    console.log(constructInitialCondition_1.mainController.mainDoc);
+    console.log(2700, "serverResponseToLoadMainDocRequest", constructInitialCondition_1.mainController.mainDoc);
 });
 exports.socket.on("processInitialData", function (data) {
     // mainController.loadMainDoc(data.initialData)

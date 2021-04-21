@@ -194,6 +194,7 @@ export function GNContainerDiv(name:string, arrayID: string, insertPosition?: nu
     _object.childrenList = {}
 
     _object._type = GNContainerDiv.name
+    _object.classList.add("GNContainerDiv")
     _object._dataStructure = ["innerHTML", "innerText"]
     _object._styleStructure = ["background", "width"]
 
@@ -230,6 +231,7 @@ export function GNContainerDiv(name:string, arrayID: string, insertPosition?: nu
 
     _object.extract = () => _object.createDataObject()
     console.log(155, _object, saveToDatabase, arrayID, insertPosition, dataPointer)
+    console.log(mainController.mainDoc)
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer)
 

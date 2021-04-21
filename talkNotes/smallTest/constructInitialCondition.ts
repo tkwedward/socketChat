@@ -2,10 +2,11 @@ import * as Automerge from 'automerge'
 import {GNObjectInterface}  from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
 export enum MainDocArrayEnum {
-    page = "page",
-    bookmark = "bookmark",
-    panel = "panel",
-    pokemon = "pokemon"
+    mainArray_pageFull = "mainArray_pageFull",
+    mainArray_pageOverview = "mainArray_pageOverview",
+    mainArray_bookmark = "mainArray_bookmark",
+    mainArray_panel = "mainArray_panel",
+    mainArray_pokemon = "mainArray_pokemon"
 }
 
 //@auto-fold here
@@ -38,6 +39,7 @@ export interface MainControllerInterface {
     updateData(_object:GNObjectInterface, dataPointerType:boolean)
     createDummyData(name:string, age: number, sex: string):any
     saveHTMLObjectToDatabase(htmlObject: GNObjectInterface)
+    sendSaveMessageToSocket(saveFile:string)
 
     /** the arrayID is for attaching to the array*/
     getObjectById(objectID: string, doc?:any)
@@ -49,9 +51,30 @@ export interface MainControllerInterface {
     function: To render the data stored in the mainDoc to HTML Elements.*/
     renderDataToHTML(data: any, arrayHTMLObject:HTMLElement|GNObjectInterface)
     /** To save the mainDoc as text file*/
-    saveMainDoc()
+    saveMainDoc(sendRequest:boolean)
     /** To load string into the mainDoc */
     loadMainDoc(data:string)
+    getMainDocChange()
+    getLoadDataFromSocket()
+}
+
+
+let mainArrayData = {
+    "mainArray_pageFull": {
+        arrayID: "", arrayHTMLObject: "fullPageModeDiv"
+    },
+    "mainArray_pageOverview": {
+        arrayID: "", arrayHTMLObject: "overviewModeDiv"
+    },
+    "mainArray_bookmark": {
+        arrayID: "", arrayHTMLObject: "pageContentContainer"
+    },
+    "mainArray_panel": {
+        arrayID: "", arrayHTMLObject: "contentContainer"
+    },
+    "mainArray_pokemon": {
+        arrayID: "", arrayHTMLObject: "contentContainer"
+    }
 }
 
 export class MainController implements MainControllerInterface{
@@ -91,7 +114,7 @@ export class MainController implements MainControllerInterface{
       document.body.style.display = "grid"
       document.body.style.gridTemplateColumns = "1fr 3fr"
 
-      let bookmarkArrayId = this.mainDocArray["bookmark"]
+      let bookmarkArrayId = this.mainDocArray["mainArray_bookmark"]
 
       let controllerStyleList = {
           "width": "95%",
@@ -117,7 +140,7 @@ export class MainController implements MainControllerInterface{
       let saveButton = document.createElement("button")
       saveButton.innerHTML = "save"
       saveButton.addEventListener("click", (e)=>{
-          let s = mainController.saveMainDoc()
+          let s = mainController.saveMainDoc(true)
           socket.emit("saveMainDocToDisk", s)
       })
       let loadButton = document.createElement("button")
@@ -147,7 +170,6 @@ export class MainController implements MainControllerInterface{
 
         for (let arrayName in MainDocArrayEnum) {
             // create an object with extract function here so that you cdo not need to use GNInputFIeld here
-
             let htmlObject = {extract: function (){}}
             //@auto-fold here
             htmlObject.extract = function(){
@@ -170,6 +192,8 @@ export class MainController implements MainControllerInterface{
             let objectID = Automerge.getObjectId(arrayObject)
             this.mainDocArray[arrayObject["data"]["name"]] = objectID
         })
+
+        this.previousDoc = this.mainDoc
     }// initalizeMainDoc
 
 
@@ -199,13 +223,10 @@ export class MainController implements MainControllerInterface{
 
         // create new object data
         let objectData  = htmlObject.extract()
-        console.log(2004, objectData)
 
         objectData._identity.accessPointer = accessPointer
         objectData._identity.dataPointer = accessPointer
         objectData._identity.linkArray.push(accessPointer)
-        console.log(184, arrayID, htmlObject, insertPosition, dataPointer, objectData)
-        console.log(185, htmlObject, objectData)
         if (dataPointer){
             objectData._identity.dataPointer = dataPointer
         }
@@ -216,7 +237,6 @@ export class MainController implements MainControllerInterface{
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             // add the data to the object
             let objectInDatabase = Automerge.getObjectById(doc, accessPointer)
-            console.log(220, objectData)
             Object.entries(objectData).forEach(([key, value], _)=>{
                 objectInDatabase[key] = value
             })
@@ -230,7 +250,6 @@ export class MainController implements MainControllerInterface{
 
         htmlObject._identity = objectData._identity
 
-        console.log(190, htmlObject._identity, accessPointer)
         return [htmlObject, accessPointer]
     }// addData
 
@@ -280,7 +299,6 @@ export class MainController implements MainControllerInterface{
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
     saveHTMLObjectToDatabase(htmlObject:GNObjectInterface){
         let newData = htmlObject.extract()
-        console.log(279, newData, htmlObject)
         let dataPointer = htmlObject.getDataPointer()
         let accessPointer = htmlObject.getAccessPointer()
 
@@ -312,52 +330,108 @@ export class MainController implements MainControllerInterface{
         return object
     }
 
+    // @auto-fold here
+
+    getMainDocChange(){
+        let changes = Automerge.getChanges(this.previousDoc, this.mainDoc)
+        return changes
+    }
 
     /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
-    renderDataToHTML(data:communicationDataStructure, arrayHTMLObject){
+    renderDataToHTML(data:communicationDataStructure, arrayHTMLObject?){
+      console.log("renderDataToHTML", 342, data, arrayHTMLObject)
+      if (!arrayHTMLObject){
+        // this is for looping the mainArray so that they can get the initial aattach div of the HTML doc
+        // get the mainArray Object from mainArrayData
 
-      console.log(data.GNType)
-      let newHTMLObject
-      if (data.GNType=="GNButton"){
-          newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
-      } else if (data.GNType=="GNSvg"){
-          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
-          console.log(325, newHTMLObject)
+          data.forEach(p=>{
+
+              let mainArrayData_item = mainArrayData[p["data"]["name"]]
+
+              // if not in the mainArrayData, just skill it
+              if (mainArrayData_item){
+                  let initialHTMLObjectClassName = mainArrayData_item["arrayHTMLObject"]
+                  let initialHTMLObject = document.querySelector(`.${initialHTMLObjectClassName}`)
+                  console.log(350, initialHTMLObject)
+                  // for each elem in the main array
+                  p.array.forEach(elem=>{
+                      this.renderDataToHTML(elem, initialHTMLObject)
+                  })
+              }
+              // if (mainArrayData_item.startsWith("mainArray_")){
+              // }
+
+
+              // renderDataToHTML(p, )
+          })
 
       } else {
-          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+        let newHTMLObject
+
+        if (data.GNType=="GNButton"){
+            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
+        } else if (data.GNType=="GNSvg"){
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+
+        } else {
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+        }
+
+          if (newHTMLObject.loadFromData) newHTMLObject.loadFromData(data)
+          newHTMLObject.applyStyle(data.stylesheet)
+          console.log(374, data.stylesheet, arrayHTMLObject)
+          arrayHTMLObject.appendChild(newHTMLObject)
+          console.log(376, data.array)
+          data.array.forEach(_data=>{
+              this.renderDataToHTML(_data, newHTMLObject)
+          })
       }
 
-        console.log(336, data, arrayHTMLObject.tagName, newHTMLObject)
-
-        if (newHTMLObject.loadFromData) newHTMLObject.loadFromData(data)
-        newHTMLObject.applyStyle(data.stylesheet)
-
-        arrayHTMLObject.appendChild(newHTMLObject)
-        data.array.forEach(_data=>{
-            console.log(334, _data)
-
-            this.renderDataToHTML(_data, newHTMLObject)
-        })
     }
 
     //@auto-fold here
-    saveMainDoc(){
+    saveMainDoc(sendRequest:boolean=false){
       let saveData = Automerge.save(this.mainDoc)
-      return saveData
+      if (sendRequest){
+        socket.emit("saveMainDocToDisk", saveData)
+        console.log(saveData)
+        return saveData
+      } else {
+        return saveData
+      }
+
     }
+
+
+    getLoadDataFromSocket(){
+        socket.emit("loadMainDoc")
+    }
+
 
     //@auto-fold here
     loadMainDoc(data){
       this.mainDoc = Automerge.load(data)
-      console.log(353, mainController.mainDoc["array"][1]["array"][1]["array"][0]["data"])
+      console.log(353, mainController.mainDoc)
       this.previousDoc = this.mainDoc
-      let contentContainer = document.querySelector(".contentContainer")
+      // let contentContainer = document.querySelector(".contentContainer")
+      // to render the data ato HTML
+
+      this.renderDataToHTML(this.mainDoc["array"])
 
       let rootArray = this.mainDoc["array"]
+      console.log(417, rootArray, rootArray.length)
       rootArray.forEach(mainArray=>{
+          // update the ID of the mainArray
+          let arrayName = mainArray["data"]["name"]
+          let arrayID = mainArray["_identity"]["accessPointer"]
+          this.mainDocArray[arrayName] = arrayID
+
+          console.log(422, mainArray, arrayName, arrayID)
           mainArray["array"].forEach(elem=>{
-              this.renderDataToHTML(elem, contentContainer)
+            console.log(422, elem)
+            // this.mainDocArray[elem["data"]["name"]] = elem._identity.accessPointer
+            this.renderDataToHTML(elem["array"])
+              // this.renderDataToHTML(elem, contentContainer)
           })
       })
     }// loadMain
