@@ -87,7 +87,7 @@ var ToolBoxClass = /** @class */ (function () {
             var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false);
             polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
             polyline.appendTo(self.targetPage);
-            polyline.soul.attr({ "stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth });
+            polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
             function updatePolyLine(e) {
                 var newPoint = polyline.soul.array().value;
                 newPoint.push([event["offsetX"], event["offsetY"]]);
@@ -97,7 +97,8 @@ var ToolBoxClass = /** @class */ (function () {
             self.targetPage.addEventListener("mousemove", updatePolyLine);
             self.targetPage.addEventListener("mouseup", function (e) {
                 self.targetPage.removeEventListener("mousemove", updatePolyLine);
-                console.log(constructInitialCondition_1.mainController.mainDoc);
+                polyline.saveHTMLObjectToDatabase();
+                console.log(138, constructInitialCondition_1.mainController.mainDoc["array"][1]["array"][1]["array"][0]);
             });
         };
         toolBoxItem.addEventListener("click", function () {
@@ -136,7 +137,7 @@ var ToolBoxClass = /** @class */ (function () {
             console.log(183, self.targetPage);
             console.log(constructInitialCondition_1.mainController.mainDoc["array"]);
             // self.targetPage.svgController
-            self.targetPage.svgNode.appendChild(eraser);
+            self.targetPage.appendChild(eraser);
             // eraser.appendTo(self.targetPage)
             // this.targetPage.appendChild(eraser.node)
         };

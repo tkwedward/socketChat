@@ -4,120 +4,88 @@ import * as ToolBoxModel from "./ToolBoxModel"
 import {mainController} from "./constructInitialCondition"
 import * as GreatNoteDataClass from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
+import * as pageViewHelperFunction from "./pageViewHelperFunction"
+
 let toolBoxController = new ToolBoxModel.ToolBoxClass()
 
+// global htmlObjects
+let panelContainer = document.querySelector(".panelContainer")
+let pageContentContainer = document.querySelector(".pageContentContainer")
+panelContainer.style.zIndex = 100;
 
-// let pageViewController = document.querySelector(".pageViewController")
-// let addButton = document.querySelector(".navBara .addButton")
-// let pageDiv = fetch('../templates/pageTemplate/pageDiv.ejs')
-//   .then(response => response.text())
-//   .then(data => {
-//       let template = document.createElement("template")
-//       template.innerHTML = data
-//
-//       var newNode = document.importNode(template.content, true)
-//
-//       pageViewController.appendChild(newNode)
-//   });
+let bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true)
+let bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent")
+let fullPageModeDiv = pageContentContainer.querySelector(".fullPageModeDiv")
+let overviewModeDiv = pageContentContainer.querySelector(".overviewModeDiv")
+let currentStatus = {
+  "newPageNumber": 1,
+  "newPageDirection": 1,
 
-let eventStatus = document.createElement("div")
-eventStatus.style.display = "flexbox"
-eventStatus.style.margin = "10px 5px"
-eventStatus.style["align-items"] = "center"
-eventStatus.style["justify-content"] = "center"
-eventStatus.style.width = "90vw"
-eventStatus.style.height = "80px"
-eventStatus.style.margin = "auto"
-eventStatus.style.background = "pink"
-console.log(mainController.mainDocArray["bookmark"])
-let currentEventNameDiv = document.createElement("div")
-currentEventNameDiv.innerText = "Current Event Name: "
-let currentEventFunctionDiv = document.createElement("div")
-currentEventFunctionDiv.innerText = "Current Event Functions: "
+  "currentPage": 0,
+  "previousPage": 0,
+  "nextPage": 0,
+  "pageArrayFullPage": [0],
+  "pageArraySmallView": [0],
+  "fullPageSize": [0, 0],
+  "overviewPageSize": [0, 0]
+}
 
-let saveButton = document.createElement("button")
-saveButton.innerHTML = "save"
-saveButton.addEventListener("click", (e)=>{
-    let s = mainController.saveMainDoc()
-    socket.emit("saveMainDocToDisk", s)
-    console.log(mainController.mainDoc)
+// create subPanel
+let pageControllerSubPanel = pageViewHelperFunction.createSubPanel("pageController", true)
+let pageControllerSubPanelContent = pageControllerSubPanel.querySelector(".subPanelContent")
+let item1 = pageViewHelperFunction.createSubPanelItem("A")
+let item2 = pageViewHelperFunction.createSubPanelItem("B")
+let item3 = pageViewHelperFunction.createSubPanelItem("C")
+let item4 = pageViewHelperFunction.createSubPanelItem("D")
+let item5 = pageViewHelperFunction.createSubPanelItem("E")
+let item6 = pageViewHelperFunction.createSubPanelItem("F")
+let item7 = pageViewHelperFunction.createSubPanelItem("G")
+let item8 = pageViewHelperFunction.createSubPanelItem("H")
+pageControllerSubPanelContent.append(item1, item2, item3, item4, item5, item6, item7, item8)
+
+//===================== bookmarkSubPanel ==================//
+/** add new div, new svg*/
+
+// page controller
+// To create a page Controller to navigate previous and nex page
+pageViewHelperFunction.pageController(currentStatus, bookmarkSubPanelContent)
+
+
+let pageDummyContent = document.createElement("input")
+pageDummyContent.classList.add("pageDummyContent")
+pageDummyContent.style.margin = "0 auto"
+let createNewDivButton = pageViewHelperFunction.functionButtonCreater(
+  "new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer, pageDummyContent)
+)
+let switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv)
+
+
+// pageViewHelperFunction.intializeFirstPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
+
+// function switch overview with fullpage view
+
+
+let createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function(e){
+
 })
 
-let loadButton = document.createElement("button")
-loadButton.innerHTML = "load"
-loadButton.addEventListener("click", (e)=>{
-    socket.emit("loadMainDoc")
-})
-
-let printMainDocButton = document.createElement("button")
-printMainDocButton.innerText = "print mainDoc"
-printMainDocButton.addEventListener("click", (e)=>{
-    console.log(mainController.mainDoc["array"][1]["array"])
-    console.log(mainController.mainDoc["array"][1]["array"].length)
-})
-
-
-let bookmarkArrayId = mainController.mainDocArray["bookmark"]
-console.log(45, bookmarkArrayId)
-GreatNoteDataClass.GNContainerDiv("div", bookmarkArrayId, false, false, true)
-
-eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton, saveButton, loadButton)
+bookmarkSubPanelContent.append(pageDummyContent, createNewDivButton, createNewSvg, switchViewModeButton)
 
 
 
-toolBoxController.eventNameDiv = currentEventNameDiv
-toolBoxController.eventFunctionDiv = currentEventFunctionDiv
+// commentSubPanel
+let commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false)
 
-document.body.appendChild(eventStatus)
-
-let toolBoxHtmlObject = toolBoxController.createToolboxHtmlObject()
-//
-//
-let bookmarkArrayId = mainController.mainDocArray["bookmark"]
-console.log(30, bookmarkArrayId)
-
-let basicDiv = document.createElement("div")
-basicDiv.style.width = "90vw"
-basicDiv.style.height = "80vh"
-basicDiv.style.background = "gold"
-// svg div board
-let svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false, false)
-svgBoard.appendToContainer(basicDiv)
-toolBoxController.targetPage = svgBoard
-svgBoard.svgNode.style.background = "pink"
-
-let newPolyLineItemButton = toolBoxController.createNewPolyLineItemButton(toolBoxHtmlObject)
-let newEraserItemButton = toolBoxController.createEraserItemButton(toolBoxHtmlObject)
-
-document.body.appendChild(toolBoxHtmlObject)
-document.body.appendChild(basicDiv)
+panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel)
 
 
-// EventModel.addMovingEvent(svgBoard.svgNode)
+// initialize the first page
+currentStatus.fullPageSize = [1187, 720]
+currentStatus.overviewPageSize = [237.4, 144]
+let [newPage, smallView] = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
+pageViewHelperFunction.insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
 
 
-
-
-
-
-// EventModel.addMovingEvent(basicDiv)
-//
-// let insideDiv1 = document.createElement("div")
-// insideDiv1.style.width = "10vw"
-// insideDiv1.style.height = "10vh"
-// insideDiv1.style.background = "red"
-// EventModel.addMovingEvent(insideDiv1)
-// basicDiv.appendChild(insideDiv1)
-
-
-
-
-// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", bookmarkArrayId, false, false, true)
-// svgCircle.appendTo(svgBoard)
-// // console.log(svgCircle)
-// EventModel.addMovingEvent(svgCircle)
-
-// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, true)
-// svgRect.applyStyle({"x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill":"pink"})
-// svgRect.appendTo(svgBoard)
-// EventModel.addMovingEvent(svgRect.node)
+let pageOneFullHtml = fullPageModeDiv.querySelector(`.divPage`)
+let pageOneOverviewHtml = overviewModeDiv.querySelector(`.divPageSmall`)
+let fullPageToOverviewScale = 0.2

@@ -259,13 +259,15 @@ var MainController = /** @class */ (function () {
             newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
         }
         else if (data.GNType == "GNSvg") {
-            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer).svgNode;
+            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
             console.log(325, newHTMLObject);
         }
         else {
             newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
         }
         console.log(336, data, arrayHTMLObject.tagName, newHTMLObject);
+        if (newHTMLObject.loadFromData)
+            newHTMLObject.loadFromData(data);
         newHTMLObject.applyStyle(data.stylesheet);
         arrayHTMLObject.appendChild(newHTMLObject);
         data.array.forEach(function (_data) {
@@ -282,6 +284,7 @@ var MainController = /** @class */ (function () {
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
         this.mainDoc = Automerge.load(data);
+        console.log(353, exports.mainController.mainDoc["array"][1]["array"][1]["array"][0]["data"]);
         this.previousDoc = this.mainDoc;
         var contentContainer = document.querySelector(".contentContainer");
         var rootArray = this.mainDoc["array"];

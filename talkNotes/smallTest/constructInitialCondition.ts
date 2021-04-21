@@ -182,6 +182,7 @@ export class MainController implements MainControllerInterface{
     addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?):[any, string]{
       // Step 1: register an accessPointer in the database
 
+
         //@auto-fold here
         this.mainDoc = Automerge.change(this.mainDoc, doc=>{
             let arrayToBeAttachedTo =  Automerge.getObjectById(doc, arrayID)["array"]
@@ -190,7 +191,6 @@ export class MainController implements MainControllerInterface{
         })
 
         // step 2 update the identityProperties of the object
-
         let arrayToBeAttachedTo = Automerge.getObjectById(this.mainDoc, arrayID)["array"]
 
 
@@ -321,7 +321,7 @@ export class MainController implements MainControllerInterface{
       if (data.GNType=="GNButton"){
           newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
       } else if (data.GNType=="GNSvg"){
-          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer).svgNode
+          newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
           console.log(325, newHTMLObject)
 
       } else {
@@ -329,6 +329,8 @@ export class MainController implements MainControllerInterface{
       }
 
         console.log(336, data, arrayHTMLObject.tagName, newHTMLObject)
+
+        if (newHTMLObject.loadFromData) newHTMLObject.loadFromData(data)
         newHTMLObject.applyStyle(data.stylesheet)
 
         arrayHTMLObject.appendChild(newHTMLObject)
@@ -348,6 +350,7 @@ export class MainController implements MainControllerInterface{
     //@auto-fold here
     loadMainDoc(data){
       this.mainDoc = Automerge.load(data)
+      console.log(353, mainController.mainDoc["array"][1]["array"][1]["array"][0]["data"])
       this.previousDoc = this.mainDoc
       let contentContainer = document.querySelector(".contentContainer")
 

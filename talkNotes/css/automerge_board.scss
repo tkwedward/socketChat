@@ -1,3 +1,92 @@
+body {
+  overflow-x: hidden;
+}
+
+.pageWrapper{
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    height: 100vh;
+
+    .panelContainer {
+      background: gold;
+    }
+
+    .pageContentContainer{
+      background: silver;
+      position: relative;
+      .divPage {
+          width: 100%;
+          height: 100%;
+          background: pink;
+          position: absolute;
+          left: 0;
+          right: 0;
+      }
+
+      .overviewModeDiv{
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+          grid-row-gap: 15px;
+          .divPageSmall {
+              background: pink;
+          }
+      }
+
+      .fullPageModeDiv[status="off"] {
+          display: none;
+      }
+      .overviewModeDiv[status="off"] {
+          display: none;
+      }
+    }
+
+    .subPanel {
+        .subPanelNavbar {
+            height: 40px;
+            background: lightgreen;
+            display: grid;
+            grid-template-columns: 9fr 1fr;
+        }
+        .subPanelContent{
+            min-height: 300px;
+            background: coral;
+        }
+        .subPanelContent[status="open"]{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .subPanelContent[status="close"]{
+            display: none;
+
+        }
+
+        .subPanelItem{
+            width: 50px;
+            height: 50px;
+            background: azure;
+            margin: 0 auto;
+        }
+        .subPanelItem[status="on"]{
+            background: yellow;
+        }
+    }
+}
+
+.bookmarkSubPanel{
+    .subPanelContent[status="open"]{
+        display: block !important;
+
+        .functionButton{
+            width: 90%;
+            height: 30px;
+            background: grey;
+            margin: 10px auto;
+        }
+    }
+}
+
+
+
 .container{
   position: fixed;
   width: 100%;
@@ -16,10 +105,10 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     text-align: center;
-    height: 10vh;
+    height: 8vh;
 }
 
 .pageViewController {
-    height: 90vh;
-    background: Aliceblue
+    height: 92svh;
+    background: Aliceblue;
 }

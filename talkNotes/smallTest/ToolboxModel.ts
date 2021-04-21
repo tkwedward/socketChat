@@ -121,7 +121,7 @@ export class ToolBoxClass implements ToolBoxInterface {
             let polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false)
             polyline.soul.plot([[event["offsetX"], event["offsetY"]]])
             polyline.appendTo(self.targetPage)
-            polyline.soul.attr({"stroke": strokeColor, "stroke-width": "4px", "fill": "none", "stroke-width": strokeWidth})
+            polyline.applyStyle({"stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none"})
 
             function updatePolyLine(e){
                 let newPoint = polyline.soul.array().value
@@ -134,7 +134,8 @@ export class ToolBoxClass implements ToolBoxInterface {
 
             self.targetPage.addEventListener("mouseup", (e)=>{
                 self.targetPage.removeEventListener("mousemove", updatePolyLine)
-                console.log(mainController.mainDoc)
+                polyline.saveHTMLObjectToDatabase()
+                console.log(138, mainController.mainDoc["array"][1]["array"][1]["array"][0])
             })
         }
 
@@ -186,7 +187,7 @@ export class ToolBoxClass implements ToolBoxInterface {
             console.log(183, self.targetPage)
             console.log(mainController.mainDoc["array"])
             // self.targetPage.svgController
-            self.targetPage.svgNode.appendChild(eraser)
+            self.targetPage.appendChild(eraser)
 
             // eraser.appendTo(self.targetPage)
             // this.targetPage.appendChild(eraser.node)

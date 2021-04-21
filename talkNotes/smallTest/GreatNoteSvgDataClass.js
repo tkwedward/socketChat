@@ -39,45 +39,44 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
-    svgDivContainer._type = GNSvg.name;
-    svgDivContainer._name = name;
-    svgDivContainer._dataStructure = ["innerHTML"];
-    svgDivContainer._styleStructure = [];
-    var svgBoard;
+    var svgController = svg_js_1["default"](svgDivContainer);
+    svgController.width("800px");
+    svgController.height("300px");
+    var svgBoard = svgController.node;
+    svgBoard.svgController = svgController;
+    svgBoard.style.background = "gold";
+    svgBoard._type = GNSvg.name;
+    svgBoard._name = name;
+    svgBoard._dataStructure = ["innerHTML"];
+    svgBoard._styleStructure = [];
     // // functions
     // svgObject.loadFromData = (data)=>{ svgObject.value = data }
-    svgDivContainer.appendToContainer = function (parent) {
+    svgBoard.appendToContainer = function (parent) {
         parent.appendChild(svgDivContainer);
-        var svgController = svg_js_1["default"](svgDivContainer);
-        svgController.width("800px");
-        svgController.height("300px");
-        svgDivContainer.svgController = svgController;
-        svgDivContainer.svgNode = svgController.node;
-        console.log(57, svgDivContainer.svgNode);
-        svgController.node.style.background = "gold";
     };
-    svgDivContainer.applyStyle = function () {
+    svgBoard.applyStyle = function () {
     };
-    svgDivContainer.createDataObject = function () {
+    svgBoard.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
-        dataObject["GNType"] = svgDivContainer._type;
-        if (svgDivContainer._identity)
-            dataObject["_identity"] = svgDivContainer._identity;
-        svgDivContainer._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = svgDivContainer[p];
+        dataObject["GNType"] = svgBoard._type;
+        if (svgBoard._identity)
+            dataObject["_identity"] = svgBoard._identity;
+        svgBoard._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgBoard[p];
         });
         // stylesheet data
-        svgDivContainer._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = svgDivContainer["style"][p];
+        svgBoard._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgBoard["style"][p];
         });
         return dataObject;
     };
     //
-    svgDivContainer.extract = function () { return svgDivContainer.createDataObject(); };
+    svgBoard.extract = function () { return svgBoard.createDataObject(); };
     // add extra funcitons to the object
-    GreatNoteDataClass.superGNObject(svgDivContainer, saveToDatabase, arrayID, insertPosition, dataPointer);
-    return svgDivContainer;
+    GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
+    console.log(900, svgBoard._identity);
+    return svgBoard;
 }
 exports.GNSvg = GNSvg;
 //@auto-fold here
@@ -180,10 +179,14 @@ function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabas
     svgObject._type = GNSvgPolyLine.name;
     svgObject._name = name;
     svgObject._dataStructure = ["points"];
-    svgObject._styleStructure = [];
+    svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
     // functions
     svgObject.loadFromData = function (data) {
-        svgObject.soul.plot(data["points"]);
+        // svgObject.soul.plot([[0, 0], [10, 100]])
+        console.log(300, data["data"]["points"]);
+        svgObject.soul.plot(data["data"]["points"]);
+        console.log(303, svgObject.applyStyle, data["stylesheet"]);
+        svgObject.applyStyle(data["stylesheet"]);
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
@@ -197,14 +200,21 @@ function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabas
         });
         // stylesheet data
         svgObject._styleStructure.forEach(function (p) {
+            console.log(320, p, svgObject["style"][p]);
             dataObject["stylesheet"][p] = svgObject["style"][p];
         });
         return dataObject;
     };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        svgObject.soul.plot(attrList["points"]);
-        svgObject.soul.attr(attrList["attribute"]);
+        svgObject._styleStructure.forEach(function (p) {
+            if (p == "fill") {
+                svgObject["style"]["fill"] = attrList["fill"] || "none";
+            }
+            else {
+                svgObject["style"][p] = attrList[p];
+            }
+        });
     };
     // to share same data function
     GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);

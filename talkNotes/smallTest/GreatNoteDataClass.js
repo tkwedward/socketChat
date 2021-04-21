@@ -161,6 +161,11 @@ function GNEditableDiv(_name, arrayID, insertPosition, dataPointer, saveToDataba
         var _dummyData = _object.createDataObject();
         return _dummyData;
     };
+    _object.loadFromData = function (data) {
+        _object._dataStructure.forEach(function (key) {
+            _object[key] = data[key];
+        });
+    };
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
     return _object;
@@ -291,11 +296,6 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     _object.addToDatabase = function (arrayID, insertPosition, dataPointer) {
         constructInitialCondition_1.mainController.addData(arrayID, _object, insertPosition, dataPointer);
         _object.setAttribute("accessPointer", _object.getAccessPointer());
-    };
-    _object.loadFromData = function (data) {
-        _object._dataStructure.forEach(function (key) {
-            _object[key] = data[key];
-        });
     };
     _object.saveHTMLObjectToDatabase = function () {
         constructInitialCondition_1.mainController.saveHTMLObjectToDatabase(_object);

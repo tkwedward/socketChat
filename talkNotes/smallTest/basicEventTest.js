@@ -19,95 +19,63 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
 var ToolBoxModel = __importStar(require("./ToolBoxModel"));
-var constructInitialCondition_1 = require("./constructInitialCondition");
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-var socketFunction_1 = require("./socketFunction");
+var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
 var toolBoxController = new ToolBoxModel.ToolBoxClass();
-// let pageViewController = document.querySelector(".pageViewController")
-// let addButton = document.querySelector(".navBara .addButton")
-// let pageDiv = fetch('../templates/pageTemplate/pageDiv.ejs')
-//   .then(response => response.text())
-//   .then(data => {
-//       let template = document.createElement("template")
-//       template.innerHTML = data
-//
-//       var newNode = document.importNode(template.content, true)
-//
-//       pageViewController.appendChild(newNode)
-//   });
-var eventStatus = document.createElement("div");
-eventStatus.style.display = "flexbox";
-eventStatus.style.margin = "10px 5px";
-eventStatus.style["align-items"] = "center";
-eventStatus.style["justify-content"] = "center";
-eventStatus.style.width = "90vw";
-eventStatus.style.height = "80px";
-eventStatus.style.margin = "auto";
-eventStatus.style.background = "pink";
-console.log(constructInitialCondition_1.mainController.mainDocArray["bookmark"]);
-var currentEventNameDiv = document.createElement("div");
-currentEventNameDiv.innerText = "Current Event Name: ";
-var currentEventFunctionDiv = document.createElement("div");
-currentEventFunctionDiv.innerText = "Current Event Functions: ";
-var saveButton = document.createElement("button");
-saveButton.innerHTML = "save";
-saveButton.addEventListener("click", function (e) {
-    var s = constructInitialCondition_1.mainController.saveMainDoc();
-    socketFunction_1.socket.emit("saveMainDocToDisk", s);
-    console.log(constructInitialCondition_1.mainController.mainDoc);
+// global htmlObjects
+var panelContainer = document.querySelector(".panelContainer");
+var pageContentContainer = document.querySelector(".pageContentContainer");
+panelContainer.style.zIndex = 100;
+var bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true);
+var bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent");
+var fullPageModeDiv = pageContentContainer.querySelector(".fullPageModeDiv");
+var overviewModeDiv = pageContentContainer.querySelector(".overviewModeDiv");
+var currentStatus = {
+    "newPageNumber": 1,
+    "newPageDirection": 1,
+    "currentPage": 0,
+    "previousPage": 0,
+    "nextPage": 0,
+    "pageArrayFullPage": [0],
+    "pageArraySmallView": [0],
+    "fullPageSize": [0, 0],
+    "overviewPageSize": [0, 0]
+};
+// create subPanel
+var pageControllerSubPanel = pageViewHelperFunction.createSubPanel("pageController", true);
+var pageControllerSubPanelContent = pageControllerSubPanel.querySelector(".subPanelContent");
+var item1 = pageViewHelperFunction.createSubPanelItem("A");
+var item2 = pageViewHelperFunction.createSubPanelItem("B");
+var item3 = pageViewHelperFunction.createSubPanelItem("C");
+var item4 = pageViewHelperFunction.createSubPanelItem("D");
+var item5 = pageViewHelperFunction.createSubPanelItem("E");
+var item6 = pageViewHelperFunction.createSubPanelItem("F");
+var item7 = pageViewHelperFunction.createSubPanelItem("G");
+var item8 = pageViewHelperFunction.createSubPanelItem("H");
+pageControllerSubPanelContent.append(item1, item2, item3, item4, item5, item6, item7, item8);
+//===================== bookmarkSubPanel ==================//
+/** add new div, new svg*/
+// page controller
+// To create a page Controller to navigate previous and nex page
+pageViewHelperFunction.pageController(currentStatus, bookmarkSubPanelContent);
+var pageDummyContent = document.createElement("input");
+pageDummyContent.classList.add("pageDummyContent");
+pageDummyContent.style.margin = "0 auto";
+var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer, pageDummyContent));
+var switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
+// pageViewHelperFunction.intializeFirstPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
+// function switch overview with fullpage view
+var createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function (e) {
 });
-var loadButton = document.createElement("button");
-loadButton.innerHTML = "load";
-loadButton.addEventListener("click", function (e) {
-    socketFunction_1.socket.emit("loadMainDoc");
-});
-var printMainDocButton = document.createElement("button");
-printMainDocButton.innerText = "print mainDoc";
-printMainDocButton.addEventListener("click", function (e) {
-    console.log(constructInitialCondition_1.mainController.mainDoc["array"][1]["array"]);
-    console.log(constructInitialCondition_1.mainController.mainDoc["array"][1]["array"].length);
-});
-var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
-console.log(45, bookmarkArrayId);
-GreatNoteDataClass.GNContainerDiv("div", bookmarkArrayId, false, false, true);
-eventStatus.append(currentEventNameDiv, currentEventFunctionDiv, printMainDocButton, saveButton, loadButton);
-toolBoxController.eventNameDiv = currentEventNameDiv;
-toolBoxController.eventFunctionDiv = currentEventFunctionDiv;
-document.body.appendChild(eventStatus);
-var toolBoxHtmlObject = toolBoxController.createToolboxHtmlObject();
-//
-//
-var bookmarkArrayId = constructInitialCondition_1.mainController.mainDocArray["bookmark"];
-console.log(30, bookmarkArrayId);
-var basicDiv = document.createElement("div");
-basicDiv.style.width = "90vw";
-basicDiv.style.height = "80vh";
-basicDiv.style.background = "gold";
-// svg div board
-var svgBoard = GreatNoteSvgDataClass.GNSvg("fast", bookmarkArrayId, false, false, false);
-svgBoard.appendToContainer(basicDiv);
-toolBoxController.targetPage = svgBoard;
-svgBoard.svgNode.style.background = "pink";
-var newPolyLineItemButton = toolBoxController.createNewPolyLineItemButton(toolBoxHtmlObject);
-var newEraserItemButton = toolBoxController.createEraserItemButton(toolBoxHtmlObject);
-document.body.appendChild(toolBoxHtmlObject);
-document.body.appendChild(basicDiv);
-// EventModel.addMovingEvent(svgBoard.svgNode)
-// EventModel.addMovingEvent(basicDiv)
-//
-// let insideDiv1 = document.createElement("div")
-// insideDiv1.style.width = "10vw"
-// insideDiv1.style.height = "10vh"
-// insideDiv1.style.background = "red"
-// EventModel.addMovingEvent(insideDiv1)
-// basicDiv.appendChild(insideDiv1)
-// let svgCircle = GreatNoteSvgDataClass.GNSvgCircle("", bookmarkArrayId, false, false, true)
-// svgCircle.appendTo(svgBoard)
-// // console.log(svgCircle)
-// EventModel.addMovingEvent(svgCircle)
-// let svgRect = GreatNoteSvgDataClass.GNSvgRect("", "", false, false, true)
-// svgRect.applyStyle({"x": "200px", "y": "100px", "width": "100px", "height": "100px", "fill":"pink"})
-// svgRect.appendTo(svgBoard)
-// EventModel.addMovingEvent(svgRect.node)
+bookmarkSubPanelContent.append(pageDummyContent, createNewDivButton, createNewSvg, switchViewModeButton);
+// commentSubPanel
+var commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false);
+panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel);
+// initialize the first page
+currentStatus.fullPageSize = [1187, 720];
+currentStatus.overviewPageSize = [237.4, 144];
+var _a = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer), newPage = _a[0], smallView = _a[1];
+pageViewHelperFunction.insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+var pageOneFullHtml = fullPageModeDiv.querySelector(".divPage");
+var pageOneOverviewHtml = overviewModeDiv.querySelector(".divPageSmall");
+var fullPageToOverviewScale = 0.2;

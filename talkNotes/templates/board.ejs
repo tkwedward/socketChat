@@ -3,12 +3,39 @@
   <head>
     <meta name= "viewport" content="width=device-width, initial-scaler=1" charset="utf-8">
     <title> Chatter </title>
-    <!-- <link href="../css/automerge_board.css" rel="stylesheet"> -->
+    <link href="../css/automerge_board.css" rel="stylesheet">
   </head>
 
   <body>
+    <template id="subPanelTemplate">
+      <div class="subPanel">
+          <div class="subPanelNavbar">
+            <span class="subPanelTitle"></span>
+            <span class="subPanelSwitch">-</span>
+          </div>
+          <div class="subPanelContent"></div>
+      </div>
+    </template>
+    <template id="subPanelItemTemplate">
+      <div class="subPanelItem"></div>
+    </template>
+
+
+    <div class="pageWrapper">
+        <div class="panelContainer">
+
+        </div>
+        <div class="pageContentContainer">
+            <div class="fullPageModeDiv"></div>
+            <div class="overviewModeDiv"></div>
+        </div>
+    </div>
+
+
     <div class="contentContainer"></div>
   </body>
+
+
 
   <script src="/socket.io/socket.io.js" charset="utf-8">
   </script>

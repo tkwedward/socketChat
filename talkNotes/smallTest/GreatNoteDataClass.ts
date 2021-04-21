@@ -280,6 +280,13 @@ export function GNEditableDiv(_name:string, arrayID: string, insertPosition?: nu
     }
 
 
+    _object.loadFromData = (data) => {
+        _object._dataStructure.forEach(key=>{
+            _object[key] = data[key]
+        })
+    }
+
+
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input")
 
@@ -473,11 +480,6 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
         _object.setAttribute("accessPointer", _object.getAccessPointer())
     }
 
-    _object.loadFromData = (data) => {
-        _object._dataStructure.forEach(key=>{
-            _object[key] = data[key]
-        })
-    }
 
     _object.saveHTMLObjectToDatabase = function(){
         mainController.saveHTMLObjectToDatabase(_object)
