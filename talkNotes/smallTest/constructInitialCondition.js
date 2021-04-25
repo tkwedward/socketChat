@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.mainController = exports.MainController = exports.MainDocArrayEnum = void 0;
 var Automerge = __importStar(require("automerge"));
+var buildInitialPageHelperFunctions = __importStar(require("./buildInitialPageHelperFunctions"));
 var socketFunction_1 = require("./socketFunction");
 var MainDocArrayEnum;
 (function (MainDocArrayEnum) {
@@ -53,11 +54,17 @@ var MainController = /** @class */ (function () {
         this.initializeRootArray();
         this.initalizeMainDoc();
         this.applyMainDocTemplate = false;
-        // this.applyMainDocTemplate = true
-        if (this.applyMainDocTemplate) {
-            // this.initializeHTMLBackground()
-        }
-        //
+        this.pageCurrentStatus = {
+            "newPageNumber": 1,
+            "newPageDirection": 1,
+            "currentPage": 0,
+            "previousPage": 0,
+            "nextPage": 0,
+            "pageArrayFullPage": [0],
+            "pageArraySmallView": [0],
+            "fullPageSize": [1187, 720],
+            "overviewPageSize": [237.4, 144]
+        };
     }
     //@auto-fold here
     MainController.prototype.initializeRootArray = function () {
@@ -66,46 +73,6 @@ var MainController = /** @class */ (function () {
             this.mainDocArray[arrayName] = "";
         }
         this.baseArrayID = "";
-    };
-    //@auto-fold here
-    MainController.prototype.initializeHTMLBackground = function () {
-        // to create a controller
-        document.body.style.display = "grid";
-        document.body.style.gridTemplateColumns = "1fr 3fr";
-        var bookmarkArrayId = this.mainDocArray["mainArray_bookmark"];
-        var controllerStyleList = {
-            "width": "95%",
-            "height": "100vh",
-            "border": "2px black solid",
-            "margin": "20px auto"
-        };
-        var controller = document.createElement("div");
-        controller.classList.add("controller");
-        controller.innerHTML = "king";
-        controller.style.width = "95%";
-        controller.style.height = "100vh";
-        controller.style.border = "2px black solid";
-        controller.style.margin = "20px auto";
-        document.body.appendChild(controller);
-        var linkArrayInfo = document.createElement("div");
-        linkArrayInfo.classList.add("linkArrayInfo");
-        controller.appendChild(linkArrayInfo);
-        var saveButton = document.createElement("button");
-        saveButton.innerHTML = "save";
-        saveButton.addEventListener("click", function (e) {
-            var s = exports.mainController.saveMainDoc(true);
-            socketFunction_1.socket.emit("saveMainDocToDisk", s);
-        });
-        var loadButton = document.createElement("button");
-        loadButton.innerHTML = "load";
-        loadButton.addEventListener("click", function (e) {
-            socketFunction_1.socket.emit("loadMainDoc");
-        });
-        controller.appendChild(saveButton);
-        controller.appendChild(loadButton);
-        var contentContainer = document.createElement("div");
-        contentContainer.classList.add("contentContainer");
-        document.body.appendChild(contentContainer);
     };
     //@auto-fold here
     MainController.prototype.initalizeMainDoc = function () {
@@ -125,6 +92,7 @@ var MainController = /** @class */ (function () {
                     "data": { "name": arrayName },
                     "array": [],
                     "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+                    "_classList": [],
                     "styleSheet": {},
                     "GNType": ""
                 };
@@ -150,9 +118,10 @@ var MainController = /** @class */ (function () {
     //@auto-fold here
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
         // Step 1: register an accessPointer in the database
-        var _this = this;
         //@auto-fold here
-        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+        var _this = this;
+        var initializeMessage = { "action": "null", "objectID": "" };
+        this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(initializeMessage), function (doc) {
             var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
             if (!insertPosition)
                 insertPosition = arrayToBeAttachedTo.length;
@@ -163,6 +132,7 @@ var MainController = /** @class */ (function () {
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
         // create new object data
+        console.log("an object is created in the database");
         var objectData = htmlObject.extract();
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
@@ -172,7 +142,9 @@ var MainController = /** @class */ (function () {
         }
         // Step 3: put real data into the database
         //@auto-fold here
-        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+        var createMessage = { "action": "create", "objectID": accessPointer, "parentHTMLObjectId": arrayID };
+        console.log(202, "here is the create message", createMessage);
+        this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(createMessage), function (doc) {
             // add the data to the object
             var objectInDatabase = Automerge.getObjectById(doc, accessPointer);
             Object.entries(objectData).forEach(function (_a, _) {
@@ -183,11 +155,18 @@ var MainController = /** @class */ (function () {
             if (dataPointer) {
                 var masterObject = _this.getObjectById(dataPointer, doc);
                 masterObject._identity.linkArray.push(accessPointer);
+                var masterObjectHtmlElement = _this.getHtmlObjectByID(dataPointer);
+                console.log(209, masterObjectHtmlElement);
+                masterObjectHtmlElement === null || masterObjectHtmlElement === void 0 ? void 0 : masterObjectHtmlElement._identity.linkArray.push(accessPointer);
             }
         });
         htmlObject._identity = objectData._identity;
         return [htmlObject, accessPointer];
     }; // addData
+    MainController.prototype.getHtmlObjectByID = function (objectID) {
+        return document.querySelector("*[accessPointer='" + objectID + "']");
+        document.querySelector("*[accessPointer='c705e759-caeb-4bb3-83ce-ddfe44270ad5']");
+    };
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
     The last parameter updateType has two kinds. The first one is called dataPointer type.
     The second type is called accessPointer typer.
@@ -236,27 +215,33 @@ var MainController = /** @class */ (function () {
         var newData = htmlObject.extract();
         var dataPointer = htmlObject.getDataPointer();
         var accessPointer = htmlObject.getAccessPointer();
-        this.mainDoc = Automerge.change(this.mainDoc, function (doc) {
+        var message = JSON.stringify({ "action": "update", "objectID": accessPointer });
+        this.mainDoc = Automerge.change(this.mainDoc, message, function (doc) {
             var dataPointerObejct = Automerge.getObjectById(doc, dataPointer);
             var accessPointerObject = Automerge.getObjectById(doc, accessPointer);
+            // update the data
             Object.entries(newData.data).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
                 dataPointerObejct["data"][key] = value;
             });
+            // update the stylesheet
             if (accessPointer != dataPointer) {
+                // if it is a link object
                 Object.entries(newData.stylesheet).forEach(function (_a, _) {
                     var key = _a[0], value = _a[1];
                     accessPointerObject["stylesheet"][key] = value;
                 });
             }
             else {
+                // if it is the main object
                 Object.entries(newData.stylesheet).forEach(function (_a, _) {
                     var key = _a[0], value = _a[1];
                     dataPointerObejct["stylesheet"][key] = value;
                 });
             }
         });
-    };
+        socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
+    }; // saveHTMLObjectToDatabase
     //@auto-fold here
     MainController.prototype.getObjectById = function (objectID, doc) {
         if (doc === void 0) { doc = this.mainDoc; }
@@ -271,7 +256,6 @@ var MainController = /** @class */ (function () {
     /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
-        console.log("renderDataToHTML", 342, data, arrayHTMLObject);
         if (!arrayHTMLObject) {
             // this is for looping the mainArray so that they can get the initial aattach div of the HTML doc
             // get the mainArray Object from mainArrayData
@@ -281,12 +265,11 @@ var MainController = /** @class */ (function () {
                 if (mainArrayData_item) {
                     var initialHTMLObjectClassName = mainArrayData_item["arrayHTMLObject"];
                     var initialHTMLObject_1 = document.querySelector("." + initialHTMLObjectClassName);
-                    console.log(350, initialHTMLObject_1);
                     // for each elem in the main array
                     p.array.forEach(function (elem) {
                         _this.renderDataToHTML(elem, initialHTMLObject_1);
                     });
-                }
+                } // if mainArrayData_item
                 // if (mainArrayData_item.startsWith("mainArray_")){
                 // }
                 // renderDataToHTML(p, )
@@ -306,9 +289,7 @@ var MainController = /** @class */ (function () {
             if (newHTMLObject_1.loadFromData)
                 newHTMLObject_1.loadFromData(data);
             newHTMLObject_1.applyStyle(data.stylesheet);
-            console.log(374, data.stylesheet, arrayHTMLObject);
             arrayHTMLObject.appendChild(newHTMLObject_1);
-            console.log(376, data.array);
             data.array.forEach(function (_data) {
                 _this.renderDataToHTML(_data, newHTMLObject_1);
             });
@@ -317,45 +298,91 @@ var MainController = /** @class */ (function () {
     //@auto-fold here
     MainController.prototype.saveMainDoc = function (sendRequest) {
         if (sendRequest === void 0) { sendRequest = false; }
+        // console.log(388, "saveMainDoc", this.mainDoc)
         var saveData = Automerge.save(this.mainDoc);
         if (sendRequest) {
             socketFunction_1.socket.emit("saveMainDocToDisk", saveData);
-            console.log(saveData);
             return saveData;
         }
         else {
             return saveData;
         }
     };
-    MainController.prototype.getLoadDataFromSocket = function () {
-        socketFunction_1.socket.emit("loadMainDoc");
+    MainController.prototype.getLinkArrayFromID = function (objectID) {
+        return this.getObjectById(objectID)._identity.linkArray;
     };
+    MainController.prototype.getLoadDataFromSocket = function () {
+        var loadData = false;
+        loadData = true;
+        // this.buildInitialHTMLSkeleton()
+        //
+        // if (loadData){
+        //     socket.emit("loadMainDoc", (response)=>{
+        //         console.log(375, this.mainDoc )
+        //         buildInitialPageHelperFunctions.buildInitialPage(this)
+        //       })
+        // }
+    };
+    MainController.prototype.buildInitialHTMLSkeleton = function () {
+        buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(this);
+    };
+    MainController.prototype.buildPageFromMainDoc = function () {
+        buildInitialPageHelperFunctions.buildInitialPage(this);
+    };
+    //@auto-fold here
     //@auto-fold here
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
         this.mainDoc = Automerge.load(data);
-        console.log(353, exports.mainController.mainDoc);
         this.previousDoc = this.mainDoc;
-        // let contentContainer = document.querySelector(".contentContainer")
         // to render the data ato HTML
-        this.renderDataToHTML(this.mainDoc["array"]);
         var rootArray = this.mainDoc["array"];
-        console.log(417, rootArray, rootArray.length);
         rootArray.forEach(function (mainArray) {
             // update the ID of the mainArray
             var arrayName = mainArray["data"]["name"];
             var arrayID = mainArray["_identity"]["accessPointer"];
             _this.mainDocArray[arrayName] = arrayID;
-            console.log(422, mainArray, arrayName, arrayID);
-            mainArray["array"].forEach(function (elem) {
-                console.log(422, elem);
-                // this.mainDocArray[elem["data"]["name"]] = elem._identity.accessPointer
-                _this.renderDataToHTML(elem["array"]);
-                // this.renderDataToHTML(elem, contentContainer)
-            });
         });
     }; // loadMain
+    MainController.prototype.createGNObjectThroughName = function (objectName, name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+        if (saveToDatabase === void 0) { saveToDatabase = true; }
+        console.log(this.GNDataStructureMapping);
+        return this.GNDataStructureMapping[objectName](name, arrayID, insertPosition, dataPointer, saveToDatabase);
+    };
+    MainController.prototype.processChangeData = function (changeDataArray) {
+        var _this = this;
+        var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
+        console.log("429 the changgeDataArray is ", jsonfiedChangeDataArray);
+        jsonfiedChangeDataArray.forEach(function (p) {
+            var changeData = p;
+            console.log("432, changeData", changeData);
+            if (changeData.action == "create") {
+                var objectData = _this.getObjectById(changeData.objectID);
+                var newHTMLObject = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                if (!newHTMLObject) {
+                    newHTMLObject = _this.createGNObjectThroughName(objectData.GNType, "", "", false, false, false);
+                    newHTMLObject.initializeHTMLObjectFromData(objectData);
+                    var parentHTMLObject = _this.getHtmlObjectByID(changeData.parentHTMLObjectId);
+                    console.log("action = create", changeData.objectID, parentHTMLObject, objectData, newHTMLObject);
+                    if (parentHTMLObject) {
+                        parentHTMLObject.appendChild(newHTMLObject);
+                    }
+                    console.log(newHTMLObject, changeData.parentHTMLObjectId);
+                }
+            } // create
+            if (changeData.action == "update") {
+                var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                console.log(_object);
+                // let object = document.querySelector(`.divPage[pageNumber='4'] input`)
+                var objectData = exports.mainController.getObjectById(changeData.objectID);
+                _object.reloadDataFromDatabase();
+                // object.processUpdateData()
+            }
+        });
+    };
     return MainController;
 }());
 exports.MainController = MainController;
 exports.mainController = new MainController();
+// mainController.getLoadDataFromSocket()
+socketFunction_1.socket.emit("initialDataRequest");

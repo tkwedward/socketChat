@@ -7,6 +7,9 @@
   </head>
 
   <body>
+
+
+
     <template id="subPanelTemplate">
       <div class="subPanel">
           <div class="subPanelNavbar">
@@ -19,7 +22,24 @@
     <template id="subPanelItemTemplate">
       <div class="subPanelItem"></div>
     </template>
+    <template id="editControllerTemplate">
+      <div class="editController">
+          <button class="copyButton"> copy </button>
+          <button class="linkButton"> link </button>
+          <button class="deleteButton"> delete </button>
+      </div>
+    </template>
 
+
+
+
+
+    <!-- <div class="latexContainer">
+        <div class="latexOutput">
+
+        </div>
+        <div class="latexInput" contenteditable="true"></div>
+    </div> -->
 
     <div class="pageWrapper">
         <div class="panelContainer">
@@ -33,13 +53,14 @@
 
 
     <div class="contentContainer"></div>
+
   </body>
 
 
 
   <script src="/socket.io/socket.io.js" charset="utf-8">
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/automerge@0.14.2/dist/automerge.min.js" charset="utf-8"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/automerge@0.14.2/dist/automerge.min.js" charset="utf-8"></script> -->
   <!-- <script src="../js/dbtest.js" charset="utf-8"></script> -->
   <script src="../js/smallTest.js" charset="utf-8"></script>
   <script type="text/javascript">

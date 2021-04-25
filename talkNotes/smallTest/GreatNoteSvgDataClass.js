@@ -93,19 +93,25 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     svgObject._dataStructure = ["cx", "cy", "r"];
     svgObject._styleStructure = [];
     // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.loadFromData = function (_GNData) {
+        console.log(145, "the data is updated", _GNData);
+        svgObject.style.cx = parseInt(_GNData["data"]["cx"]) + 200;
+        svgObject.style.cy = parseInt(_GNData["data"]["cy"]);
+        svgObject.style.r = parseInt(_GNData["data"]["r"]);
+    };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
-        dataObject["GNType"] = svgDivContainer._type;
-        if (svgDivContainer._identity)
-            dataObject["_identity"] = _object._identity;
-        svgDivContainer._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = svgDivContainer[p];
-        });
+        dataObject["GNType"] = svgObject._type;
+        if (svgObject._identity)
+            dataObject["_identity"] = svgObject._identity;
+        dataObject["data"]["cx"] = svgObject.style.cx;
+        dataObject["data"]["cy"] = svgObject.style.cy;
+        dataObject["data"]["r"] = svgObject.style.r;
+        console.log(159, dataObject["data"]);
         // stylesheet data
-        svgDivContainer._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = svgDivContainer["style"][p];
+        svgObject._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgObject["style"][p];
         });
         return dataObject;
     };
@@ -256,5 +262,4 @@ function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabas
     //
     // svgObject.applyStyle = function (attributeSheet){
     //
-    // }
 }

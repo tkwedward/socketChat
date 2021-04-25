@@ -103,7 +103,9 @@ io.on("connection", socket=>{
     })
 
     socket.on("sendInitialDataToServer", data=>{
-
+        if (data.receiver==socket.id){
+            data.initialData = null
+        }
         io.sockets.to(data.receiver).emit("processInitialData", data)
         // console.log(data);
     })
@@ -158,11 +160,12 @@ io.on("connection", socket=>{
       await socket.emit("message", "save success")
   }) // saveMainDocToDisk
 
-  socket.on("loadMainDoc",async () => {
+  socket.on("loadMainDoc",async (callback) => {
       let jsonFileLocation = path.join(__dirname, "./talkNotes/data/automergeData.txt")
       let data = await fs.readFileSync(jsonFileLocation, 'utf8');
       socket.emit("serverResponseToLoadMainDocRequest", data)
-
+      callback(data)
+      return data
   }) // saveMainDocToDisk
 })
 

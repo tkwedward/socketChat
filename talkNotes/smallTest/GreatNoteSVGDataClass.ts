@@ -18,10 +18,10 @@ function createDummyData(){
 
 // GNInputFieldInterface
 //@auto-fold here
-export interface GNSvgContainerInterface extends SVG.LinkedHTMLElement{
+export interface GNSvgContainerInterface extends SVG.LinkedHTMLElement, GreatNoteDataClass.GNObjectInterface{
     _parent?:any
-    _type?: string
-    _name?: string
+    _type: string
+    _name: string
     _identity: any
     _dataStructure?: string[]
     _styleStructure?: string[]
@@ -142,23 +142,30 @@ export function GNSvgCircle(name:string, arrayID: string, insertPosition?: numbe
     svgObject._styleStructure = []
 
     // functions
-    svgObject.loadFromData = (data)=>{ svgObject = data }
+    svgObject.loadFromData = (_GNData)=>{
+        console.log(145, "the data is updated", _GNData)
+        svgObject.style.cx = parseInt(_GNData["data"]["cx"]) + 200
+        svgObject.style.cy = parseInt(_GNData["data"]["cy"])
+        svgObject.style.r  = parseInt(_GNData["data"]["r"])
+    }
 
 
     svgObject.createDataObject = function(){
         let dataObject = createDummyData()
 
         // data structure
-        dataObject["GNType"] = svgDivContainer._type
-        if (svgDivContainer._identity) dataObject["_identity"] = _object._identity
+        dataObject["GNType"] = svgObject._type
+        if (svgObject._identity) dataObject["_identity"] = svgObject._identity
 
-        svgDivContainer._dataStructure.forEach(p=>{
-          dataObject["data"][p] = svgDivContainer[p]
-        })
+
+        dataObject["data"]["cx"] = svgObject.style.cx
+        dataObject["data"]["cy"] = svgObject.style.cy
+        dataObject["data"]["r"] = svgObject.style.r
+        console.log(159, dataObject["data"])
 
         // stylesheet data
-        svgDivContainer._styleStructure.forEach(p=>{
-          dataObject["stylesheet"][p] = svgDivContainer["style"][p]
+        svgObject._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = svgObject["style"][p]
         })
 
         return dataObject
@@ -400,5 +407,4 @@ function SuperSVG(svgObject, arrayID: string, insertPosition?: number|boolean, d
     //
     // svgObject.applyStyle = function (attributeSheet){
     //
-    // }
 }

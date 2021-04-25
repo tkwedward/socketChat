@@ -1,3 +1,4 @@
+@namespace xlink "http://www.w3.org/1999/xlink";
 body {
   overflow-x: hidden;
   position: absolute;
@@ -96,6 +97,71 @@ body {
 .pageViewController {
   height: 92svh;
   background: Aliceblue;
+}
+
+.latexContainer .latexOutput {
+  width: 800px;
+  height: 400px;
+  background: maroon;
+}
+.latexContainer .latexInput {
+  width: 800px;
+  height: 250px;
+  background: pink;
+}
+
+div.selectedObject {
+  border: maroon 5px solid;
+  background: maroon !important;
+}
+
+svg.selectedObject {
+  background: maroon !important;
+  border: 2px red solid;
+}
+
+circle.selectedObject:hover {
+  fill: blue;
+}
+
+circle.selectedObject {
+  r: 50 !important;
+  stroke: maroon;
+}
+
+.pkmContentContainerWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow-y: scroll;
+}
+.pkmContentContainerWrapper .pkmContentContainer1, .pkmContentContainerWrapper .pkmContentContainer2 {
+  width: 50vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.pkmContentContainerWrapper .itemContainer {
+  width: 200px;
+  height: 300px;
+  margin: 10px 20px;
+}
+.pkmContentContainerWrapper .container1 .navBar {
+  background: green;
+}
+.pkmContentContainerWrapper .container1 .pkmContentContainer1 {
+  background: red;
+}
+.pkmContentContainerWrapper .container1 .pkmContentContainer1 .itemContainer {
+  background: orange;
+}
+.pkmContentContainerWrapper .container2 .navBar {
+  background: pink;
+}
+.pkmContentContainerWrapper .container2 .pkmContentContainer2 {
+  background: purple;
+}
+.pkmContentContainerWrapper .container2 .pkmContentContainer2 .itemContainer {
+  background: lightgreen;
 }
 
 /*# sourceMappingURL=automerge_board.css.map */
