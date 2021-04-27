@@ -24,17 +24,28 @@ socket.on("askRootUserForInitialData", data=>{
 })
 
 
+socket.on("saveDataToServer", data=>{
+    console.log("receive save message from server")
+    console.log(data)
+    mainController.saveMainDoc(true)
+})
+
 socket.on("serverResponseToLoadMainDocRequest", data=>{
     mainController.loadMainDoc(data)
+    mainController.buildInitialHTMLSkeleton()
+    mainController.buildPageFromMainDoc()
 
 })
 
 socket.on("processInitialData", data=>{
     if (data.initialData){
         mainController.loadMainDoc(data.initialData)
+        mainController.buildInitialHTMLSkeleton()
+        mainController.buildPageFromMainDoc()
+    } else {
+        socket.emit("loadMainDoc")
     }
-    mainController.buildInitialHTMLSkeleton()
-    mainController.buildPageFromMainDoc()
+
 })
 
 
@@ -47,7 +58,7 @@ socket.on("serverInitiatesSynchronization", ()=>{
 })
 
 socket.on("deliverSynchronizeDataFromServer", changeDataArray=>{
-
+    console.log(changeDataArray)
     let changeToBeProcessedArray = new Set()
     changeDataArray.forEach(change=>{
         let senderID = change.id
@@ -60,6 +71,7 @@ socket.on("deliverSynchronizeDataFromServer", changeDataArray=>{
     })
     mainController.previousDoc = mainController.mainDoc
     mainController.processChangeData(changeToBeProcessedArray)
+    // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
     // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     // console.log(52, changes)
 

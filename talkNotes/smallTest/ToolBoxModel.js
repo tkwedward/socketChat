@@ -31,7 +31,8 @@ var ToolBoxClass = /** @class */ (function () {
         toolBoxContainer.classList.add("toolBoxHtml");
         toolBoxContainer.style.height = "80px";
         toolBoxContainer.style.background = "silver";
-        toolBoxContainer.style.width = "90vw";
+        // toolBoxContainer.style.width = "90vw"
+        toolBoxContainer.style.width = "90%";
         toolBoxContainer.style.margin = "0 auto";
         toolBoxContainer.style.display = "grid";
         toolBoxContainer.style.gridTemplateColumns = "4fr 3fr";
@@ -81,26 +82,26 @@ var ToolBoxClass = /** @class */ (function () {
         }
         toolBoxItem.eventFunction = function () {
             console.log("polyline item button is activated");
-            console.log(event);
-            var strokeWidth = "15px";
-            var strokeColor = "black";
-            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false);
+            var _a = constructInitialCondition_1.mainController.attributeControllerMapping.polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
+            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: self.targetPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
             polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
             polyline.appendTo(self.targetPage);
             polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
+            var t1 = 0;
+            var t2 = 0;
             function updatePolyLine(e) {
+                t2 = e.timeStamp;
+                t1 = t2;
                 var newPoint = polyline.soul.array().value;
                 newPoint.push([event["offsetX"], event["offsetY"]]);
-                console.log(newPoint);
                 polyline.soul.plot(newPoint);
             }
             self.targetPage.addEventListener("mousemove", updatePolyLine);
             self.targetPage.addEventListener("mouseup", function (e) {
                 self.targetPage.removeEventListener("mousemove", updatePolyLine);
                 polyline.saveHTMLObjectToDatabase();
-                console.log(138, constructInitialCondition_1.mainController.mainDoc["array"][1]["array"][1]["array"][0]);
             });
-        };
+        }; // eventFunction
         toolBoxItem.addEventListener("click", function () {
             console.log("polyline item button is activated");
             self.activateButtonFunction(toolBoxItem);
@@ -113,17 +114,18 @@ var ToolBoxClass = /** @class */ (function () {
         var toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject);
         toolBoxItem.eventName = "mousedown";
         toolBoxItem.eventFunction = function () {
-            console.log(event);
-            var cx = event.offsetX + "px";
-            var cy = event.offsetY + "px";
+            var cx = event["offsetX"] + "px";
+            var cy = event["offsetY"] + "px";
             var r = "10px";
-            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", constructInitialCondition_1.mainController.mainDocArray["bookmark"], false, false);
-            console.log(164, eraser, constructInitialCondition_1.mainController.mainDoc["array"][1]);
-            eraser.applyStyle({ "cx": cx, "cy": cy, "r": r });
+            var eraser = GreatNoteSvgDataClass.GNSvgCircle({ name: "123", arrayID: constructInitialCondition_1.mainController.mainDocArray["bookmark"], insertPosition: false, dataPointer: false, saveToDatabase: false });
+            eraser.style["cx"] = cx;
+            eraser.style["cy"] = cy;
+            eraser.style["r"] = r;
             function updateEraserPosition(e) {
                 cx = event["offsetX"] + "px";
                 cy = event["offsetY"] + "px";
-                eraser.applyStyle({ "cx": cx, "cy": cy });
+                eraser.style["cx"] = cx;
+                eraser.style["cy"] = cy;
             }
             _this.targetPage.addEventListener("mousemove", updateEraserPosition);
             _this.targetPage.addEventListener("mouseup", function (e) {
@@ -134,8 +136,6 @@ var ToolBoxClass = /** @class */ (function () {
                 // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
                 console.log("You are out of the boundary");
             });
-            console.log(183, self.targetPage);
-            console.log(constructInitialCondition_1.mainController.mainDoc["array"]);
             // self.targetPage.svgController
             self.targetPage.appendChild(eraser);
             // eraser.appendTo(self.targetPage)
@@ -160,6 +160,14 @@ var ToolBoxClass = /** @class */ (function () {
         // this.activateToolboxItem(toolBoxItem)
         console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction);
         this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
+    };
+    ToolBoxClass.prototype.registerSvg = function (svgLayer) {
+        var self = this;
+        console.log(226, "registerSvg, yoyoyo");
+        svgLayer.addEventListener("click", function () {
+            console.log("The svg is register to the toolbox");
+            self.targetPage = svgLayer;
+        });
     };
     return ToolBoxClass;
 }());

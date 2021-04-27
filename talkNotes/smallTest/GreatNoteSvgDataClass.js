@@ -35,8 +35,9 @@ function createDummyData() {
     };
 }
 //@auto-fold here
-function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNSvg(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message;
+    console.log(4141, createData);
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
     var svgController = svg_js_1["default"](svgDivContainer);
@@ -48,13 +49,17 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgBoard._type = GNSvg.name;
     svgBoard._name = name;
     svgBoard._dataStructure = ["innerHTML"];
-    svgBoard._styleStructure = [];
+    svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
     // // functions
     // svgObject.loadFromData = (data)=>{ svgObject.value = data }
     svgBoard.appendToContainer = function (parent) {
         parent.appendChild(svgDivContainer);
     };
-    svgBoard.applyStyle = function () {
+    svgBoard.applyStyle = function (stylesheet) {
+        Object.entries(stylesheet).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgBoard["style"][key] = value;
+        });
     };
     svgBoard.createDataObject = function () {
         var dataObject = createDummyData();
@@ -73,6 +78,7 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     };
     //
     svgBoard.extract = function () { return svgBoard.createDataObject(); };
+    console.log(987, svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
     // add extra funcitons to the object
     GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
     console.log(900, svgBoard._identity);
@@ -80,8 +86,8 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
 }
 exports.GNSvg = GNSvg;
 //@auto-fold here
-function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNSvgCircle(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
     var svgObjectSoul = new svg_js_1["default"].Circle();
     console.log(119, svgObjectSoul);
     svgObjectSoul.radius(75);
@@ -95,19 +101,19 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     // functions
     svgObject.loadFromData = function (_GNData) {
         console.log(145, "the data is updated", _GNData);
-        svgObject.style.cx = parseInt(_GNData["data"]["cx"]) + 200;
-        svgObject.style.cy = parseInt(_GNData["data"]["cy"]);
-        svgObject.style.r = parseInt(_GNData["data"]["r"]);
+        svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200;
+        svgObject.style["cy"] = parseInt(_GNData["data"]["cy"]);
+        svgObject.style["r"] = parseInt(_GNData["data"]["r"]);
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
         dataObject["GNType"] = svgObject._type;
-        if (svgObject._identity)
-            dataObject["_identity"] = svgObject._identity;
-        dataObject["data"]["cx"] = svgObject.style.cx;
-        dataObject["data"]["cy"] = svgObject.style.cy;
-        dataObject["data"]["r"] = svgObject.style.r;
+        if (svgObject["_identity"])
+            dataObject["_identity"] = svgObject["_identity"];
+        dataObject["data"]["cx"] = svgObject.style["cx"];
+        dataObject["data"]["cy"] = svgObject.style["cy"];
+        dataObject["data"]["r"] = svgObject.style["r"];
         console.log(159, dataObject["data"]);
         // stylesheet data
         svgObject._styleStructure.forEach(function (p) {
@@ -177,8 +183,8 @@ function GNSvgLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
 }
 exports.GNSvgLine = GNSvgLine;
 //@auto-fold here
-function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNSvgPolyLine(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
     var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
     var svgObject = svgObjectSoul.node;
     svgObject.soul = svgObjectSoul;
@@ -189,10 +195,10 @@ function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabas
     // functions
     svgObject.loadFromData = function (data) {
         // svgObject.soul.plot([[0, 0], [10, 100]])
-        console.log(300, data["data"]["points"]);
-        svgObject.soul.plot(data["data"]["points"]);
-        console.log(303, svgObject.applyStyle, data["stylesheet"]);
-        svgObject.applyStyle(data["stylesheet"]);
+        console.log(309, data);
+        svgObject.soul.plot(data["points"]);
+        // console.log(303, svgObject.applyStyle, data["stylesheet"])
+        // svgObject.applyStyle(data["stylesheet"])
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
@@ -200,15 +206,11 @@ function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabas
         dataObject["GNType"] = svgObject._type;
         if (svgObject._identity)
             dataObject["_identity"] = svgObject._identity;
-        console.log(302, svgObject.soul.array().value);
-        svgObject._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = svgObject.soul.array().value.toString();
-        });
+        dataObject["data"]["points"] = svgObject.soul.array().value.toString();
         // stylesheet data
-        svgObject._styleStructure.forEach(function (p) {
-            console.log(320, p, svgObject["style"][p]);
-            dataObject["stylesheet"][p] = svgObject["style"][p];
-        });
+        dataObject["stylesheet"]["stroke"] = svgObject["style"]["stroke"];
+        dataObject["stylesheet"]["stroke-width"] = svgObject["style"]["stroke-width"];
+        dataObject["stylesheet"]["fill"] = svgObject["style"]["fill"];
         return dataObject;
     };
     svgObject.extract = function () { return svgObject.createDataObject(); };

@@ -1,7 +1,11 @@
 import * as Automerge from 'automerge'
 import * as buildInitialPageHelperFunctions from "./buildInitialPageHelperFunctions"
-import {GNObjectInterface}  from "./GreatNoteDataClass"
+import {GNObjectInterface, CreateGreatNoteObjectInterface}  from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
+import {ToolBoxInterface} from "./ToolboxModel"
+import {processCreationDataHelper} from "./databaseHelperFunction"
+import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers"
+
 export enum MainDocArrayEnum {
     mainArray_pageFull = "mainArray_pageFull",
     mainArray_pageOverview = "mainArray_pageOverview",
@@ -23,29 +27,34 @@ export interface communicationDataStructure{
 //@auto-fold here
 export interface MainControllerInterface {
     mainDoc: any
-    applyMainDocTemplate:boolean
     previousDoc: any
+    applyMainDocTemplate:boolean // **** can be deleted latter
+
     mainDocArray: any
     baseArrayID: string
     GNDataStructureMapping: any
+    attributeControllerMapping: any
     pageCurrentStatus: any
+    toolBox: ToolBoxInterface
 
     // getArrayID(MainDocArrayEnum):string
     initializeRootArray()
     initalizeMainDoc()
 
     /** Functions related to save and update data in the database */
-    addData(arrayID: string, htmlObject: GNObjectInterface|HTMLElement, insertPosition?:number|boolean, dataPointer?:string, attachToRoot?: boolean): [HTMLElement, string]
+    addData(arrayID: string, htmlObject: GNObjectInterface|HTMLElement, insertPosition?:number|boolean, dataPointer?:string, specialMessage?: string): [HTMLElement, string]
     updateData(_object:GNObjectInterface, dataPointerType:boolean)
     createDummyData(name:string, age: number, sex: string):any
     saveHTMLObjectToDatabase(htmlObject: GNObjectInterface)
-    // sendSaveMessageToSocket(saveFile:string)
 
     /** the arrayID is for attaching to the array*/
-    getLinkArrayFromID(objectID):any
     getObjectById(objectID: string, doc?:any)
+    getLinkArrayFromID(objectID):any
     getHtmlObjectByID(objectID:string)
-    createGNObjectThroughName(objectName:string, name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean)
+
+
+
+    createGNObjectThroughName(objectName:string, createData: CreateGreatNoteObjectInterface)
     /** internode functions*/
 
     /**
@@ -90,7 +99,12 @@ export class MainController implements MainControllerInterface{
   GNDataStructureMapping:any
   applyMainDocTemplate:boolean
   pageCurrentStatus: any
+  toolBox: any
 
+
+// *****************************
+// *     A. Initialization     *
+// *****************************
     //@auto-fold here
     constructor(){
         this.initializeRootArray()
@@ -99,6 +113,10 @@ export class MainController implements MainControllerInterface{
         this.pageCurrentStatus = {
           "newPageNumber": 1,
           "newPageDirection": 1,
+          "pendingObject": {// an array for collecting enough data before enough data is collected to create new objects
+              "newPage": new Set(),
+              "newPageArray": []
+          },
           "currentPage": 0,
           "previousPage": 0,
           "nextPage": 0,
@@ -161,13 +179,17 @@ export class MainController implements MainControllerInterface{
     }// initalizeMainDoc
 
 
+
+
+// ******************************************
+// *     B. Modify data in the database     *
+// ******************************************
     /** to append data to the database
     return: the HTMLObject related to, the accessID of the object in the database
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
-
     //@auto-fold here
-    addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?):[any, string]{
+    addData(arrayID, htmlObject:GNObjectInterface|any, insertPosition?:number|boolean, dataPointer?, specialCreationMessage?: string):[any, string]{
       // Step 1: register an accessPointer in the database
         //@auto-fold here
 
@@ -186,7 +208,6 @@ export class MainController implements MainControllerInterface{
         let accessPointer = arrayToBeAttachedTo[<number>insertPosition][objectSymbolArray[1]]
 
         // create new object data
-        console.log("an object is created in the database")
         let objectData  = htmlObject.extract()
 
         objectData._identity.accessPointer = accessPointer
@@ -198,8 +219,8 @@ export class MainController implements MainControllerInterface{
 
         // Step 3: put real data into the database
         //@auto-fold here
-        let createMessage = {"action": "create", "objectID": accessPointer, "parentHTMLObjectId": arrayID}
-        console.log(202, "here is the create message", createMessage)
+        let createMessage = {"action": "create", "objectID": accessPointer, "parentHTMLObjectId": arrayID, "specialCreationMessage": specialCreationMessage}
+
         this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(createMessage), doc=>{
             // add the data to the object
             let objectInDatabase = Automerge.getObjectById(doc, accessPointer)
@@ -213,8 +234,7 @@ export class MainController implements MainControllerInterface{
                 masterObject._identity.linkArray.push(accessPointer)
 
                 let masterObjectHtmlElement = this.getHtmlObjectByID(dataPointer)
-                console.log(209, masterObjectHtmlElement)
-                masterObjectHtmlElement?._identity.linkArray.push(accessPointer)
+                masterObjectHtmlElement?._identity.linkArray.push(accessPointer) // **** this line may be deleted because we do not need to access the linkArray of the master object
             }
         })
 
@@ -223,10 +243,7 @@ export class MainController implements MainControllerInterface{
         return [htmlObject, accessPointer]
     }// addData
 
-    getHtmlObjectByID(objectID:string){
-        return document.querySelector(`*[accessPointer='${objectID}']`)
-        document.querySelector(`*[accessPointer='c705e759-caeb-4bb3-83ce-ddfe44270ad5']`)
-    }
+
 
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
     The last parameter updateType has two kinds. The first one is called dataPointer type.
@@ -255,6 +272,7 @@ export class MainController implements MainControllerInterface{
 
     //@auto-fold here
     /** to initiate the data so that you can store the data to the db*/
+    // **** can be deleted later
     createDummyData(data = {}): any{
         let _dummyData:communicationDataStructure = {
             "data": data,
@@ -303,72 +321,106 @@ export class MainController implements MainControllerInterface{
                 })
             }
         })
-
         socket.emit("clientAskServerToInitiateSynchronization")
     }// saveHTMLObjectToDatabase
 
+
+// ******************************************
+// *     C. Access data in the database     *
+// ******************************************
     //@auto-fold here
     getObjectById(objectID, doc=this.mainDoc){
-        let object = Automerge.getObjectById(doc, objectID)
-        return object
+        return Automerge.getObjectById(doc, objectID)
+    }
+
+    //@auto-fold here
+    getLinkArrayFromID(objectID){
+        return this.getObjectById(objectID)._identity.linkArray
+    }
+
+    //@auto-fold here
+    getHtmlObjectByID(objectID:string){
+        return document.querySelector(`*[accessPointer='${objectID}']`)
     }
 
     // @auto-fold here
     getMainDocChange(){
-        let changes = Automerge.getChanges(this.previousDoc, this.mainDoc)
-        return changes
+        return Automerge.getChanges(this.previousDoc, this.mainDoc)
     }
 
-    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
+// **********************************
+// *     E. Build up the page       *
+// **********************************
+    buildInitialHTMLSkeleton(){
+        buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(this)
+    } // buildInitialHTMLSkeleton
+
+
+    buildPageFromMainDoc(){
+        buildInitialPageHelperFunctions.buildInitialPage(this)
+    } // 2. buildPageFromMainDoc
+
+    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database, not array, but the object includes array property */
     renderDataToHTML(data:communicationDataStructure, arrayHTMLObject?){
-      if (!arrayHTMLObject){
-        // this is for looping the mainArray so that they can get the initial aattach div of the HTML doc
-        // get the mainArray Object from mainArrayData
-          data.forEach(p=>{
-              let mainArrayData_item = mainArrayData[p["data"]["name"]]
-
-              // if not in the mainArrayData, just skill it
-              if (mainArrayData_item){
-                  let initialHTMLObjectClassName = mainArrayData_item["arrayHTMLObject"]
-                  let initialHTMLObject = document.querySelector(`.${initialHTMLObjectClassName}`)
-                  // for each elem in the main array
-                  p.array.forEach(elem=>{
-                      this.renderDataToHTML(elem, initialHTMLObject)
-                  })
-              }// if mainArrayData_item
-              // if (mainArrayData_item.startsWith("mainArray_")){
-              // }
-
-
-              // renderDataToHTML(p, )
-          })
-
-      } else {
         let newHTMLObject
+        console.log(329, data, arrayHTMLObject)
+        // cannot save any obeject to the data base here
+        data["array"].forEach(p=>{
+            console.log(331, p)
+            if (p.GNType=="GNSvg"){
+              // cannot save any obeject to the data base here because this will create an infinity loop and will append new obejct forever
+                newHTMLObject = this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer() , saveToDatabase:false})
+                newHTMLObject._identity = p._identity
 
-        if (data.GNType=="GNButton"){
-            newHTMLObject = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer)
-        } else if (data.GNType=="GNSvg"){
-            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
+                let objectData =  newHTMLObject.getDataFromDataBase()
+                console.log(352, objectData)
+                newHTMLObject.applyStyle(objectData.stylesheet)
 
-        } else {
-            newHTMLObject = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer)
-        }
+                newHTMLObject.addEventListener("click", function(){
+                    mainController.toolBox.targetPage = newHTMLObject
+                })
+            }
 
-          if (newHTMLObject.loadFromData) newHTMLObject.loadFromData(data)
-          newHTMLObject.applyStyle(data.stylesheet)
-          arrayHTMLObject.appendChild(newHTMLObject)
-          data.array.forEach(_data=>{
-              this.renderDataToHTML(_data, newHTMLObject)
-          })
-      }
-    }
+            if (p.GNType=="GNContainerDiv"){
+                newHTMLObject =  this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false})
+                newHTMLObject._identity = p._identity
+
+                let objectData =  newHTMLObject.getDataFromDataBase()
+                console.log(352, objectData)
+                newHTMLObject.applyStyle(objectData.stylesheet)
+            }
+
+            if (p.GNType=="GNSvgPolyLine"){
+                newHTMLObject =  this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false})
+                newHTMLObject._identity = p._identity
+                //
+                let newPolylineData = newHTMLObject.getDataFromDataBase()
+                console.log(340, newPolylineData)
+                newHTMLObject.loadFromData(newPolylineData["data"])
+
+                let stylesheet = newPolylineData["stylesheet"]
+                newHTMLObject.applyStyle({"stroke": stylesheet["stroke"], "stroke-width": stylesheet["stroke-width"], "fill": stylesheet["fill"]})
+            }
+
+            if (newHTMLObject){
+                arrayHTMLObject.appendChild(newHTMLObject)
+                newHTMLObject.setAttribute("accessPointer", p._identity.accessPointer)
+                this.renderDataToHTML(p, newHTMLObject)
+            }
+        })
+    }// 3. renderDataToHTML
+
+    createGNObjectThroughName(objectName:string, createData: CreateGreatNoteObjectInterface){
+        let {name, arrayID, insertPosition, dataPointer, saveToDatabase} = createData
+        return this.GNDataStructureMapping[objectName](name, arrayID, insertPosition, dataPointer, saveToDatabase)
+    } // 4. createGNObjectThroughName
+
 
     //@auto-fold here
     saveMainDoc(sendRequest:boolean=false){
-      // console.log(388, "saveMainDoc", this.mainDoc)
       let saveData = Automerge.save(this.mainDoc)
       if (sendRequest){
+        console.log(407, "save data to the server")
         socket.emit("saveMainDocToDisk", saveData)
         return saveData
       } else {
@@ -377,9 +429,7 @@ export class MainController implements MainControllerInterface{
 
     }
 
-    getLinkArrayFromID(objectID){
-        return this.getObjectById(objectID)._identity.linkArray
-    }
+
 
     getLoadDataFromSocket(){
         let loadData = false
@@ -394,14 +444,6 @@ export class MainController implements MainControllerInterface{
         // }
     }
 
-    buildInitialHTMLSkeleton(){
-        buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(this)
-    }
-
-
-    buildPageFromMainDoc(){
-        buildInitialPageHelperFunctions.buildInitialPage(this)
-    }
 
 
     //@auto-fold here
@@ -420,45 +462,25 @@ export class MainController implements MainControllerInterface{
       })
     }// loadMain
 
-    createGNObjectThroughName(objectName:string, name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase: boolean=true){
-        console.log(this.GNDataStructureMapping)
-        return this.GNDataStructureMapping[objectName](name, arrayID, insertPosition, dataPointer, saveToDatabase)
-    }
+
 
     processChangeData(changeDataArray:Set<string>){
         let jsonfiedChangeDataArray = Array.from(changeDataArray).map(p=>JSON.parse(p))
-        console.log("429 the changgeDataArray is ", jsonfiedChangeDataArray)
-
+        console.log(447, jsonfiedChangeDataArray)
         jsonfiedChangeDataArray.forEach(p=>{
             let changeData = p
-            console.log("432, changeData",changeData)
             if (changeData.action=="create"){
-                let objectData = this.getObjectById(changeData.objectID)
 
-                let newHTMLObject = document.querySelector(`*[accessPointer='${changeData.objectID}']`)
-
-                if (!newHTMLObject){
-                    newHTMLObject = <GNObjectInterface> this.createGNObjectThroughName(objectData.GNType, "", "", false, false, false)
-                    newHTMLObject.initializeHTMLObjectFromData(objectData)
-                    let parentHTMLObject = this.getHtmlObjectByID(changeData.parentHTMLObjectId)
-                    console.log("action = create", changeData.objectID, parentHTMLObject, objectData, newHTMLObject)
-
-                    if (parentHTMLObject){
-                      parentHTMLObject.appendChild(newHTMLObject)
-                    }
-                    console.log(newHTMLObject, changeData.parentHTMLObjectId)
-                }
+                processCreationDataHelper(this, changeData)
             }// create
 
             if (changeData.action=="update"){
                 let _object = document.querySelector(`*[accessPointer='${changeData.objectID}']`)
-                console.log(_object)
-                // let object = document.querySelector(`.divPage[pageNumber='4'] input`)
+                // console.log(457, _object, changeData.objectID)
+
                 let objectData = mainController.getObjectById(changeData.objectID)
 
                 _object.reloadDataFromDatabase()
-
-                // object.processUpdateData()
             }
         })
     }
@@ -468,5 +490,25 @@ export class MainController implements MainControllerInterface{
 
 export var mainController:MainControllerInterface
 mainController = new MainController()
+
+//
+// to create toolbox
+//
+import * as ToolBoxModel from "./ToolboxModel"
+mainController.toolBox = new ToolBoxModel.ToolBoxClass()
+
+//
+// to create the attributeControllers
+//
+let panelContainer = document.querySelector(".panelContainer")
+InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(mainController)
+Object.values(mainController.attributeControllerMapping).forEach(p=>{
+    panelContainer.appendChild(<HTMLDivElement>p)
+})
+
+//
 // mainController.getLoadDataFromSocket()
+//
 socket.emit("initialDataRequest")
+// buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(mainController)
+// buildInitialPageHelperFunctions.buildInitialPage()

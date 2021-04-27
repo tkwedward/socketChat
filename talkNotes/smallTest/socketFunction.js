@@ -39,15 +39,25 @@ exports.socket.on("askRootUserForInitialData", function (data) {
     data.initialData = constructInitialCondition_1.mainController.saveMainDoc(false);
     exports.socket.emit("sendInitialDataToServer", data);
 });
+exports.socket.on("saveDataToServer", function (data) {
+    console.log("receive save message from server");
+    console.log(data);
+    constructInitialCondition_1.mainController.saveMainDoc(true);
+});
 exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
     constructInitialCondition_1.mainController.loadMainDoc(data);
+    constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
+    constructInitialCondition_1.mainController.buildPageFromMainDoc();
 });
 exports.socket.on("processInitialData", function (data) {
     if (data.initialData) {
         constructInitialCondition_1.mainController.loadMainDoc(data.initialData);
+        constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
+        constructInitialCondition_1.mainController.buildPageFromMainDoc();
     }
-    constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
-    constructInitialCondition_1.mainController.buildPageFromMainDoc();
+    else {
+        exports.socket.emit("loadMainDoc");
+    }
 });
 exports.socket.on("serverInitiatesSynchronization", function () {
     // send back change data to the server
@@ -56,6 +66,7 @@ exports.socket.on("serverInitiatesSynchronization", function () {
     exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
 });
 exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {
+    console.log(changeDataArray);
     var changeToBeProcessedArray = new Set();
     changeDataArray.forEach(function (change) {
         var senderID = change.id;
@@ -68,6 +79,7 @@ exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray)
     });
     constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
     constructInitialCondition_1.mainController.processChangeData(changeToBeProcessedArray);
+    // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
     // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     // console.log(52, changes)
 });

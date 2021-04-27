@@ -7,6 +7,10 @@ body {
   margin: 0px;
 }
 
+.polylineColorController div.selectedColor {
+  border: 2px solid red;
+}
+
 .pageWrapper {
   display: grid;
   grid-template-columns: 1fr 5fr;
@@ -23,6 +27,14 @@ body {
   width: 100%;
   height: 100vh;
   background: pink;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.pageWrapper .pageContentContainer .divPage .divLayer {
+  width: 100%;
+  height: 100vh;
+  background: blue;
   position: absolute;
   left: 0;
   right: 0;
@@ -51,10 +63,6 @@ body {
   min-height: 300px;
   background: coral;
 }
-.pageWrapper .subPanel .subPanelContent[status=open] {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
 .pageWrapper .subPanel .subPanelContent[status=close] {
   display: none;
 }
@@ -68,6 +76,9 @@ body {
   background: yellow;
 }
 
+.bookmarkSubPanel {
+  height: 230px;
+}
 .bookmarkSubPanel .subPanelContent[status=open] {
   display: block !important;
 }
@@ -76,6 +87,10 @@ body {
   height: 30px;
   background: grey;
   margin: 10px auto;
+}
+
+.commentSubPanel {
+  height: 230px;
 }
 
 .container {
@@ -110,13 +125,23 @@ body {
   background: pink;
 }
 
+.layerController {
+  margin: 10px;
+}
+.layerController .layerView {
+  background: grey;
+  height: 150px;
+}
+.layerController .layerControllerFunction {
+  background: lightblue;
+  height: 50px;
+}
+
 div.selectedObject {
-  border: maroon 5px solid;
-  background: maroon !important;
+  border: maroon 3px solid;
 }
 
 svg.selectedObject {
-  background: maroon !important;
   border: 2px red solid;
 }
 

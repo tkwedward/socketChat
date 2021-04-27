@@ -9,6 +9,13 @@ body {
   margin: 0px;
 }
 
+
+.polylineColorController{
+    div.selectedColor {
+        border: 2px solid red;
+    }
+}
+
 .pageWrapper{
     display: grid;
     grid-template-columns: 1fr 5fr;
@@ -28,6 +35,15 @@ body {
           position: absolute;
           left: 0;
           right: 0;
+
+          .divLayer {
+            width: 100%;
+            height: 100vh;
+            background: blue;
+            position: absolute;
+            left: 0;
+            right: 0;
+          }
       }
 
       .overviewModeDiv{
@@ -59,8 +75,8 @@ body {
             background: coral;
         }
         .subPanelContent[status="open"]{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            // display: grid;
+            // grid-template-columns: 1fr 1fr;
         }
         .subPanelContent[status="close"]{
             display: none;
@@ -80,8 +96,10 @@ body {
 }
 
 .bookmarkSubPanel{
+    height: 230px;
     .subPanelContent[status="open"]{
         display: block !important;
+
 
         .functionButton{
             width: 90%;
@@ -90,6 +108,10 @@ body {
             margin: 10px auto;
         }
     }
+}
+
+.commentSubPanel{
+    height: 230px;
 }
 
 
@@ -137,14 +159,29 @@ body {
 }
 
 
+.layerController{
+  margin: 10px;
+    .layerView {
+      background: grey;
+      height: 150px;
+    }
+
+    .layerControllerFunction {
+      background: lightblue;
+      height: 50px;
+    }
+
+}
+
 
 div.selectedObject{
-  border: maroon 5px solid;
-  background: maroon !important;
+  border: maroon 3px solid;
+  // background: maroon !important;
+  // opacity: 0.9;
 }
 
 svg.selectedObject{
-  background: maroon !important;
+  // background: maroon !important;
   border: 2px red solid
 }
 

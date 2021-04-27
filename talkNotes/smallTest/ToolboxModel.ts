@@ -14,6 +14,8 @@ interface ToolBoxInterface extends HTMLDivElement{
     activateToolboxItem(toolBoxItem)
 
     createToolBoxItem(name:string, toolBoxHtmlObject: HTMLDivElement):HTMLDivElement    // to create an item
+
+    registerSvg(svgLayer)
 }
 
 export interface ToolBoxItemInterface extends HTMLDivElement{
@@ -34,6 +36,7 @@ export class ToolBoxClass implements ToolBoxInterface {
     currentActiveEventName:string
     selectionHTMLObject: HTMLDivElement
     optionHTMLObject: HTMLDivElement
+    activateToolboxItem: any
 
 
     constructor(){
@@ -47,7 +50,8 @@ export class ToolBoxClass implements ToolBoxInterface {
         toolBoxContainer.classList.add("toolBoxHtml")
         toolBoxContainer.style.height = "80px"
         toolBoxContainer.style.background = "silver"
-        toolBoxContainer.style.width = "90vw"
+        // toolBoxContainer.style.width = "90vw"
+        toolBoxContainer.style.width = "90%"
         toolBoxContainer.style.margin = "0 auto"
         toolBoxContainer.style.display = "grid"
         toolBoxContainer.style.gridTemplateColumns = "4fr 3fr"
@@ -114,19 +118,23 @@ export class ToolBoxClass implements ToolBoxInterface {
 
         toolBoxItem.eventFunction = ()=>{
             console.log("polyline item button is activated")
-            console.log(event)
+            let [strokeColor, strokeWidth]:[string, string] = mainController.attributeControllerMapping.polylineController.extract()
 
-            let strokeWidth = "15px"
-            let strokeColor = "black"
-            let polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false)
+            let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({name:"", arrayID: self.targetPage.getAccessPointer(), insertPosition:false, dataPointer:false, saveToDatabase:true, specialCreationMessage:"polylineCreated"})
+
+
             polyline.soul.plot([[event["offsetX"], event["offsetY"]]])
             polyline.appendTo(self.targetPage)
             polyline.applyStyle({"stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none"})
 
+            let t1 = 0
+            let t2 = 0
+
             function updatePolyLine(e){
+                t2 = e.timeStamp
+                t1 = t2
                 let newPoint = polyline.soul.array().value
                 newPoint.push([event["offsetX"], event["offsetY"]])
-                console.log(newPoint)
                 polyline.soul.plot(newPoint)
             }
 
@@ -135,16 +143,12 @@ export class ToolBoxClass implements ToolBoxInterface {
             self.targetPage.addEventListener("mouseup", (e)=>{
                 self.targetPage.removeEventListener("mousemove", updatePolyLine)
                 polyline.saveHTMLObjectToDatabase()
-                console.log(138, mainController.mainDoc["array"][1]["array"][1]["array"][0])
             })
-        }
+        }// eventFunction
 
         toolBoxItem.addEventListener("click", function(){
             console.log("polyline item button is activated")
             self.activateButtonFunction(toolBoxItem)
-
-
-
         })
 
         return toolBoxItem
@@ -158,19 +162,20 @@ export class ToolBoxClass implements ToolBoxInterface {
         toolBoxItem.eventName = "mousedown"
 
         toolBoxItem.eventFunction = ()=>{
-            console.log(event)
-            let cx = event.offsetX + "px"
-            let cy = event.offsetY + "px"
+            let cx = event["offsetX"] + "px"
+            let cy = event["offsetY"] + "px"
             let r = "10px"
-            let eraser = GreatNoteSvgDataClass.GNSvgCircle("123", mainController.mainDocArray["bookmark"], false, false)
+            let eraser = GreatNoteSvgDataClass.GNSvgCircle({name: "123", arrayID: mainController.mainDocArray["bookmark"], insertPosition: false, dataPointer: false, saveToDatabase: false})
 
-            console.log(164, eraser, mainController.mainDoc["array"][1])
-            eraser.applyStyle({"cx": cx, "cy": cy, "r":r})
+            eraser.style["cx"] = cx
+            eraser.style["cy"] = cy
+            eraser.style["r"] = r
 
             function updateEraserPosition(e){
                 cx = event["offsetX"] + "px"
                 cy = event["offsetY"] + "px"
-                eraser.applyStyle({"cx": cx, "cy": cy})
+                eraser.style["cx"] = cx
+                eraser.style["cy"] = cy
             }
 
             this.targetPage.addEventListener("mousemove", updateEraserPosition)
@@ -184,8 +189,6 @@ export class ToolBoxClass implements ToolBoxInterface {
                 // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
                 console.log("You are out of the boundary")
             })
-            console.log(183, self.targetPage)
-            console.log(mainController.mainDoc["array"])
             // self.targetPage.svgController
             self.targetPage.appendChild(eraser)
 
@@ -218,5 +221,15 @@ export class ToolBoxClass implements ToolBoxInterface {
         console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction)
         this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction)
     }
+
+    registerSvg(svgLayer){
+      let self = this
+      console.log(226, "registerSvg, yoyoyo")
+        svgLayer.addEventListener("click", function(){
+            console.log("The svg is register to the toolbox")
+            self.targetPage = svgLayer
+        })
+    }
+
 
 }

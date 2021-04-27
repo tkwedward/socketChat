@@ -88,13 +88,15 @@ export function pageController(currentStatus, subPanelContainer){
             pageNumberInput.value = newPageNumber
             leftPageArrayDiv.innerText = ""
             rightPageArrayDiv.innerText = ""
-            for (let i=1; i< currentPageNumber-1; i++){
-                leftPageArrayDiv.innerText += `${i} `
-            }
-            for (let i=currentPageNumber; i< totalPageNumber; i++){
-                rightPageArrayDiv.innerText += `${i} `
-            }
+            // for (let i=1; i< currentPageNumber-1; i++){
+            //     leftPageArrayDiv.innerText += `${i} `
+            // }
+            // for (let i=currentPageNumber; i< totalPageNumber; i++){
+            //     rightPageArrayDiv.innerText += `${i} `
+            // }
             // currentPage should be
+
+            currentStatus.currentPage = currentStatus.pageArrayFullPage[newPageNumber]
             currentStatus.pageArrayFullPage[currentPageNumber].style.left = "+100%"
             currentStatus.pageArrayFullPage[newPageNumber].style.left = "0%"
         }
@@ -112,13 +114,14 @@ export function pageController(currentStatus, subPanelContainer){
 
             leftPageArrayDiv.innerText = ""
             rightPageArrayDiv.innerText = ""
-            for (let i=1; i< currentPageNumber+1; i++){
-                leftPageArrayDiv.innerText += `${i} `
-            }
-            for (let i=currentPageNumber+2; i< totalPageNumber; i++){
-                rightPageArrayDiv.innerText += `${i} `
-            }
+            // for (let i=1; i< currentPageNumber+1; i++){
+            //     leftPageArrayDiv.innerText += `${i} `
+            // }
+            // for (let i=currentPageNumber+2; i< totalPageNumber; i++){
+            //     rightPageArrayDiv.innerText += `${i} `
+            // }
             // currentPage should be
+            currentStatus.currentPage = currentStatus.pageArrayFullPage[newPageNumber]
             currentStatus.pageArrayFullPage[currentPageNumber].style.left = "-100%"
             currentStatus.pageArrayFullPage[newPageNumber].style.left = "0%"
         }// if currentpage > 0
@@ -165,13 +168,14 @@ export function updatePageNumberInNewOrder(currentStatus){
 }
 
 export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?, overviewPageData?, saveToDatabase=true){
-    let newPage = GreatNoteDataClass.GNContainerDiv("fullPage", mainController.mainDocArray["mainArray_pageFull"], false, false, saveToDatabase)
+    let newPage = GreatNoteDataClass.GNContainerDiv({name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject"})
+
     newPage.classList.add("divPage")
     newPage._dataStructure = ["innerText"]
     newPage._styleStructure = ["background", "width", "height"]
 
-    let smallViewAccesssPointer = saveToDatabase? newPage.getAccessPointer(): false // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
-    let smallView = GreatNoteDataClass.GNContainerDiv("overviewPage", mainController.mainDocArray["mainArray_pageOverview"], false, smallViewAccesssPointer, saveToDatabase)
+    let newPageAccesssPointer = saveToDatabase? newPage.getAccessPointer(): false // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
+    let smallView = GreatNoteDataClass.GNContainerDiv({name: "overviewPage", arrayID: mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject"})
     smallView.classList.add("divPageSmall")
     smallView._dataStructure = ["innerText"]
     smallView._styleStructure = ["background", "width", "height"]
@@ -179,12 +183,12 @@ export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, ove
     smallView.style.width = `${currentStatus.overviewPageSize[0]}px`
     smallView.style.height = `${currentStatus.overviewPageSize[1]}px`
 
-
-    let smallViewContent = document.createElement("div")
-    smallViewContent.classList.add("smallViewContent")
-    let smallViewDescription = document.createElement("div")
-    smallViewDescription.classList.add("smallViewDescription")
-    smallView.append(smallViewContent, smallViewDescription)
+    //
+    // let smallViewContent = document.createElement("div")
+    // smallViewContent.classList.add("smallViewContent")
+    // let smallViewDescription = document.createElement("div")
+    // smallViewDescription.classList.add("smallViewDescription")
+    // smallView.append(smallViewContent, smallViewDescription)
 
     // ==========================
     // add events to smallView
@@ -192,7 +196,7 @@ export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, ove
 
     let dummyNumber = Math.floor(Math.random() * pkmDatabase.length)
     newPage.innerText = `${pkmDatabase[dummyNumber].name}`
-    smallViewDescription.innerText = `${pkmDatabase[dummyNumber].name}`
+    // smallViewDescription.innerText = `${pkmDatabase[dummyNumber].name}`
 
     // ==========================
     // add events to smallView
@@ -207,8 +211,8 @@ export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, ove
     }
 
     if (fullPageData && overviewPageData){
-        fillInDataContent(newPage, smallView, fullPageData, overviewPageData)
-        console.log("203, fullPageData, overviewPageData", fullPageData, overviewPageData)
+        fillInNewPageDataContent(newPage, fullPageData)
+        fillInSmallViewDataContent(smallView, overviewPageData)
         // fillInDataContent(fullPageData, overviewPageData)
         // socket.emit("clientAskServerToInitiateSynchronization")
     }
@@ -218,37 +222,22 @@ export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, ove
 
 import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
 
-function fillInDataContent(newPage, smallView, fullPageData, overviewPageData){
+export function fillInNewPageDataContent(newPage, fullPageData){
     newPage.initializeHTMLObjectFromData(fullPageData)
+    console.log(227, fullPageData)
     newPage.innerText = fullPageData.data.innerText
+}
 
+export function fillInSmallViewDataContent(smallView, overviewPageData){
     smallView.initializeHTMLObjectFromData(overviewPageData)
-
     let smallViewDescription = smallView.querySelector(".smallViewDescription")
-    smallViewDescription.innerText = overviewPageData.data.innerText
-
-    // this line is for rendering items in a page array into the page
-    // mainController.renderDataToHTML(fullPageData["array"], newPage)
-//
-
-    // let svgBoard = GreatNoteSvgDataClass.GNSvg("svg", newPage.getAccessPointer())
-    // svgBoard.appendToContainer(newPage)
-    // console.log(2109, svgBoard.getAccessPointer())
-    // for (let i = 0; i< 3; i++){
-    //
-    //     let circle = GreatNoteSvgDataClass.GNSvgCircle("circle_"+i, svgBoard.getAccessPointer())
-    //     let randomCX = Math.random() * 400
-    //     let randomCY = Math.random() * 300
-    //     circle.applyStyle({"cx":randomCX , "cy":randomCY, r: 10})
-    //     circle.appendTo(svgBoard)
-    // }
-
+    // smallViewDescription.innerText = overviewPageData.data.innerText
 }
 
 
 export function addEventToNewPage(currentStatus, newPage){
     newPage.addEventListener("click", function(e){
-      console.log(e.target._identity)
+      console.log(240, "pageViewHelperFunction", e.target._identity)
       if (newPage.contains(e.target)){
 
       // if (newPage.compareDocumentPosition(e.target)){
@@ -256,7 +245,6 @@ export function addEventToNewPage(currentStatus, newPage){
           currentStatus.selectedObject = e.target
           e.target.classList.add("selectedObject")
           // e.target.style.background = "maroon"
-
       }
 
     })
@@ -266,31 +254,25 @@ export function addEventToNewPage(currentStatus, newPage){
 export function insertNewPage(currentStatus, newFullPage, newSmallView, fullPageModeDiv, overviewModeDiv){
     // get the new page number
     let newPageNumber = currentStatus.newPageNumber
+
     currentStatus.newPageNumber += 1
     currentStatus.pageArrayFullPage.splice(newPageNumber, 0, newFullPage)
     currentStatus.pageArraySmallView.splice(newPageNumber, 0, newSmallView)
-
     currentStatus.previousPage = currentStatus.currentPage ? currentStatus.currentPage:null
     currentStatus.currentPage = newFullPage
-
-    // console.log(`currentPageNumber: ${newPageNumber}, nextPageNumber: ${currentStatus.newPageNumber}, pageArray: ${currentStatus.pageArray}, previousPage: ${currentStatus.previousPage}, currentPage: ${currentStatus.currentPage}`)
 
     // ==========================
     // appending new pages to the fullPageModeDiv and overviewModeDiv
     //==========================
+
     newFullPage.setAttribute("pageNumber", newPageNumber)
-    newSmallView.setAttribute("pageNumber", newPageNumber)
-
-    // insert to the one next to the currentPage
-    // select the object from the array
-    // append the new page to full mode div
-    let smallViewContent = newSmallView.querySelector(".smallViewContent")
-    smallViewContent.innerText = newPageNumber
-
-
-    // first insert to the end of the html
     fullPageModeDiv.append(newFullPage)
+
+    newSmallView.setAttribute("pageNumber", newPageNumber)
+    let smallViewContent = newSmallView.querySelector(".smallViewContent")
+    // smallViewContent.innerText = newPageNumber
     overviewModeDiv.append(newSmallView)
+
     if (currentStatus.previousPage){
         fullPageModeDiv.insertBefore(newFullPage,  currentStatus.pageArrayFullPage[newPageNumber-1])
         fullPageModeDiv.insertBefore( currentStatus.pageArrayFullPage[newPageNumber-1], newFullPage)
@@ -353,6 +335,9 @@ function highlightCurrentPageInOverviewMode(smallPageView:HTMLDivElement, curren
     let currentPageHtml = currentStatus.pageArraySmallView[currentPageNumber]
      // smallPageView.parentNode.querySelector(`.divPageSmall[pageNumber='${currentPageNumber}']`)
     currentPageHtml.style.border = "3px red solid"
+}
+
+function layerController(){
 }
 
 // extract and create data object do not directly save object to the database.

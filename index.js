@@ -85,6 +85,10 @@ io.on("connection", socket=>{
     })
 
 
+
+    setInterval(function(){
+      io.sockets.to(socketArray[0].id).emit("saveDataToServer", "periodical save")
+    }, 30000)
     // begin: server receives request from a particular client to synchronize data among all the clients.
     // action: server sends request to all clients to give him all the changes. Wait for clients to send back all the changes and then send back the collection of changes to the clients.
     // message to ask all clients to send back changes
@@ -126,7 +130,7 @@ io.on("connection", socket=>{
     // console.log(socketArray.map(_s=>_s.id));
 
     // to create an array of promises so that after getting all changes from clients, the server will send the changes to the clients
-    socketArray.forEach(_s=>{
+    socketArray.forEach((_s, i)=>{
         let promise =  new Promise(res=>{
           _s.once("clientSendChangesToServer", data =>{
             changeList.push({
@@ -146,6 +150,8 @@ io.on("connection", socket=>{
       // socket.off('clientSendChangesToServer');
       // console.log(changeList);
         io.emit("deliverSynchronizeDataFromServer", changeList);
+
+        console.log("ask ", socketArray[0] , "to save data")
     })
 
     // to ask all the clients to send data to the server

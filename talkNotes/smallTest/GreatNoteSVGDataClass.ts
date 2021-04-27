@@ -1,6 +1,6 @@
 import {mainController} from "./constructInitialCondition"
 import SVG from "svg.js";
-import {GNObjectInterface} from "./GreatNoteDataClass"
+import {GNObjectInterface, CreateGreatNoteObjectInterface} from "./GreatNoteDataClass"
 import * as GreatNoteDataClass from "./GreatNoteDataClass"
 
 
@@ -35,12 +35,12 @@ export interface GNSvgContainerInterface extends SVG.LinkedHTMLElement, GreatNot
 
 }
 
-
 //@auto-fold here
-export function GNSvg(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase: boolean=true) : GNSvgContainerInterface {
+export function GNSvg(createData: CreateGreatNoteObjectInterface) : GNSvgContainerInterface {
+    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, message} = createData
+    console.log(4141, createData)
     let svgDivContainer =  document.createElement("div")
     svgDivContainer.id = "testSvgDiv"
-
 
     let svgController = SVG(svgDivContainer)
     svgController.width("800px")
@@ -52,7 +52,7 @@ export function GNSvg(name:string, arrayID: string, insertPosition?: number|bool
     svgBoard._type = GNSvg.name
     svgBoard._name = name
     svgBoard._dataStructure = ["innerHTML"]
-    svgBoard._styleStructure = []
+    svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"]
 
     // // functions
     // svgObject.loadFromData = (data)=>{ svgObject.value = data }
@@ -60,8 +60,10 @@ export function GNSvg(name:string, arrayID: string, insertPosition?: number|bool
         parent.appendChild(svgDivContainer)
     }
 
-    svgBoard.applyStyle = function(){
-
+    svgBoard.applyStyle = function(stylesheet){
+        Object.entries(stylesheet).forEach(([key, value], _)=>{
+            svgBoard["style"][key] = value
+        })
     }
 
     svgBoard.createDataObject = function(){
@@ -85,7 +87,7 @@ export function GNSvg(name:string, arrayID: string, insertPosition?: number|bool
 
     //
     svgBoard.extract = () => svgBoard.createDataObject()
-
+    console.log(987, svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer)
     // add extra funcitons to the object
     GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer)
     console.log(900, svgBoard._identity)
@@ -129,7 +131,8 @@ export interface GNSvgCircleData {
 }
 
 //@auto-fold here
-export function GNSvgCircle(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase: boolean=true) : GNSvgCircleInterface {
+export function GNSvgCircle(createData: CreateGreatNoteObjectInterface) : GNSvgCircleInterface {
+    let {name, arrayID, insertPosition, dataPointer, saveToDatabase} = createData
     let svgObjectSoul = new SVG.Circle()
     console.log(119, svgObjectSoul)
     svgObjectSoul.radius(75)
@@ -144,9 +147,9 @@ export function GNSvgCircle(name:string, arrayID: string, insertPosition?: numbe
     // functions
     svgObject.loadFromData = (_GNData)=>{
         console.log(145, "the data is updated", _GNData)
-        svgObject.style.cx = parseInt(_GNData["data"]["cx"]) + 200
-        svgObject.style.cy = parseInt(_GNData["data"]["cy"])
-        svgObject.style.r  = parseInt(_GNData["data"]["r"])
+        svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200
+        svgObject.style["cy"] = parseInt(_GNData["data"]["cy"])
+        svgObject.style["r"]  = parseInt(_GNData["data"]["r"])
     }
 
 
@@ -155,12 +158,12 @@ export function GNSvgCircle(name:string, arrayID: string, insertPosition?: numbe
 
         // data structure
         dataObject["GNType"] = svgObject._type
-        if (svgObject._identity) dataObject["_identity"] = svgObject._identity
+        if (svgObject["_identity"]) dataObject["_identity"] = svgObject["_identity"]
 
 
-        dataObject["data"]["cx"] = svgObject.style.cx
-        dataObject["data"]["cy"] = svgObject.style.cy
-        dataObject["data"]["r"] = svgObject.style.r
+        dataObject["data"]["cx"] = svgObject.style["cx"]
+        dataObject["data"]["cy"] = svgObject.style["cy"]
+        dataObject["data"]["r"] = svgObject.style["r"]
         console.log(159, dataObject["data"])
 
         // stylesheet data
@@ -282,13 +285,13 @@ export interface GNSvgPolyLineInterface extends GNSvgObjectInterface, SVG.Linked
 
 //@auto-fold here
 export interface GNSvgPolyLineData{
-
     points?: number[]
-    attribute?: {"stroke"?: string, "width"?: number, "fill"?:string}
+    attribute?: {"stroke"?: string, "width"?: number, "fill"?:string, "stroke-width"?: string}
 }
 
 //@auto-fold here
-export function GNSvgPolyLine(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase: boolean=true) : GNSvgPolyLineInterface {
+export function GNSvgPolyLine(createData: CreateGreatNoteObjectInterface) : GNSvgPolyLineInterface {
+    let {name, arrayID, insertPosition, dataPointer, saveToDatabase} = createData
 
     let svgObjectSoul = <SVG.PolyLine> SVG(document.createElement("polyline")).polyline([0, 0, 0, 0])
 
@@ -304,11 +307,11 @@ export function GNSvgPolyLine(name:string, arrayID: string, insertPosition?: num
     // functions
     svgObject.loadFromData = (data)=>{
       // svgObject.soul.plot([[0, 0], [10, 100]])
-      console.log(300, data["data"]["points"])
-      svgObject.soul.plot(data["data"]["points"])
+      console.log(309, data)
+      svgObject.soul.plot(data["points"])
 
-      console.log(303, svgObject.applyStyle, data["stylesheet"])
-      svgObject.applyStyle(data["stylesheet"])
+      // console.log(303, svgObject.applyStyle, data["stylesheet"])
+      // svgObject.applyStyle(data["stylesheet"])
     }
 
     svgObject.createDataObject = function(){
@@ -317,16 +320,13 @@ export function GNSvgPolyLine(name:string, arrayID: string, insertPosition?: num
         // data structure
         dataObject["GNType"] = svgObject._type
         if (svgObject._identity) dataObject["_identity"] = svgObject._identity
-        console.log(302, svgObject.soul.array().value)
-        svgObject._dataStructure.forEach(p=>{
-          dataObject["data"][p] = svgObject.soul.array().value.toString()
-        })
+
+        dataObject["data"]["points"] = svgObject.soul.array().value.toString()
 
         // stylesheet data
-        svgObject._styleStructure.forEach(p=>{
-          console.log(320, p, svgObject["style"][p])
-          dataObject["stylesheet"][p] = svgObject["style"][p]
-        })
+        dataObject["stylesheet"]["stroke"] = svgObject["style"]["stroke"]
+        dataObject["stylesheet"]["stroke-width"] = svgObject["style"]["stroke-width"]
+        dataObject["stylesheet"]["fill"] = svgObject["style"]["fill"]
 
         return dataObject
     }
@@ -342,8 +342,6 @@ export function GNSvgPolyLine(name:string, arrayID: string, insertPosition?: num
               svgObject["style"][p] = attrList[p]
           }
       })
-
-
     }
 
     // to share same data function

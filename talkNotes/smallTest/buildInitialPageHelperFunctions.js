@@ -42,14 +42,17 @@ function buildInitialPage(mainController, saveToDatabase) {
     var currentStatus = mainController.pageCurrentStatus;
     var pageFullArray = mainController.mainDoc["array"][0]["array"];
     var pageOverviewArray = mainController.mainDoc["array"][1]["array"];
+    console.log("pageFullArray", pageFullArray);
     var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
     var overviewModeDiv = document.querySelector(".overviewModeDiv");
     for (var i = 0; i < pageFullArray.length; i++) {
         var _a = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
+        console.log(37, pageFullArray[i], newPage);
+        mainController.renderDataToHTML(pageFullArray[i], newPage);
         // console.log(pageFullArray[i])
         pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
     }
-}
+} // buildInitialPage
 exports.buildInitialPage = buildInitialPage;
 function buildInitialHTMLSkeleton(mainController) {
     var toolBoxController = new ToolBoxModel.ToolBoxClass();
@@ -65,17 +68,13 @@ function buildInitialHTMLSkeleton(mainController) {
     var bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true);
     var bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent");
     var currentStatus = mainController.pageCurrentStatus;
+    // toolBoxObject
+    var toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
+    var polylineItemButton = mainController.toolBox.createNewPolyLineItemButton(toolBoxHtmlObject);
+    var eraserItemButton = mainController.toolBox.createEraserItemButton(toolBoxHtmlObject);
     // create subPanel
     var pageControllerSubPanel = pageViewHelperFunction.createSubPanel("pageController", true);
     var pageControllerSubPanelContent = pageControllerSubPanel.querySelector(".subPanelContent");
-    var item1 = pageViewHelperFunction.createSubPanelItem("A");
-    var item2 = pageViewHelperFunction.createSubPanelItem("B");
-    var item3 = pageViewHelperFunction.createSubPanelItem("C");
-    var item4 = pageViewHelperFunction.createSubPanelItem("D");
-    // let item5 = pageViewHelperFunction.createSubPanelItem("E")
-    // let item6 = pageViewHelperFunction.createSubPanelItem("F")
-    // let item7 = pageViewHelperFunction.createSubPanelItem("G")
-    // let item8 = pageViewHelperFunction.createSubPanelItem("H")
     var editorControllerTemplate = document.querySelector("#editControllerTemplate");
     var editorController = editorControllerTemplate.content.cloneNode(true);
     var copyButton = editorController.querySelector(".copyButton");
@@ -86,7 +85,7 @@ function buildInitialHTMLSkeleton(mainController) {
         var nameOfGNtype = selectedObject._type;
         var selectedObjectData = selectedObject.extract();
         selectedObjectData["data"]["cx"] += 100;
-        var copiedObject = mainController.createGNObjectThroughName(nameOfGNtype, "", selectedObject.getAccessPointer(), false, false, false, false);
+        var copiedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: "", insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: false });
         copiedObject.loadFromData(selectedObjectData);
         console.log(88, selectedObjectData, copiedObject);
         selectedObject.parentNode.appendChild(copiedObject);
@@ -98,7 +97,7 @@ function buildInitialHTMLSkeleton(mainController) {
         selectedObjectData["data"]["cx"] += 100;
         //_name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true
         var parentContainerObjectID = selectedObject.parentNode.getAccessPointer();
-        var linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, "", parentContainerObjectID, false, selectedObject.getAccessPointer(), true);
+        var linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: parentContainerObjectID, insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: true });
         linkedObject.loadFromData(selectedObjectData);
         console.log(88, selectedObjectData, linkedObject);
         selectedObject.parentNode.appendChild(linkedObject);
@@ -113,12 +112,63 @@ function buildInitialHTMLSkeleton(mainController) {
     addInputFieldButton.innerText = "addInput";
     addInputFieldButton.addEventListener("click", function () {
         var currentPage = mainController.pageCurrentStatus.currentPage;
-        var newInputField = GreatNoteDataClass.GNInputField("", currentPage.getAccessPointer(), false, false, true);
+        var newInputField = GreatNoteDataClass.GNInputField({ name: "", arrayID: currentPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true });
         newInputField.appendTo(currentPage);
+    });
+    var addSvgDivButton = document.createElement("button");
+    addSvgDivButton.innerText = "addSvg";
+    addSvgDivButton.addEventListener("click", function () {
+        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var svgBoard = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        svgBoard.addEventListener("click", function () {
+            mainController.toolBox.targetPage = svgBoard;
+        });
+        svgBoard.appendToContainer(currentPage);
+        // console.log(135, currentPage, currentPage.getAccessPointer())
+    });
+    var syncButton = document.createElement("button");
+    syncButton.innerText = "sync";
+    syncButton.addEventListener("click", function () {
         socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
     });
-    editorController.appendChild(addInputFieldButton);
-    pageControllerSubPanelContent.append(item1, item2, item3, item4, editorController);
+    var showMainDocButton = document.createElement("button");
+    showMainDocButton.innerText = "mainDoc";
+    showMainDocButton.addEventListener("click", function () {
+        console.log(153, mainController.mainDoc["array"][0]["array"], mainController);
+    });
+    var resetButton = document.createElement("button");
+    resetButton.innerText = "resetButton";
+    resetButton.addEventListener("click", function () {
+        mainController.initalizeMainDoc();
+        var saveData = mainController.saveMainDoc(true);
+    });
+    editorController.append(addInputFieldButton, addSvgDivButton, syncButton, showMainDocButton, resetButton);
+    // layerController
+    var layerControllerTemplate = document.querySelector("#layerControllerTemplate");
+    var layerControllerHTMLObject = layerControllerTemplate.content.cloneNode(true);
+    var addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton");
+    addDivLayerButton.addEventListener("click", function () {
+        var currentPage = mainController.pageCurrentStatus.currentPage;
+        console.log("add a new div layer");
+        var divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        divLayer.applyStyle({ width: "100%", height: "100%", background: "blue", "position": "absolute", "left": "0px", "right": "0px" });
+        divLayer.classList.add("divLayer");
+        divLayer.appendTo(currentPage);
+    });
+    var addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton");
+    addSvgLayerButton.addEventListener("click", function () {
+        console.log("add a new svg layer");
+        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        console.log(mainController.toolBox.registerSvg);
+        mainController.toolBox.registerSvg(svgLayer);
+        svgLayer.applyStyle({ width: "100%", height: "100%", background: "gold", position: "absolute", left: "0px", top: "0px" });
+        mainController.saveHTMLObjectToDatabase(svgLayer);
+        console.log(svgLayer);
+        svgLayer.classList.add("svgLayer");
+        svgLayer.appendTo(currentPage);
+    });
+    pageControllerSubPanelContent.append(toolBoxHtmlObject, polylineItemButton, editorController, layerControllerHTMLObject);
     //===================== bookmarkSubPanel ==================//
     /** add new div, new svg*/
     // page controller
@@ -129,7 +179,7 @@ function buildInitialHTMLSkeleton(mainController) {
     var saveButton = document.createElement("button");
     saveButton.innerHTML = "saveButton";
     saveButton.addEventListener("click", function () {
-        // let saveData = mainController.saveMainDoc(true)
+        var saveData = mainController.saveMainDoc(true);
     });
     var createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function (e) {
     });

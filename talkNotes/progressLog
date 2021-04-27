@@ -1,0 +1,90 @@
+want to find out the reason why after refresh, the svg cannot update when I draw on the other board?
+
+First, look aat the processCreationDataHelper in the databaseHelperFunction.
+
+reason, because the svgboard obeject dooes not have accesspointer after it is recreated in the renderDataToHTML.
+Therefore, in the initialize object from data method, we need to have the following function
+a) add the _identity
+b) add accesspointer
+====================
+
+GNObjectInterface
+    1. properties
+
+    2. methods
+    loadFromData?(data)
+    extract?():any
+    controlledObject?:any
+    controllerEvent?:any
+
+    _type: string // the GN type???
+    _name: string // a name to describe the object
+
+    // these two are used for extracting data and create dataObject
+    _dataStructure?: string[]
+    _styleStructure?: string[]
+    stylesheet?: {}
+
+    _identity?: {
+      "accessPointer": string,
+      "dataPointer": string,
+      "linkArray": string
+    }
+
+    processUpdateData(data:any)
+    createDataObject(GNObjectInterface?):any
+    appendTo(_parent:HTMLElement)
+    applyStyle(any)
+    appendElements(...any)
+
+
+    // extra functions
+    getDataPointer():string
+    getAccessPointer():string
+    setDataPointer():string
+    setAccessPointer():string
+    getDataFromDataBase():any
+    editEvent(eventName:string)
+    updateLinkObject()
+
+    getLinkArray():any
+    reloadDataFromDatabase()
+    saveHTMLObjectToDatabase()
+    initializeHTMLObjectFromData(objectData:any)
+
+    /** to save data from the database and extract data*/
+    save()                 // ???
+    load(data:any)         // ???
+    processUpdateData()
+
+    // relate to DB
+    addToDatabase(arrayID, insertPosition?:number|boolean, dataPointer?)
+    GNdelete()
+
+
+outside function
+- createDummyData()
+- superGNObject()
+
+
+dataObject
+- GNType
+- data
+- stylesheet
+
+
+
+buildInitialHTMLSkeleton
+1. build up the toolBoxController
+
+
+/** To save the mainDoc as text file*/
+saveMainDoc(sendRequest:boolean)
+/** To load string into the mainDoc */
+loadMainDoc(data:string)
+getMainDocChange()
+getLoadDataFromSocket()
+processChangeData(changeDataArray:Set<string>)
+activateButtonFunction(toolBoxItem)
+
+=====================

@@ -17315,7 +17315,7 @@ class WS extends Transport {
 module.exports = WS;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":61,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
+},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":66,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
     if (obj.hasOwnProperty(k)) {
@@ -17640,7 +17640,7 @@ formatters.j = function (v) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./common":18,"_process":63}],18:[function(require,module,exports){
+},{"./common":18,"_process":68}],18:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -19437,7 +19437,7 @@ exports.url = url;
 
 },{"debug":33,"parseuri":26}],33:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":34,"_process":63,"dup":17}],34:[function(require,module,exports){
+},{"./common":34,"_process":68,"dup":17}],34:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":35}],35:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -19864,7 +19864,7 @@ exports.hasBinary = hasBinary;
 
 },{}],39:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":40,"_process":63,"dup":17}],40:[function(require,module,exports){
+},{"./common":40,"_process":68,"dup":17}],40:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":41}],41:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -25779,18 +25779,15 @@ function createDummyData() {
     };
 }
 //@auto-fold here
-function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    // export function GNInputField(name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true) : GNInputFieldInterface {
+function GNInputField(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
     var _object = document.createElement("input");
     _object._type = GNInputField.name;
     _object._name = name;
     _object._dataStructure = ["value"];
     _object._styleStructure = [];
     // functions
-    console.log("_86", _object._dataStructure);
     _object.createDataObject = function () {
-        console.log("_87", _object._dataStructure);
         var dataObject = createDummyData();
         // data structure
         dataObject["GNType"] = _object._type;
@@ -25806,39 +25803,30 @@ function GNInputField(name, arrayID, insertPosition, dataPointer, saveToDatabase
         return dataObject;
     };
     _object.extract = function () { return _object.createDataObject(); };
-    _object.loadFromData = function (data) {
-        _object.value = data.value;
-    };
+    _object.loadFromData = function (data) { return _object.value = data.value; };
     //@auto-fold here
-    console.log("_116, _dataStructure", _object._dataStructure);
     // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
-    console.log("_120, _dataStructure", _object._dataStructure);
+    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
     // if the object is assigned to the database, then this  addEventListener is to monitor the change
     // define what is the update action
+    var eventStatus = { t0: 0, t1: 0, run: true };
     _object.addEventListener("input", function (e) {
-        console.log("_124, _dataStructure", _object._dataStructure);
-        console.log(120, e.target.value, _object._identity);
-        if (_object._identity.accessPointer != "") {
-            var dataPointer_1 = _object.getDataPointer();
-            var accessPointer = _object.getAccessPointer();
-            var masterObject = constructInitialCondition_1.mainController.getObjectById(dataPointer_1);
-            // let dataObject = _object.extract()
-            // _object.saveHTMLObjectToDatabase()
-            console.log(120, e.target.value, _object.createDataObject, _object._dataStructure);
-            // console.log(120, e.target.value, dataObject, _object.extract)
-        }
-        if (_object.processUpdateData) {
-            _object.processUpdateData();
+        eventStatus.t0 = eventStatus.t1;
+        eventStatus.t1 = e.timeStamp;
+        console.log(eventStatus.t1 - eventStatus.t0, eventStatus.t1 - eventStatus.t0 > 100);
+        if (eventStatus.t1 - eventStatus.t0 > 100) {
+            if (_object._identity.accessPointer != "")
+                _object.saveHTMLObjectToDatabase();
+            if (_object.processUpdateData)
+                _object.processUpdateData();
         }
     }); //addEventListener
     return _object;
-}
+} // GNInputField
 exports.GNInputField = GNInputField;
 //@auto-fold here
 function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
-    console.log(86, "name", _name, "statusList: ", statusList, "arrayID", arrayID, "insertPosition", insertPosition, "saveToDatabase: ", saveToDatabase);
     var _object = document.createElement("button");
     _object._name = _name;
     _object._type = GNButton.name;
@@ -25884,14 +25872,13 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
 }
 exports.GNButton = GNButton;
 //@auto-fold here
-function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNContainerDiv(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
     var _object = document.createElement("div");
     _object.childrenList = {};
     _object._type = GNContainerDiv.name;
-    _object.classList.add("GNContainerDiv");
     _object._dataStructure = ["innerText"];
-    _object._styleStructure = ["background", "width"];
+    _object._styleStructure = ["background", "width", "height"];
     // functions
     _object.appendElements = function () {
         var childrenArray = [];
@@ -25905,7 +25892,6 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
         });
     };
     _object.loadFromData = function (data) {
-        console.log(250, data);
         _object._dataStructure.forEach(function (key) {
             console.log(216, key, _object[key], _object);
             _object[key] = data[key];
@@ -25928,9 +25914,16 @@ function GNContainerDiv(name, arrayID, insertPosition, dataPointer, saveToDataba
         // console.log(238, dataObject, _object)
         return dataObject;
     };
+    _object.applyStyle = function (styleObject) {
+        Object.entries(styleObject).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            _object[key] = value;
+        });
+        _object.saveHTMLObjectToDatabase();
+    };
     _object.extract = function () { return _object.createDataObject(); };
     // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
+    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
     return _object;
 }
 exports.GNContainerDiv = GNContainerDiv;
@@ -26042,35 +26035,18 @@ function GNTemplate(_name, _parent) {
 }
 exports.GNTemplate = GNTemplate;
 //@auto-fold here
-function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, editEvent) {
+function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage) {
     _object = _object;
     /** important function to extract data from individual elements*/
     // when the data is first created, add it to the database
-    _object.addToDatabase = function (arrayID, insertPosition, dataPointer) {
-        constructInitialCondition_1.mainController.addData(arrayID, _object, insertPosition, dataPointer);
+    _object.addToDatabase = function (arrayID, insertPosition, dataPointer, specialCreationMessage) {
+        constructInitialCondition_1.mainController.addData(arrayID, _object, insertPosition, dataPointer, specialCreationMessage);
         _object.setAttribute("accessPointer", _object.getAccessPointer());
     };
     _object.saveHTMLObjectToDatabase = function () {
         constructInitialCondition_1.mainController.saveHTMLObjectToDatabase(_object);
     };
     /** to apply stylesheet to an element */
-    _object.applyStyle = function (stylesheet, stylechoice) {
-        if (stylechoice) {
-            Object.entries(stylesheet[stylechoice]).forEach(function (_a, _) {
-                var key = _a[0], value = _a[1];
-                _object.style[key] = value;
-            });
-            _object.stylesheet = stylesheet[stylechoice];
-        }
-        else {
-            Object.entries(stylesheet).forEach(function (_a, _) {
-                var key = _a[0], value = _a[1];
-                _object.style[key] = value;
-                _object.stylesheet = stylesheet;
-            });
-        }
-        _object.saveHTMLObjectToDatabase();
-    };
     _object.updateLinkObject = function () {
         var dataPointer = _object.getDataPointer();
         var accessPointer = _object.getAccessPointer();
@@ -26088,27 +26064,19 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         });
     };
     _object.initializeHTMLObjectFromData = function (data) {
-        console.log(data);
         _object.setAttribute("accessPointer", data._identity.accessPointer);
         _object._identity = data._identity;
         _object._type = data._type;
-        // console.log("_1523, _dataStructure", _object._dataStructure)
-        // _object._dataStructure = data._dataStructure
-        // _object._styleStructure = data._styleStructure
     };
     _object.processUpdateData = function () {
         var objectData = _object.reloadDataFromDatabase();
-        console.log("517, processUpdateData", objectData);
         _object.updateLinkObject();
-        // console.log(_object.getDataFromDataBase())
     };
     _object.reloadDataFromDatabase = function () {
         var dataPointer = _object.getDataPointer();
         var accessPointer = _object.getAccessPointer();
         var dataPointerObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
-        // console.log(528, dataPointerObject.data)
         _object.loadFromData(dataPointerObject.data);
-        console.log(540, dataPointerObject);
         if (dataPointer != accessPointer) {
             var accessPointerObject = constructInitialCondition_1.mainController.getObjectById(accessPointer);
             _object.applyStyle(accessPointerObject.stylesheet);
@@ -26155,14 +26123,13 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         return constructInitialCondition_1.mainController.getObjectById(_object.getDataPointer());
     };
     if (saveToDatabase) {
-        console.log("603", _object, "is created and saved to database.");
-        _object.addToDatabase(arrayID, insertPosition, dataPointer);
+        _object.addToDatabase(arrayID, insertPosition, dataPointer, specialCreationMessage);
         // _object.editEvent(editEvent)
     }
 }
 exports.superGNObject = superGNObject;
 
-},{"./constructInitialCondition":53}],47:[function(require,module,exports){
+},{"./constructInitialCondition":59}],47:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26200,8 +26167,9 @@ function createDummyData() {
     };
 }
 //@auto-fold here
-function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNSvg(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message;
+    console.log(4141, createData);
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
     var svgController = svg_js_1["default"](svgDivContainer);
@@ -26213,13 +26181,17 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgBoard._type = GNSvg.name;
     svgBoard._name = name;
     svgBoard._dataStructure = ["innerHTML"];
-    svgBoard._styleStructure = [];
+    svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
     // // functions
     // svgObject.loadFromData = (data)=>{ svgObject.value = data }
     svgBoard.appendToContainer = function (parent) {
         parent.appendChild(svgDivContainer);
     };
-    svgBoard.applyStyle = function () {
+    svgBoard.applyStyle = function (stylesheet) {
+        Object.entries(stylesheet).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgBoard["style"][key] = value;
+        });
     };
     svgBoard.createDataObject = function () {
         var dataObject = createDummyData();
@@ -26238,6 +26210,7 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     };
     //
     svgBoard.extract = function () { return svgBoard.createDataObject(); };
+    console.log(987, svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
     // add extra funcitons to the object
     GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
     console.log(900, svgBoard._identity);
@@ -26245,8 +26218,8 @@ function GNSvg(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
 }
 exports.GNSvg = GNSvg;
 //@auto-fold here
-function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNSvgCircle(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
     var svgObjectSoul = new svg_js_1["default"].Circle();
     console.log(119, svgObjectSoul);
     svgObjectSoul.radius(75);
@@ -26260,19 +26233,19 @@ function GNSvgCircle(name, arrayID, insertPosition, dataPointer, saveToDatabase)
     // functions
     svgObject.loadFromData = function (_GNData) {
         console.log(145, "the data is updated", _GNData);
-        svgObject.style.cx = parseInt(_GNData["data"]["cx"]) + 200;
-        svgObject.style.cy = parseInt(_GNData["data"]["cy"]);
-        svgObject.style.r = parseInt(_GNData["data"]["r"]);
+        svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200;
+        svgObject.style["cy"] = parseInt(_GNData["data"]["cy"]);
+        svgObject.style["r"] = parseInt(_GNData["data"]["r"]);
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
         dataObject["GNType"] = svgObject._type;
-        if (svgObject._identity)
-            dataObject["_identity"] = svgObject._identity;
-        dataObject["data"]["cx"] = svgObject.style.cx;
-        dataObject["data"]["cy"] = svgObject.style.cy;
-        dataObject["data"]["r"] = svgObject.style.r;
+        if (svgObject["_identity"])
+            dataObject["_identity"] = svgObject["_identity"];
+        dataObject["data"]["cx"] = svgObject.style["cx"];
+        dataObject["data"]["cy"] = svgObject.style["cy"];
+        dataObject["data"]["r"] = svgObject.style["r"];
         console.log(159, dataObject["data"]);
         // stylesheet data
         svgObject._styleStructure.forEach(function (p) {
@@ -26342,8 +26315,8 @@ function GNSvgLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
 }
 exports.GNSvgLine = GNSvgLine;
 //@auto-fold here
-function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
+function GNSvgPolyLine(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
     var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
     var svgObject = svgObjectSoul.node;
     svgObject.soul = svgObjectSoul;
@@ -26354,10 +26327,10 @@ function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabas
     // functions
     svgObject.loadFromData = function (data) {
         // svgObject.soul.plot([[0, 0], [10, 100]])
-        console.log(300, data["data"]["points"]);
-        svgObject.soul.plot(data["data"]["points"]);
-        console.log(303, svgObject.applyStyle, data["stylesheet"]);
-        svgObject.applyStyle(data["stylesheet"]);
+        console.log(309, data);
+        svgObject.soul.plot(data["points"]);
+        // console.log(303, svgObject.applyStyle, data["stylesheet"])
+        // svgObject.applyStyle(data["stylesheet"])
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
@@ -26365,15 +26338,11 @@ function GNSvgPolyLine(name, arrayID, insertPosition, dataPointer, saveToDatabas
         dataObject["GNType"] = svgObject._type;
         if (svgObject._identity)
             dataObject["_identity"] = svgObject._identity;
-        console.log(302, svgObject.soul.array().value);
-        svgObject._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = svgObject.soul.array().value.toString();
-        });
+        dataObject["data"]["points"] = svgObject.soul.array().value.toString();
         // stylesheet data
-        svgObject._styleStructure.forEach(function (p) {
-            console.log(320, p, svgObject["style"][p]);
-            dataObject["stylesheet"][p] = svgObject["style"][p];
-        });
+        dataObject["stylesheet"]["stroke"] = svgObject["style"]["stroke"];
+        dataObject["stylesheet"]["stroke-width"] = svgObject["style"]["stroke-width"];
+        dataObject["stylesheet"]["fill"] = svgObject["style"]["fill"];
         return dataObject;
     };
     svgObject.extract = function () { return svgObject.createDataObject(); };
@@ -26465,7 +26434,8 @@ var ToolBoxClass = /** @class */ (function () {
         toolBoxContainer.classList.add("toolBoxHtml");
         toolBoxContainer.style.height = "80px";
         toolBoxContainer.style.background = "silver";
-        toolBoxContainer.style.width = "90vw";
+        // toolBoxContainer.style.width = "90vw"
+        toolBoxContainer.style.width = "90%";
         toolBoxContainer.style.margin = "0 auto";
         toolBoxContainer.style.display = "grid";
         toolBoxContainer.style.gridTemplateColumns = "4fr 3fr";
@@ -26515,26 +26485,26 @@ var ToolBoxClass = /** @class */ (function () {
         }
         toolBoxItem.eventFunction = function () {
             console.log("polyline item button is activated");
-            console.log(event);
-            var strokeWidth = "15px";
-            var strokeColor = "black";
-            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine("", self.targetPage.getAccessPointer(), false, false);
+            var _a = constructInitialCondition_1.mainController.attributeControllerMapping.polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
+            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: self.targetPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
             polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
             polyline.appendTo(self.targetPage);
             polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
+            var t1 = 0;
+            var t2 = 0;
             function updatePolyLine(e) {
+                t2 = e.timeStamp;
+                t1 = t2;
                 var newPoint = polyline.soul.array().value;
                 newPoint.push([event["offsetX"], event["offsetY"]]);
-                console.log(newPoint);
                 polyline.soul.plot(newPoint);
             }
             self.targetPage.addEventListener("mousemove", updatePolyLine);
             self.targetPage.addEventListener("mouseup", function (e) {
                 self.targetPage.removeEventListener("mousemove", updatePolyLine);
                 polyline.saveHTMLObjectToDatabase();
-                console.log(138, constructInitialCondition_1.mainController.mainDoc["array"][1]["array"][1]["array"][0]);
             });
-        };
+        }; // eventFunction
         toolBoxItem.addEventListener("click", function () {
             console.log("polyline item button is activated");
             self.activateButtonFunction(toolBoxItem);
@@ -26547,17 +26517,18 @@ var ToolBoxClass = /** @class */ (function () {
         var toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject);
         toolBoxItem.eventName = "mousedown";
         toolBoxItem.eventFunction = function () {
-            console.log(event);
-            var cx = event.offsetX + "px";
-            var cy = event.offsetY + "px";
+            var cx = event["offsetX"] + "px";
+            var cy = event["offsetY"] + "px";
             var r = "10px";
-            var eraser = GreatNoteSvgDataClass.GNSvgCircle("123", constructInitialCondition_1.mainController.mainDocArray["bookmark"], false, false);
-            console.log(164, eraser, constructInitialCondition_1.mainController.mainDoc["array"][1]);
-            eraser.applyStyle({ "cx": cx, "cy": cy, "r": r });
+            var eraser = GreatNoteSvgDataClass.GNSvgCircle({ name: "123", arrayID: constructInitialCondition_1.mainController.mainDocArray["bookmark"], insertPosition: false, dataPointer: false, saveToDatabase: false });
+            eraser.style["cx"] = cx;
+            eraser.style["cy"] = cy;
+            eraser.style["r"] = r;
             function updateEraserPosition(e) {
                 cx = event["offsetX"] + "px";
                 cy = event["offsetY"] + "px";
-                eraser.applyStyle({ "cx": cx, "cy": cy });
+                eraser.style["cx"] = cx;
+                eraser.style["cy"] = cy;
             }
             _this.targetPage.addEventListener("mousemove", updateEraserPosition);
             _this.targetPage.addEventListener("mouseup", function (e) {
@@ -26568,8 +26539,6 @@ var ToolBoxClass = /** @class */ (function () {
                 // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
                 console.log("You are out of the boundary");
             });
-            console.log(183, self.targetPage);
-            console.log(constructInitialCondition_1.mainController.mainDoc["array"]);
             // self.targetPage.svgController
             self.targetPage.appendChild(eraser);
             // eraser.appendTo(self.targetPage)
@@ -26595,11 +26564,499 @@ var ToolBoxClass = /** @class */ (function () {
         console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction);
         this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
     };
+    ToolBoxClass.prototype.registerSvg = function (svgLayer) {
+        var self = this;
+        console.log(226, "registerSvg, yoyoyo");
+        svgLayer.addEventListener("click", function () {
+            console.log("The svg is register to the toolbox");
+            self.targetPage = svgLayer;
+        });
+    };
     return ToolBoxClass;
 }());
 exports.ToolBoxClass = ToolBoxClass;
 
-},{"./GreatNoteSVGDataClass":47,"./constructInitialCondition":53}],50:[function(require,module,exports){
+},{"./GreatNoteSVGDataClass":47,"./constructInitialCondition":59}],50:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.ToolBoxClass = void 0;
+var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSVGDataClass"));
+var constructInitialCondition_1 = require("./constructInitialCondition");
+var ToolBoxClass = /** @class */ (function () {
+    function ToolBoxClass() {
+    }
+    ToolBoxClass.prototype.createToolboxHtmlObject = function () {
+        var self = this;
+        var toolBoxContainer = document.createElement("div");
+        toolBoxContainer.classList.add("toolBoxHtml");
+        toolBoxContainer.style.height = "80px";
+        toolBoxContainer.style.background = "silver";
+        // toolBoxContainer.style.width = "90vw"
+        toolBoxContainer.style.width = "90%";
+        toolBoxContainer.style.margin = "0 auto";
+        toolBoxContainer.style.display = "grid";
+        toolBoxContainer.style.gridTemplateColumns = "4fr 3fr";
+        // toolBoxHtmlObject.style.width = "90%"
+        toolBoxContainer.itemArray = [];
+        var toolBoxSelectionHtmlObject = document.createElement("div");
+        var toolBoxOptionHtmlObject = document.createElement("div");
+        toolBoxOptionHtmlObject.classList.add("toolBoxOption");
+        toolBoxOptionHtmlObject.style.height = "80px";
+        toolBoxOptionHtmlObject.style.background = "lightBlue";
+        toolBoxContainer.selectionHTMLObject = toolBoxSelectionHtmlObject;
+        toolBoxContainer.optionHTMLObject = toolBoxOptionHtmlObject;
+        toolBoxContainer.appendChild(toolBoxSelectionHtmlObject);
+        // toolBoxContainer.appendChild(toolBoxOptionHtmlObject)
+        return toolBoxContainer;
+    };
+    ToolBoxClass.prototype.createToolBoxItem = function (name, toolBoxContainer) {
+        var toolBoxItem = document.createElement("div");
+        // the html style part
+        toolBoxItem.style.display = "inline-block";
+        toolBoxItem.classList.add("toolBoxItem");
+        toolBoxItem.innerText = name[0];
+        toolBoxItem.style.background = "gold";
+        // toolBoxItem.style.display = "flex"
+        toolBoxItem.style.margin = "10px 5px";
+        toolBoxItem.style["align-items"] = "center";
+        toolBoxItem.style["justify-content"] = "center";
+        var squreLength = "40px";
+        toolBoxItem.style.width = squreLength;
+        toolBoxItem.style.height = squreLength;
+        // internaal variable part
+        toolBoxItem.status = false;
+        toolBoxItem.resetButton = function () {
+            toolBoxItem.status = false;
+        };
+        toolBoxItem._parent = toolBoxContainer.selectionHTMLObject;
+        toolBoxContainer.itemArray.push(toolBoxItem);
+        toolBoxContainer.selectionHTMLObject.appendChild(toolBoxItem);
+        toolBoxItem.addEventListener(toolBoxItem.eventName, toolBoxItem.eventFunction);
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.createNewPolyLineItemButton = function (toolBoxHtmlObject) {
+        var self = this;
+        var toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject);
+        toolBoxItem.eventName = "mousedown";
+        function polyLineOption() {
+        }
+        toolBoxItem.eventFunction = function () {
+            console.log("polyline item button is activated");
+            var _a = constructInitialCondition_1.mainController.attributeControllerMapping.polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
+            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: self.targetPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
+            polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
+            polyline.appendTo(self.targetPage);
+            polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
+            var t1 = 0;
+            var t2 = 0;
+            function updatePolyLine(e) {
+                t2 = e.timeStamp;
+                if (t2 - t1 > 50) {
+                    // console.log(141, t2-t1, " pass test")
+                    t1 = t2;
+                    var newPoint = polyline.soul.array().value;
+                    newPoint.push([event["offsetX"], event["offsetY"]]);
+                    polyline.soul.plot(newPoint);
+                }
+            }
+            self.targetPage.addEventListener("mousemove", updatePolyLine);
+            self.targetPage.addEventListener("mouseup", function (e) {
+                self.targetPage.removeEventListener("mousemove", updatePolyLine);
+                polyline.saveHTMLObjectToDatabase();
+            });
+        }; // eventFunction
+        toolBoxItem.addEventListener("click", function () {
+            console.log("polyline item button is activated");
+            self.activateButtonFunction(toolBoxItem);
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.createEraserItemButton = function (toolBoxHtmlObject) {
+        var _this = this;
+        var self = this;
+        var toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject);
+        toolBoxItem.eventName = "mousedown";
+        toolBoxItem.eventFunction = function () {
+            var cx = event["offsetX"] + "px";
+            var cy = event["offsetY"] + "px";
+            var r = "10px";
+            var eraser = GreatNoteSvgDataClass.GNSvgCircle({ name: "123", arrayID: constructInitialCondition_1.mainController.mainDocArray["bookmark"], insertPosition: false, dataPointer: false, saveToDatabase: false });
+            eraser.style["cx"] = cx;
+            eraser.style["cy"] = cy;
+            eraser.style["r"] = r;
+            function updateEraserPosition(e) {
+                cx = event["offsetX"] + "px";
+                cy = event["offsetY"] + "px";
+                eraser.style["cx"] = cx;
+                eraser.style["cy"] = cy;
+            }
+            _this.targetPage.addEventListener("mousemove", updateEraserPosition);
+            _this.targetPage.addEventListener("mouseup", function (e) {
+                _this.targetPage.removeEventListener("mousemove", updateEraserPosition);
+                eraser.remove();
+            });
+            _this.targetPage.addEventListener("mouseout", function (e) {
+                // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
+                console.log("You are out of the boundary");
+            });
+            // self.targetPage.svgController
+            self.targetPage.appendChild(eraser);
+            // eraser.appendTo(self.targetPage)
+            // this.targetPage.appendChild(eraser.node)
+        };
+        toolBoxItem.addEventListener("click", function () {
+            console.log("eraser button is activated");
+            self.activateButtonFunction(toolBoxItem);
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.activateButtonFunction = function (toolBoxItem) {
+        if (this.currentActiveButton) {
+            console.log("clear the toolbox button status");
+            this.currentActiveButton.style.background = "gold";
+            this.targetPage.removeEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
+        }
+        toolBoxItem.style.background = "red";
+        this.currentActiveButton = toolBoxItem;
+        this.currentActiveEventName = toolBoxItem.eventName;
+        this.currentActiveEventFunction = toolBoxItem.eventFunction;
+        // this.activateToolboxItem(toolBoxItem)
+        console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction);
+        this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
+    };
+    ToolBoxClass.prototype.registerSvg = function (svgLayer) {
+        var self = this;
+        console.log(226, "registerSvg, yoyoyo");
+        svgLayer.addEventListener("click", function () {
+            console.log("The svg is register to the toolbox");
+            self.targetPage = svgLayer;
+        });
+    };
+    return ToolBoxClass;
+}());
+exports.ToolBoxClass = ToolBoxClass;
+
+},{"./GreatNoteSVGDataClass":47,"./constructInitialCondition":59}],51:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.universalControllerCreater = exports.superController = exports.initializeContainerAndControllerEvent = void 0;
+var basicControllerType_1 = require("./basicControllerType");
+// when the input htmlObject is click, then it will loop all the attribute controllers in the controller array. Check if the controller's type is consistent with the input htmlobject's tagname. If they are consistent, then the controllers will be shown, otherwise, they will be hide.
+// clear the controllers target and then set their newtarget to be the new htmlObject
+function initializeContainerAndControllerEvent(htmlObject, controllerArray) {
+    var _this = this;
+    htmlObject.addEventListener("click", function (e) {
+        _this.GNObjectControllerArray.forEach(function (p) { return p.responseToHtmlType(htmlObject); });
+        console.log(177, _this.GNObjectControllerArray);
+        // e.stopPropagation()
+        controllerArray.forEach(function (p) {
+            p.clear();
+            p.setControllerTarget(htmlObject);
+        });
+    }, false);
+} // initializeContainerAndControllerEvent
+exports.initializeContainerAndControllerEvent = initializeContainerAndControllerEvent;
+function superController(controllerContainer) {
+    // to add some function and common properties to an controller object
+    // controllerContainer.style.display = "none"
+    //** if the controller's targetHTMLType is not equal to the input htmlObject's tagname, then will hide the controller, but if they are the same, then the
+    controllerContainer.responseToHtmlType = function (htmlObject) {
+        console.log(htmlObject.tagName, controllerContainer.targetHTMLType);
+        if (htmlObject.tagName != controllerContainer.targetHTMLType) {
+            console.log("none");
+            controllerContainer.style.display = "none";
+        }
+        else {
+            console.log("visible");
+            controllerContainer.style.display = "block";
+        }
+    };
+    //** ??? don't understand
+    controllerContainer.attachTo = function (htmlObject) {
+        initializeContainerAndControllerEvent(htmlObject, controllerContainer.controllerArray);
+    };
+} // superController
+exports.superController = superController;
+//** to create the type of controller according to the controller type
+// e.g. for
+function universalControllerCreater(name, controllerOptions) {
+    var controllerContainer = document.createElement("div");
+    controllerContainer.classList.add(name);
+    controllerContainer.style.width = "90%";
+    controllerContainer.style.minHeight = "200px";
+    controllerContainer.style.border = "2px black solid";
+    controllerContainer.style.margin = "20px auto";
+    var attributeName = controllerOptions["attributeName"];
+    var unitOptions = controllerOptions["unitOptions"];
+    var selectionList = controllerOptions["selectionList"];
+    if (unitOptions)
+        return basicControllerType_1.inputFieldAndDropdownListController(attributeName, unitOptions);
+    if (selectionList)
+        return basicControllerType_1.dropdownListController(attributeName, selectionList);
+}
+exports.universalControllerCreater = universalControllerCreater;
+
+},{"./basicControllerType":53}],52:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+
+},{}],53:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = void 0;
+// @auto-fold heres
+function inputFieldAndDropdownListController(attributeName, unitOptions) {
+    var controllerContainer = document.createElement("div");
+    controllerContainer.style.display = "grid";
+    controllerContainer.style.gridTemplateColumns = "1fr 3fr 1fr";
+    controllerContainer.classList.add(attributeName + "Controller");
+    var title = document.createElement("span");
+    title.innerText = attributeName;
+    title.style.textAlign = "center";
+    var inputField = document.createElement("input");
+    var dropdownList = document.createElement("select");
+    unitOptions.forEach(function (unit) {
+        var option = document.createElement("option");
+        option.value = unit;
+        option.innerText = unit;
+        dropdownList.appendChild(option);
+    });
+    dropdownList.addEventListener("change", function (e) { return controllerContainer.updateObject(); });
+    inputField.addEventListener("input", function (e) { return controllerContainer.updateObject(); });
+    // to update the value according to the controller values
+    // @auto-fold her
+    controllerContainer.updateObject = function () {
+        if (controllerContainer.controllerTarget) {
+            controllerContainer.controllerTarget.style[attributeName] = inputField.value + dropdownList.value;
+        }
+    };
+    // to extract the input field and unit
+    controllerContainer.extract = function () {
+        return inputField.value + dropdownList.value;
+    };
+    // functions
+    controllerContainer.setControllerTarget = function (object) {
+        controllerContainer.controllerTarget = object;
+    };
+    /** to clear the controller's data when it is dismissed. */
+    controllerContainer.clear = function () {
+        controllerContainer.setControllerTarget(null);
+    };
+    controllerContainer.append(title, inputField, dropdownList);
+    return controllerContainer;
+} // inputFieldAndDropdownListController
+exports.inputFieldAndDropdownListController = inputFieldAndDropdownListController;
+// @auto-fold here
+function dropdownListController(attributeName, selectionList) {
+    var controllerContainer = document.createElement("div");
+    var title = attributeName;
+    var dropdownList = document.createElement("select");
+    selectionList.forEach(function (unit) {
+        var option = document.createElement("option");
+        option.value = unit;
+        option.innerText = unit;
+        dropdownList.appendChild(option);
+    });
+    dropdownList.addEventListener("change", function (e) { return controllerContainer.updateObject(); });
+    controllerContainer.updateObject = function () {
+        if (controllerContainer.controllerTarget) {
+            controllerContainer.controllerTarget.style[attributeName] = dropdownList.value;
+        }
+    };
+    // functions
+    controllerContainer.setControllerTarget = function (object) {
+        controllerContainer.controllerTarget = object;
+    };
+    /** to clear the controller's data when it is dismissed. */
+    controllerContainer.clear = function () {
+        controllerContainer.setControllerTarget(null);
+    };
+    controllerContainer.append(title, dropdownList);
+    return controllerContainer;
+} // dropdownListController
+exports.dropdownListController = dropdownListController;
+// @auto-fold here
+function choiceController(attribute, choiceList, prototype) {
+    var controllerContainer = document.createElement("div");
+    controllerContainer.style.display = "flex";
+    controllerContainer.style["align-items"] = "center";
+    controllerContainer.style["justify-content"] = "left";
+    controllerContainer.style["flex-wrap"] = "wrap";
+    controllerContainer.style.width = "300px";
+    controllerContainer.style.minHeight = "150px";
+    controllerContainer.classList.add(attribute + "Controller");
+    choiceList.forEach(function (choiceValue) {
+        var item = prototype.cloneNode(true);
+        if (attribute == "fill") {
+            item["style"]["background"] = choiceValue;
+            item["style"]["opacity"] = "0.90";
+        }
+        else {
+            // background, stroke can be the attribute in css
+            item["style"][attribute] = choiceValue;
+        }
+        controllerContainer.appendChild(item);
+        item.addEventListener("click", function (e) {
+            var selectedColor = controllerContainer.querySelector("div .selectedColor");
+            if (selectedColor)
+                selectedColor.classList.remove("selectedColor");
+            item.classList.add("selectedColor");
+            // controllerContainer.updateObject(choiceValue)
+        });
+    });
+    //
+    controllerContainer.extract = function () {
+        return controllerContainer.querySelector(".selectedColor")["style"]["background"];
+    };
+    /** to update the value according to the controller values */
+    controllerContainer.updateObject = function (itemValue) {
+        if (controllerContainer.controllerTarget) {
+            controllerContainer.controllerTarget.style[attribute] = itemValue;
+        }
+    };
+    // functions
+    controllerContainer.setControllerTarget = function (object) {
+        controllerContainer.controllerTarget = object;
+    };
+    /** to clear the controller's data when it is dismissed. */
+    controllerContainer.clear = function () {
+        controllerContainer.setControllerTarget(null);
+    };
+    return controllerContainer;
+} // choiceController
+exports.choiceController = choiceController;
+
+},{}],54:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.createSvgCircleControllerContainer = exports.createDivControllerContainer = exports.createPolylineController = void 0;
+var basicControllerType_1 = require("./basicControllerType");
+var attributeControllerHelperFunction_1 = require("./attributeControllerHelperFunction");
+function createPolylineController() {
+    var polylineControllerContainer = document.createElement("div");
+    polylineControllerContainer.classList.add("polylineController");
+    polylineControllerContainer.targetHTMLType = "polyline";
+    // color controller
+    var colorTemplate = document.createElement("div");
+    colorTemplate.style.display = "inline-block";
+    colorTemplate.style["width"] = "50px";
+    colorTemplate.style["height"] = "50px";
+    colorTemplate.style["margin"] = "10px";
+    var polylineStrokeColorController = basicControllerType_1.choiceController("background", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorTemplate);
+    polylineStrokeColorController.classList.add("polylineColorController");
+    var polylineStrokeWidthController = attributeControllerHelperFunction_1.universalControllerCreater("widthController", {
+        attributeName: "width",
+        unitOptions: ["px", "vw", "%"],
+        controllerType: basicControllerType_1.inputFieldAndDropdownListController
+    });
+    polylineStrokeWidthController.classList.add("polylineStrokeWidthController");
+    polylineStrokeWidthController.querySelector("input").value = "10";
+    polylineControllerContainer.controllerArray = [polylineStrokeColorController, polylineStrokeWidthController];
+    polylineControllerContainer.append.apply(polylineControllerContainer, polylineControllerContainer.controllerArray);
+    polylineControllerContainer.extract = function () {
+        var strokeColor = polylineStrokeColorController.extract();
+        var strokeWidth = polylineStrokeWidthController.extract();
+        return [strokeColor, strokeWidth];
+    };
+    attributeControllerHelperFunction_1.superController(polylineControllerContainer);
+    return polylineControllerContainer;
+}
+exports.createPolylineController = createPolylineController;
+function createDivControllerContainer() {
+    var divControllerContainer = document.createElement("div");
+    divControllerContainer.classList.add("divController");
+    divControllerContainer.targetHTMLType = "DIV";
+    // color controller
+    var colorSquare = document.createElement("div");
+    colorSquare.style.display = "inline-block";
+    colorSquare.style["width"] = "50px";
+    colorSquare.style["height"] = "50px";
+    colorSquare.style["margin"] = "10px";
+    var backgroundColorController = basicControllerType_1.choiceController("background", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorSquare);
+    // width Controller
+    var widthController = attributeControllerHelperFunction_1.universalControllerCreater("widthController", {
+        attributeName: "width",
+        unitOptions: ["px", "vw", "%"],
+        controllerType: basicControllerType_1.inputFieldAndDropdownListController
+    });
+    var heightController = attributeControllerHelperFunction_1.universalControllerCreater("widthController", {
+        attributeName: "height",
+        unitOptions: ["px", "vw", "%"],
+        controllerType: basicControllerType_1.inputFieldAndDropdownListController
+    });
+    var positionController = attributeControllerHelperFunction_1.universalControllerCreater("positionController", {
+        attributeName: "position",
+        selectionList: ["none", "relative", "absolute"],
+        controllerType: basicControllerType_1.dropdownListController
+    });
+    divControllerContainer.controllerArray = [widthController, heightController, positionController, backgroundColorController];
+    divControllerContainer.append.apply(divControllerContainer, divControllerContainer.controllerArray);
+    this.superController(divControllerContainer);
+    return divControllerContainer;
+}
+exports.createDivControllerContainer = createDivControllerContainer;
+function createSvgCircleControllerContainer() {
+    var svgCircleContainer = document.createElement("div");
+    svgCircleContainer.classList.add("svgCircleContainer");
+    svgCircleContainer.targetHTMLType = "circle";
+    var radiusController = basicControllerType_1.inputFieldAndDropdownListController("r", ["px", "vw", "%"]);
+    var circleCenterXController = attributeControllerHelperFunction_1.universalControllerCreater("cxController", {
+        attributeName: "cx",
+        unitOptions: ["px", "vw", "%"],
+        controllerType: basicControllerType_1.inputFieldAndDropdownListController
+    });
+    var circleCenterYController = attributeControllerHelperFunction_1.universalControllerCreater("cyController", {
+        attributeName: "cy",
+        unitOptions: ["px", "vw", "%"],
+        controllerType: basicControllerType_1.inputFieldAndDropdownListController
+    });
+    var colorSquare = document.createElement("div");
+    colorSquare.style.display = "inline-block";
+    colorSquare.style["width"] = "50px";
+    colorSquare.style["height"] = "50px";
+    colorSquare.style["margin"] = "10px";
+    var fillController = basicControllerType_1.choiceController("fill", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorSquare);
+    svgCircleContainer.controllerArray = [radiusController, circleCenterXController, circleCenterYController, fillController];
+    svgCircleContainer.append.apply(svgCircleContainer, svgCircleContainer.controllerArray);
+    this.superController(svgCircleContainer);
+    return svgCircleContainer;
+} // createSvgCircleControllerContainer
+exports.createSvgCircleControllerContainer = createSvgCircleControllerContainer;
+
+},{"./attributeControllerHelperFunction":51,"./basicControllerType":53}],55:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.initializeMainControllerAttributeControllerMapping = void 0;
+var highLevelController_1 = require("./highLevelController");
+//** to initialize the main controller attribute controller mapping so that other objects can access tthe attribute controllers through the mainController
+function initializeMainControllerAttributeControllerMapping(mainController) {
+    var polylineController = highLevelController_1.createPolylineController();
+    mainController.attributeControllerMapping = {
+        polylineController: polylineController
+    };
+}
+exports.initializeMainControllerAttributeControllerMapping = initializeMainControllerAttributeControllerMapping;
+
+},{"./highLevelController":54}],56:[function(require,module,exports){
 //
 //
 // function renderLatex(latexMotherCell, latexChildCell){
@@ -26648,9 +27105,9 @@ exports.ToolBoxClass = ToolBoxClass;
 //     renderLatex(latexInput, latexOutput)
 // })
 
-},{}],51:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 
-},{}],52:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26695,14 +27152,17 @@ function buildInitialPage(mainController, saveToDatabase) {
     var currentStatus = mainController.pageCurrentStatus;
     var pageFullArray = mainController.mainDoc["array"][0]["array"];
     var pageOverviewArray = mainController.mainDoc["array"][1]["array"];
+    console.log("pageFullArray", pageFullArray);
     var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
     var overviewModeDiv = document.querySelector(".overviewModeDiv");
     for (var i = 0; i < pageFullArray.length; i++) {
         var _a = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
+        console.log(37, pageFullArray[i], newPage);
+        mainController.renderDataToHTML(pageFullArray[i], newPage);
         // console.log(pageFullArray[i])
         pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
     }
-}
+} // buildInitialPage
 exports.buildInitialPage = buildInitialPage;
 function buildInitialHTMLSkeleton(mainController) {
     var toolBoxController = new ToolBoxModel.ToolBoxClass();
@@ -26718,17 +27178,13 @@ function buildInitialHTMLSkeleton(mainController) {
     var bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true);
     var bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent");
     var currentStatus = mainController.pageCurrentStatus;
+    // toolBoxObject
+    var toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
+    var polylineItemButton = mainController.toolBox.createNewPolyLineItemButton(toolBoxHtmlObject);
+    var eraserItemButton = mainController.toolBox.createEraserItemButton(toolBoxHtmlObject);
     // create subPanel
     var pageControllerSubPanel = pageViewHelperFunction.createSubPanel("pageController", true);
     var pageControllerSubPanelContent = pageControllerSubPanel.querySelector(".subPanelContent");
-    var item1 = pageViewHelperFunction.createSubPanelItem("A");
-    var item2 = pageViewHelperFunction.createSubPanelItem("B");
-    var item3 = pageViewHelperFunction.createSubPanelItem("C");
-    var item4 = pageViewHelperFunction.createSubPanelItem("D");
-    // let item5 = pageViewHelperFunction.createSubPanelItem("E")
-    // let item6 = pageViewHelperFunction.createSubPanelItem("F")
-    // let item7 = pageViewHelperFunction.createSubPanelItem("G")
-    // let item8 = pageViewHelperFunction.createSubPanelItem("H")
     var editorControllerTemplate = document.querySelector("#editControllerTemplate");
     var editorController = editorControllerTemplate.content.cloneNode(true);
     var copyButton = editorController.querySelector(".copyButton");
@@ -26739,7 +27195,7 @@ function buildInitialHTMLSkeleton(mainController) {
         var nameOfGNtype = selectedObject._type;
         var selectedObjectData = selectedObject.extract();
         selectedObjectData["data"]["cx"] += 100;
-        var copiedObject = mainController.createGNObjectThroughName(nameOfGNtype, "", selectedObject.getAccessPointer(), false, false, false, false);
+        var copiedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: "", insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: false });
         copiedObject.loadFromData(selectedObjectData);
         console.log(88, selectedObjectData, copiedObject);
         selectedObject.parentNode.appendChild(copiedObject);
@@ -26751,7 +27207,7 @@ function buildInitialHTMLSkeleton(mainController) {
         selectedObjectData["data"]["cx"] += 100;
         //_name:string, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean=true
         var parentContainerObjectID = selectedObject.parentNode.getAccessPointer();
-        var linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, "", parentContainerObjectID, false, selectedObject.getAccessPointer(), true);
+        var linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: parentContainerObjectID, insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: true });
         linkedObject.loadFromData(selectedObjectData);
         console.log(88, selectedObjectData, linkedObject);
         selectedObject.parentNode.appendChild(linkedObject);
@@ -26766,12 +27222,63 @@ function buildInitialHTMLSkeleton(mainController) {
     addInputFieldButton.innerText = "addInput";
     addInputFieldButton.addEventListener("click", function () {
         var currentPage = mainController.pageCurrentStatus.currentPage;
-        var newInputField = GreatNoteDataClass.GNInputField("", currentPage.getAccessPointer(), false, false, true);
+        var newInputField = GreatNoteDataClass.GNInputField({ name: "", arrayID: currentPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true });
         newInputField.appendTo(currentPage);
+    });
+    var addSvgDivButton = document.createElement("button");
+    addSvgDivButton.innerText = "addSvg";
+    addSvgDivButton.addEventListener("click", function () {
+        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var svgBoard = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        svgBoard.addEventListener("click", function () {
+            mainController.toolBox.targetPage = svgBoard;
+        });
+        svgBoard.appendToContainer(currentPage);
+        // console.log(135, currentPage, currentPage.getAccessPointer())
+    });
+    var syncButton = document.createElement("button");
+    syncButton.innerText = "sync";
+    syncButton.addEventListener("click", function () {
         socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
     });
-    editorController.appendChild(addInputFieldButton);
-    pageControllerSubPanelContent.append(item1, item2, item3, item4, editorController);
+    var showMainDocButton = document.createElement("button");
+    showMainDocButton.innerText = "mainDoc";
+    showMainDocButton.addEventListener("click", function () {
+        console.log(153, mainController.mainDoc["array"][0]["array"], mainController);
+    });
+    var resetButton = document.createElement("button");
+    resetButton.innerText = "resetButton";
+    resetButton.addEventListener("click", function () {
+        mainController.initalizeMainDoc();
+        var saveData = mainController.saveMainDoc(true);
+    });
+    editorController.append(addInputFieldButton, addSvgDivButton, syncButton, showMainDocButton, resetButton);
+    // layerController
+    var layerControllerTemplate = document.querySelector("#layerControllerTemplate");
+    var layerControllerHTMLObject = layerControllerTemplate.content.cloneNode(true);
+    var addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton");
+    addDivLayerButton.addEventListener("click", function () {
+        var currentPage = mainController.pageCurrentStatus.currentPage;
+        console.log("add a new div layer");
+        var divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        divLayer.applyStyle({ width: "100%", height: "100%", background: "blue", "position": "absolute", "left": "0px", "right": "0px" });
+        divLayer.classList.add("divLayer");
+        divLayer.appendTo(currentPage);
+    });
+    var addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton");
+    addSvgLayerButton.addEventListener("click", function () {
+        console.log("add a new svg layer");
+        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        console.log(mainController.toolBox.registerSvg);
+        mainController.toolBox.registerSvg(svgLayer);
+        svgLayer.applyStyle({ width: "100%", height: "100%", background: "gold", position: "absolute", left: "0px", top: "0px" });
+        mainController.saveHTMLObjectToDatabase(svgLayer);
+        console.log(svgLayer);
+        svgLayer.classList.add("svgLayer");
+        svgLayer.appendTo(currentPage);
+    });
+    pageControllerSubPanelContent.append(toolBoxHtmlObject, polylineItemButton, editorController, layerControllerHTMLObject);
     //===================== bookmarkSubPanel ==================//
     /** add new div, new svg*/
     // page controller
@@ -26782,7 +27289,7 @@ function buildInitialHTMLSkeleton(mainController) {
     var saveButton = document.createElement("button");
     saveButton.innerHTML = "saveButton";
     saveButton.addEventListener("click", function () {
-        // let saveData = mainController.saveMainDoc(true)
+        var saveData = mainController.saveMainDoc(true);
     });
     var createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function (e) {
     });
@@ -26799,7 +27306,7 @@ function buildInitialHTMLSkeleton(mainController) {
 }
 exports.buildInitialHTMLSkeleton = buildInitialHTMLSkeleton;
 
-},{"./GreatNoteDataClass":46,"./GreatNoteSvgDataClass":48,"./ToolBoxModel":49,"./pageViewHelperFunction":57,"./socketFunction":58}],53:[function(require,module,exports){
+},{"./GreatNoteDataClass":46,"./GreatNoteSvgDataClass":48,"./ToolBoxModel":49,"./pageViewHelperFunction":62,"./socketFunction":63}],59:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26825,6 +27332,8 @@ exports.mainController = exports.MainController = exports.MainDocArrayEnum = voi
 var Automerge = __importStar(require("automerge"));
 var buildInitialPageHelperFunctions = __importStar(require("./buildInitialPageHelperFunctions"));
 var socketFunction_1 = require("./socketFunction");
+var databaseHelperFunction_1 = require("./databaseHelperFunction");
+var InitializeAttributeControllerFunction = __importStar(require("./attributeControllerFolder/initializeAttributeControllers"));
 var MainDocArrayEnum;
 (function (MainDocArrayEnum) {
     MainDocArrayEnum["mainArray_pageFull"] = "mainArray_pageFull";
@@ -26851,6 +27360,9 @@ var mainArrayData = {
     }
 };
 var MainController = /** @class */ (function () {
+    // *****************************
+    // *     A. Initialization     *
+    // *****************************
     //@auto-fold here
     function MainController() {
         this.initializeRootArray();
@@ -26859,6 +27371,10 @@ var MainController = /** @class */ (function () {
         this.pageCurrentStatus = {
             "newPageNumber": 1,
             "newPageDirection": 1,
+            "pendingObject": {
+                "newPage": new Set(),
+                "newPageArray": []
+            },
             "currentPage": 0,
             "previousPage": 0,
             "nextPage": 0,
@@ -26913,12 +27429,15 @@ var MainController = /** @class */ (function () {
         });
         this.previousDoc = this.mainDoc;
     }; // initalizeMainDoc
+    // ******************************************
+    // *     B. Modify data in the database     *
+    // ******************************************
     /** to append data to the database
     return: the HTMLObject related to, the accessID of the object in the database
     the last paraameter is used only for the first tiee to initialize the object, no need to worry about it when used later
     */
     //@auto-fold here
-    MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer) {
+    MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer, specialCreationMessage) {
         // Step 1: register an accessPointer in the database
         //@auto-fold here
         var _this = this;
@@ -26934,7 +27453,6 @@ var MainController = /** @class */ (function () {
         var objectSymbolArray = Object.getOwnPropertySymbols(arrayToBeAttachedTo[insertPosition]);
         var accessPointer = arrayToBeAttachedTo[insertPosition][objectSymbolArray[1]];
         // create new object data
-        console.log("an object is created in the database");
         var objectData = htmlObject.extract();
         objectData._identity.accessPointer = accessPointer;
         objectData._identity.dataPointer = accessPointer;
@@ -26944,8 +27462,7 @@ var MainController = /** @class */ (function () {
         }
         // Step 3: put real data into the database
         //@auto-fold here
-        var createMessage = { "action": "create", "objectID": accessPointer, "parentHTMLObjectId": arrayID };
-        console.log(202, "here is the create message", createMessage);
+        var createMessage = { "action": "create", "objectID": accessPointer, "parentHTMLObjectId": arrayID, "specialCreationMessage": specialCreationMessage };
         this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(createMessage), function (doc) {
             // add the data to the object
             var objectInDatabase = Automerge.getObjectById(doc, accessPointer);
@@ -26958,17 +27475,12 @@ var MainController = /** @class */ (function () {
                 var masterObject = _this.getObjectById(dataPointer, doc);
                 masterObject._identity.linkArray.push(accessPointer);
                 var masterObjectHtmlElement = _this.getHtmlObjectByID(dataPointer);
-                console.log(209, masterObjectHtmlElement);
-                masterObjectHtmlElement === null || masterObjectHtmlElement === void 0 ? void 0 : masterObjectHtmlElement._identity.linkArray.push(accessPointer);
+                masterObjectHtmlElement === null || masterObjectHtmlElement === void 0 ? void 0 : masterObjectHtmlElement._identity.linkArray.push(accessPointer); // **** this line may be deleted because we do not need to access the linkArray of the master object
             }
         });
         htmlObject._identity = objectData._identity;
         return [htmlObject, accessPointer];
     }; // addData
-    MainController.prototype.getHtmlObjectByID = function (objectID) {
-        return document.querySelector("*[accessPointer='" + objectID + "']");
-        document.querySelector("*[accessPointer='c705e759-caeb-4bb3-83ce-ddfe44270ad5']");
-    };
     /** A function to update the data store in the database. There are two types of update, the first is to update the data in the dataAccess Point. Another is to update self  identity and its style.
     The last parameter updateType has two kinds. The first one is called dataPointer type.
     The second type is called accessPointer typer.
@@ -26997,6 +27509,7 @@ var MainController = /** @class */ (function () {
     };
     //@auto-fold here
     /** to initiate the data so that you can store the data to the db*/
+    // **** can be deleted later
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
         var _dummyData = {
@@ -27044,74 +27557,94 @@ var MainController = /** @class */ (function () {
         });
         socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
     }; // saveHTMLObjectToDatabase
+    // ******************************************
+    // *     C. Access data in the database     *
+    // ******************************************
     //@auto-fold here
     MainController.prototype.getObjectById = function (objectID, doc) {
         if (doc === void 0) { doc = this.mainDoc; }
-        var object = Automerge.getObjectById(doc, objectID);
-        return object;
+        return Automerge.getObjectById(doc, objectID);
+    };
+    //@auto-fold here
+    MainController.prototype.getLinkArrayFromID = function (objectID) {
+        return this.getObjectById(objectID)._identity.linkArray;
+    };
+    //@auto-fold here
+    MainController.prototype.getHtmlObjectByID = function (objectID) {
+        return document.querySelector("*[accessPointer='" + objectID + "']");
     };
     // @auto-fold here
     MainController.prototype.getMainDocChange = function () {
-        var changes = Automerge.getChanges(this.previousDoc, this.mainDoc);
-        return changes;
+        return Automerge.getChanges(this.previousDoc, this.mainDoc);
     };
-    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database */
+    // **********************************
+    // *     E. Build up the page       *
+    // **********************************
+    MainController.prototype.buildInitialHTMLSkeleton = function () {
+        buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(this);
+    }; // buildInitialHTMLSkeleton
+    MainController.prototype.buildPageFromMainDoc = function () {
+        buildInitialPageHelperFunctions.buildInitialPage(this);
+    }; // 2. buildPageFromMainDoc
+    /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database, not array, but the object includes array property */
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
-        if (!arrayHTMLObject) {
-            // this is for looping the mainArray so that they can get the initial aattach div of the HTML doc
-            // get the mainArray Object from mainArrayData
-            data.forEach(function (p) {
-                var mainArrayData_item = mainArrayData[p["data"]["name"]];
-                // if not in the mainArrayData, just skill it
-                if (mainArrayData_item) {
-                    var initialHTMLObjectClassName = mainArrayData_item["arrayHTMLObject"];
-                    var initialHTMLObject_1 = document.querySelector("." + initialHTMLObjectClassName);
-                    // for each elem in the main array
-                    p.array.forEach(function (elem) {
-                        _this.renderDataToHTML(elem, initialHTMLObject_1);
-                    });
-                } // if mainArrayData_item
-                // if (mainArrayData_item.startsWith("mainArray_")){
-                // }
-                // renderDataToHTML(p, )
-            });
-        }
-        else {
-            var newHTMLObject_1;
-            if (data.GNType == "GNButton") {
-                newHTMLObject_1 = this.GNDataStructureMapping["GNButton"]("name", ["yes", "no"], data._identity.accessPointer, false, data._identity.dataPointer);
+        var newHTMLObject;
+        console.log(329, data, arrayHTMLObject);
+        // cannot save any obeject to the data base here
+        data["array"].forEach(function (p) {
+            console.log(331, p);
+            if (p.GNType == "GNSvg") {
+                // cannot save any obeject to the data base here because this will create an infinity loop and will append new obejct forever
+                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
+                newHTMLObject._identity = p._identity;
+                var objectData = newHTMLObject.getDataFromDataBase();
+                console.log(352, objectData);
+                newHTMLObject.applyStyle(objectData.stylesheet);
+                newHTMLObject.addEventListener("click", function () {
+                    exports.mainController.toolBox.targetPage = newHTMLObject;
+                });
             }
-            else if (data.GNType == "GNSvg") {
-                newHTMLObject_1 = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+            if (p.GNType == "GNContainerDiv") {
+                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
+                newHTMLObject._identity = p._identity;
+                var objectData = newHTMLObject.getDataFromDataBase();
+                console.log(352, objectData);
+                newHTMLObject.applyStyle(objectData.stylesheet);
             }
-            else {
-                newHTMLObject_1 = this.GNDataStructureMapping[data.GNType]("name", data._identity.accessPointer, false, data._identity.dataPointer);
+            if (p.GNType == "GNSvgPolyLine") {
+                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
+                newHTMLObject._identity = p._identity;
+                //
+                var newPolylineData = newHTMLObject.getDataFromDataBase();
+                console.log(340, newPolylineData);
+                newHTMLObject.loadFromData(newPolylineData["data"]);
+                var stylesheet = newPolylineData["stylesheet"];
+                newHTMLObject.applyStyle({ "stroke": stylesheet["stroke"], "stroke-width": stylesheet["stroke-width"], "fill": stylesheet["fill"] });
             }
-            if (newHTMLObject_1.loadFromData)
-                newHTMLObject_1.loadFromData(data);
-            newHTMLObject_1.applyStyle(data.stylesheet);
-            arrayHTMLObject.appendChild(newHTMLObject_1);
-            data.array.forEach(function (_data) {
-                _this.renderDataToHTML(_data, newHTMLObject_1);
-            });
-        }
-    };
+            if (newHTMLObject) {
+                arrayHTMLObject.appendChild(newHTMLObject);
+                newHTMLObject.setAttribute("accessPointer", p._identity.accessPointer);
+                _this.renderDataToHTML(p, newHTMLObject);
+            }
+        });
+    }; // 3. renderDataToHTML
+    MainController.prototype.createGNObjectThroughName = function (objectName, createData) {
+        var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
+        return this.GNDataStructureMapping[objectName](name, arrayID, insertPosition, dataPointer, saveToDatabase);
+    }; // 4. createGNObjectThroughName
     //@auto-fold here
     MainController.prototype.saveMainDoc = function (sendRequest) {
         if (sendRequest === void 0) { sendRequest = false; }
-        // console.log(388, "saveMainDoc", this.mainDoc)
         var saveData = Automerge.save(this.mainDoc);
         if (sendRequest) {
+            console.log(407, "save data to the server");
             socketFunction_1.socket.emit("saveMainDocToDisk", saveData);
             return saveData;
         }
         else {
             return saveData;
         }
-    };
-    MainController.prototype.getLinkArrayFromID = function (objectID) {
-        return this.getObjectById(objectID)._identity.linkArray;
     };
     MainController.prototype.getLoadDataFromSocket = function () {
         var loadData = false;
@@ -27124,12 +27657,6 @@ var MainController = /** @class */ (function () {
         //         buildInitialPageHelperFunctions.buildInitialPage(this)
         //       })
         // }
-    };
-    MainController.prototype.buildInitialHTMLSkeleton = function () {
-        buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(this);
-    };
-    MainController.prototype.buildPageFromMainDoc = function () {
-        buildInitialPageHelperFunctions.buildInitialPage(this);
     };
     //@auto-fold here
     //@auto-fold here
@@ -27146,39 +27673,20 @@ var MainController = /** @class */ (function () {
             _this.mainDocArray[arrayName] = arrayID;
         });
     }; // loadMain
-    MainController.prototype.createGNObjectThroughName = function (objectName, name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-        if (saveToDatabase === void 0) { saveToDatabase = true; }
-        console.log(this.GNDataStructureMapping);
-        return this.GNDataStructureMapping[objectName](name, arrayID, insertPosition, dataPointer, saveToDatabase);
-    };
     MainController.prototype.processChangeData = function (changeDataArray) {
         var _this = this;
         var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
-        console.log("429 the changgeDataArray is ", jsonfiedChangeDataArray);
+        console.log(447, jsonfiedChangeDataArray);
         jsonfiedChangeDataArray.forEach(function (p) {
             var changeData = p;
-            console.log("432, changeData", changeData);
             if (changeData.action == "create") {
-                var objectData = _this.getObjectById(changeData.objectID);
-                var newHTMLObject = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
-                if (!newHTMLObject) {
-                    newHTMLObject = _this.createGNObjectThroughName(objectData.GNType, "", "", false, false, false);
-                    newHTMLObject.initializeHTMLObjectFromData(objectData);
-                    var parentHTMLObject = _this.getHtmlObjectByID(changeData.parentHTMLObjectId);
-                    console.log("action = create", changeData.objectID, parentHTMLObject, objectData, newHTMLObject);
-                    if (parentHTMLObject) {
-                        parentHTMLObject.appendChild(newHTMLObject);
-                    }
-                    console.log(newHTMLObject, changeData.parentHTMLObjectId);
-                }
+                databaseHelperFunction_1.processCreationDataHelper(_this, changeData);
             } // create
             if (changeData.action == "update") {
                 var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
-                console.log(_object);
-                // let object = document.querySelector(`.divPage[pageNumber='4'] input`)
+                // console.log(457, _object, changeData.objectID)
                 var objectData = exports.mainController.getObjectById(changeData.objectID);
                 _object.reloadDataFromDatabase();
-                // object.processUpdateData()
             }
         });
     };
@@ -27186,257 +27694,27 @@ var MainController = /** @class */ (function () {
 }());
 exports.MainController = MainController;
 exports.mainController = new MainController();
-// mainController.getLoadDataFromSocket()
-socketFunction_1.socket.emit("initialDataRequest");
-
-},{"./buildInitialPageHelperFunctions":52,"./socketFunction":58,"automerge":1}],54:[function(require,module,exports){
-arguments[4][51][0].apply(exports,arguments)
-},{"dup":51}],55:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = exports.AttributeControllerClass = exports.controllerCreater = void 0;
 //
-var widthController;
-var heightController;
-var backgroundColorController;
-var radiusController;
-var circleCenterXController;
-var circleCenterYController;
-var fillController;
-var allController = {
-    divController: [widthController, heightController, backgroundColorController],
-    svgCircleController: [radiusController, circleCenterXController, circleCenterYController, fillController]
-};
-function controllerCreater(name, controllerOptions) {
-    var controllerContainer = document.createElement("div");
-    controllerContainer.classList.add(name);
-    controllerContainer.style.width = "90%";
-    controllerContainer.style.minHeight = "200px";
-    controllerContainer.style.border = "2px black solid";
-    controllerContainer.style.margin = "20px auto";
-    var controllerType = controllerOptions["controllerType"];
-    var attributeName = controllerOptions["attributeName"];
-    var unitOptions = controllerOptions["unitOptions"];
-    var selectionList = controllerOptions["selectionList"];
-    if (unitOptions)
-        return controllerType(attributeName, unitOptions);
-    if (selectionList)
-        return controllerType(attributeName, selectionList);
-}
-exports.controllerCreater = controllerCreater;
-var AttributeControllerClass = /** @class */ (function () {
-    // @auto-fold here
-    function AttributeControllerClass() {
-        this.GNObjectControllerArray = [];
-    }
-    AttributeControllerClass.prototype.createDivControllerContainer = function () {
-        var divControllerContainer = document.createElement("div");
-        divControllerContainer.classList.add("divController");
-        divControllerContainer.targetHTMLType = "DIV";
-        // color controller
-        var colorSquare = document.createElement("div");
-        colorSquare.style.display = "inline-block";
-        colorSquare.style["width"] = "50px";
-        colorSquare.style["height"] = "50px";
-        colorSquare.style["margin"] = "10px";
-        var backgroundColorController = choiceController("background", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorSquare);
-        // width Controller
-        var widthController = controllerCreater("widthController", {
-            attributeName: "width",
-            unitOptions: ["px", "vw", "%"],
-            controllerType: inputFieldAndDropdownListController
-        });
-        var heightController = controllerCreater("widthController", {
-            attributeName: "height",
-            unitOptions: ["px", "vw", "%"],
-            controllerType: inputFieldAndDropdownListController
-        });
-        var positionController = controllerCreater("positionController", {
-            attributeName: "position",
-            selectionList: ["none", "relative", "absolute"],
-            controllerType: dropdownListController
-        });
-        divControllerContainer.controllerArray = [widthController, heightController, positionController, backgroundColorController];
-        divControllerContainer.append.apply(divControllerContainer, divControllerContainer.controllerArray);
-        this.superController(divControllerContainer);
-        this.GNObjectControllerArray.push(divControllerContainer);
-        return divControllerContainer;
-    };
-    AttributeControllerClass.prototype.createSvgCircleControllerContainer = function () {
-        var svgCircleContainer = document.createElement("div");
-        svgCircleContainer.classList.add("svgCircleContainer");
-        svgCircleContainer.targetHTMLType = "circle";
-        var radiusController = inputFieldAndDropdownListController("r", ["px", "vw", "%"]);
-        var circleCenterXController = controllerCreater("cxController", {
-            attributeName: "cx",
-            unitOptions: ["px", "vw", "%"],
-            controllerType: inputFieldAndDropdownListController
-        });
-        var circleCenterYController = controllerCreater("cyController", {
-            attributeName: "cy",
-            unitOptions: ["px", "vw", "%"],
-            controllerType: inputFieldAndDropdownListController
-        });
-        var colorSquare = document.createElement("div");
-        colorSquare.style.display = "inline-block";
-        colorSquare.style["width"] = "50px";
-        colorSquare.style["height"] = "50px";
-        colorSquare.style["margin"] = "10px";
-        var fillController = choiceController("fill", ["red", "blue", "green", "black", "yellow", "grey", "gold", "silver", "pink"], colorSquare);
-        svgCircleContainer.controllerArray = [radiusController, circleCenterXController, circleCenterYController, fillController];
-        svgCircleContainer.append.apply(svgCircleContainer, svgCircleContainer.controllerArray);
-        this.superController(svgCircleContainer);
-        this.GNObjectControllerArray.push(svgCircleContainer);
-        return svgCircleContainer;
-    };
-    AttributeControllerClass.prototype.superController = function (controllerContainer) {
-        var self = this;
-        controllerContainer.style.display = "none";
-        controllerContainer.responseToHtmlType = function (htmlObject) {
-            console.log(htmlObject.tagName, controllerContainer.targetHTMLType);
-            if (htmlObject.tagName != controllerContainer.targetHTMLType) {
-                console.log("none");
-                controllerContainer.style.display = "none";
-            }
-            else {
-                console.log("visible");
-                controllerContainer.style.display = "block";
-            }
-        };
-        controllerContainer.attachTo = function (htmlObject) {
-            self.initializeContainerAndControllerEvent(htmlObject, controllerContainer.controllerArray);
-        };
-    };
-    AttributeControllerClass.prototype.initializeContainerAndControllerEvent = function (htmlObject, controllerArray) {
-        var _this = this;
-        htmlObject.addEventListener("click", function (e) {
-            _this.GNObjectControllerArray.forEach(function (p) { return p.responseToHtmlType(htmlObject); });
-            console.log(177, _this.GNObjectControllerArray);
-            e.stopPropagation();
-            controllerArray.forEach(function (p) {
-                p.clear();
-                p.setControllerTarget(htmlObject);
-            });
-        }, false);
-    };
-    return AttributeControllerClass;
-}());
-exports.AttributeControllerClass = AttributeControllerClass;
-// @auto-fold here
-function inputFieldAndDropdownListController(attributeName, unitOptions) {
-    var controllerContainer = document.createElement("div");
-    controllerContainer.style.display = "grid";
-    controllerContainer.style.gridTemplateColumns = "1fr 3fr 1fr";
-    controllerContainer.classList.add(attributeName + "Controller");
-    var title = document.createElement("span");
-    title.innerText = attributeName;
-    title.style.textAlign = "center";
-    var inputField = document.createElement("input");
-    var dropdownList = document.createElement("select");
-    unitOptions.forEach(function (unit) {
-        var option = document.createElement("option");
-        option.value = unit;
-        option.innerText = unit;
-        dropdownList.appendChild(option);
-    });
-    dropdownList.addEventListener("change", function (e) { return controllerContainer.updateObject(); });
-    inputField.addEventListener("input", function (e) { return controllerContainer.updateObject(); });
-    // to update the value according to the controller values
-    // @auto-fold her
-    controllerContainer.updateObject = function () {
-        if (controllerContainer.controllerTarget) {
-            controllerContainer.controllerTarget.style[attributeName] = inputField.value + dropdownList.value;
-        }
-    };
-    // functions
-    controllerContainer.setControllerTarget = function (object) {
-        controllerContainer.controllerTarget = object;
-    };
-    /** to clear the controller's data when it is dismissed. */
-    controllerContainer.clear = function () {
-        controllerContainer.setControllerTarget(null);
-    };
-    controllerContainer.append(title, inputField, dropdownList);
-    return controllerContainer;
-} // inputFieldAndDropdownListController
-exports.inputFieldAndDropdownListController = inputFieldAndDropdownListController;
-// @auto-fold here
-function dropdownListController(attributeName, selectionList) {
-    var controllerContainer = document.createElement("div");
-    var title = attributeName;
-    var dropdownList = document.createElement("select");
-    selectionList.forEach(function (unit) {
-        var option = document.createElement("option");
-        option.value = unit;
-        option.innerText = unit;
-        dropdownList.appendChild(option);
-    });
-    dropdownList.addEventListener("change", function (e) { return controllerContainer.updateObject(); });
-    controllerContainer.updateObject = function () {
-        if (controllerContainer.controllerTarget) {
-            controllerContainer.controllerTarget.style[attributeName] = dropdownList.value;
-        }
-    };
-    // functions
-    controllerContainer.setControllerTarget = function (object) {
-        controllerContainer.controllerTarget = object;
-    };
-    /** to clear the controller's data when it is dismissed. */
-    controllerContainer.clear = function () {
-        controllerContainer.setControllerTarget(null);
-    };
-    controllerContainer.append(title, dropdownList);
-    return controllerContainer;
-}
-exports.dropdownListController = dropdownListController;
-// @auto-fold here
-function choiceController(attribute, choiceList, prototype) {
-    var controllerContainer = document.createElement("div");
-    controllerContainer.style.display = "flex";
-    controllerContainer.style["align-items"] = "center";
-    controllerContainer.style["justify-content"] = "left";
-    controllerContainer.style["flex-wrap"] = "wrap";
-    controllerContainer.style.width = "300px";
-    controllerContainer.style.minHeight = "150px";
-    controllerContainer.classList.add(attribute + "Controller");
-    choiceList.forEach(function (choiceValue) {
-        var item = prototype.cloneNode(true);
-        if (attribute == "fill") {
-            item["style"]["background"] = choiceValue;
-        }
-        else {
-            item["style"][attribute] = choiceValue;
-        }
-        controllerContainer.appendChild(item);
-        item.addEventListener("click", function (e) {
-            controllerContainer.updateObject(choiceValue);
-        });
-    });
-    /** to update the value according to the controller values */
-    controllerContainer.updateObject = function (itemValue) {
-        if (controllerContainer.controllerTarget) {
-            controllerContainer.controllerTarget.style[attribute] = itemValue;
-        }
-    };
-    // functions
-    controllerContainer.setControllerTarget = function (object) {
-        controllerContainer.controllerTarget = object;
-    };
-    /** to clear the controller's data when it is dismissed. */
-    controllerContainer.clear = function () {
-        controllerContainer.setControllerTarget(null);
-    };
-    return controllerContainer;
-}
-exports.choiceController = choiceController;
+// to create toolbox
+//
+var ToolBoxModel = __importStar(require("./ToolboxModel"));
+exports.mainController.toolBox = new ToolBoxModel.ToolBoxClass();
+//
+// to create the attributeControllers
+//
+var panelContainer = document.querySelector(".panelContainer");
+InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(exports.mainController);
+Object.values(exports.mainController.attributeControllerMapping).forEach(function (p) {
+    panelContainer.appendChild(p);
+});
+//
+// mainController.getLoadDataFromSocket()
+//
+socketFunction_1.socket.emit("initialDataRequest");
+// buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(mainController)
+// buildInitialPageHelperFunctions.buildInitialPage()
 
-},{}],56:[function(require,module,exports){
-// import * as Automerge from 'automerge'
-// import {mainController} from "./constructInitialCondition"
-// import * as GreatNoteDataClass from "./GreatNoteDataClass"
-// let pkmDatabase = [{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cf47f9fac4ed3037ff2a8ea83204e32aff8fb5f3.png","number":"001","name":"妙蛙種子","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3245e4f8c04aa0619cb31884dbf123c6918b3700.png","number":"002","name":"妙蛙草","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0186d64c5773c8d3d03cd05dc79574b2d2798d4f.png","number":"003","name":"妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3bfcc4360c44f37815dc1e59f75818935cbfc41b.png","number":"003","name":"超級妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6b55babb3825ef9fa9e5d9ff44a14bdb8406ce97.png","number":"003","name":"妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d0ee81f16175c97770192fb691fdda8da1f4f349.png","number":"004","name":"小火龍","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/285395ca77d82861fd30cea64567021a50c1169c.png","number":"005","name":"火恐龍","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2050f1fd1283f473d7d048f8631712e7e003f802.png","number":"006","name":"噴火龍","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ca3db4aad5c85a525d9be86852b26db1db7a22c0.png","number":"006","name":"超級噴火龍Ｘ","type":"火, 龍"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0aa78a0061bda9d88cbb0bbf739cd9cc56522fe9.png","number":"006","name":"超級噴火龍Ｙ","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fd12098f15628cce80d411e090189aeb7d758ff.png","number":"006","name":"噴火龍","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5794f0251b1180998d72d1f8568239620ff5279c.png","number":"007","name":"傑尼龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a3bc17e6215031332462cc64e59b7922ddd14b91.png","number":"008","name":"卡咪龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fe157db59153af8abd636ab03c7df6f28b08242.png","number":"009","name":"水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00186af714a048895ba8116e71b08671c3cfb8f5.png","number":"009","name":"超級水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/50eba0f85c4e9a039be078e7de0b10acc7323264.png","number":"009","name":"水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/68f0cec6bcba20a0c53db3d8cfce81bd319d2c82.png","number":"010","name":"綠毛蟲","type":"蟲"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/05fd4676fa4a4b58288510a97a5211e066e02464.png","number":"011","name":"鐵甲蛹","type":"蟲"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eacd20285cb634ba9fea41fc0fa13871c2fcbc66.png","number":"012","name":"巴大蝶","type":"蟲, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b76026363e301dbd8ac3f084e7d242232c46c95f.png","number":"012","name":"巴大蝶","type":"蟲, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5ae74d403ec682eaf13e066850afd4b0c20d85f7.png","number":"013","name":"獨角蟲","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd41f31a3c97f1f9d998361b125362584873157b.png","number":"014","name":"鐵殼蛹","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/70f4206271b72492c9ba71d708d6183a80ba0e96.png","number":"015","name":"大針蜂","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e12ce48ab99b2df6fbbc1e97038c4f6e192d09d7.png","number":"015","name":"超級大針蜂","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0e7c6e616404c683f00701b591eeab56e465641a.png","number":"016","name":"波波","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a2935587b7c61e6e6da88da3578d700c133246e5.png","number":"017","name":"比比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/01e13954dff668c1420407c98b308c81b83f6dda.png","number":"018","name":"大比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd6ab4ce8e7d05fb74e50cf66764e3ed8e11a097.png","number":"018","name":"超級大比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e4b38ab7545ebd938154d9aed9502cb068569d6.png","number":"019","name":"小拉達","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3567693e3479fb0cf15b9ec84ee8a033aa7b4310.png","number":"019","name":"小拉達","type":"惡, 一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e97c62e4e4b46017be60806d00f4d389d003f115.png","number":"020","name":"拉達","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a30454b7040a4a517bfe0914777e2e7c045f6c65.png","number":"020","name":"拉達","type":"惡, 一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e815cb4b8ba9c2d0841dfa364c87164880944e3a.png","number":"021","name":"烈雀","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b326a6f77b73b3c250ba95f3a97fc21b28c8f4b.png","number":"022","name":"大嘴雀","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ad90ec632849d032615d707ebe8ad741651eee06.png","number":"023","name":"阿柏蛇","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eb3c14ed44c1e4a2ba4c2d7970cddf07cd8ef67f.png","number":"024","name":"阿柏怪","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b3f6ff00db7a1efae21d85cfb8995eaff2da8d8.png","number":"025","name":"皮卡丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a90881f103830615ee7f85e16fe9f586d41f2332.png","number":"025","name":"皮卡丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9c28defa939e230800ec0d0c421d9f82c60df77a.png","number":"026","name":"雷丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8be55a3ff2b24890fac0b9e2415dda9d0f893c1f.png","number":"026","name":"雷丘","type":"電, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f5fcf7a292a180320138ace7235f8a2c16f6594a.png","number":"027","name":"穿山鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d9ea1612a6ec53ba12e2d9abe28f99e66021bde1.png","number":"027","name":"穿山鼠","type":"冰, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d00d72f082b7dae546fa8bd5cf09fcfe53ffcae8.png","number":"028","name":"穿山王","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc154af4dcd20d14aba494a6a679f528bb9f3d6d.png","number":"028","name":"穿山王","type":"冰, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/14179c8ab9c2003fc5b27a29e91e4cd195283d52.png","number":"029","name":"尼多蘭","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fed980fd2341745923812e9dcd88a039aaaf36ea.png","number":"030","name":"尼多娜","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5174a41a9db00baf5dd664c92a12254b0baa5fde.png","number":"031","name":"尼多后","type":"毒, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/237579eaf2141edad61d647c62f074d53653337b.png","number":"032","name":"尼多朗","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3d8e45646fb05516dff845922c3d62d9aa33cbe.png","number":"033","name":"尼多力諾","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ce24d9eb27f4e554ea5bd29840a35957f7bd9d30.png","number":"034","name":"尼多王","type":"毒, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/18e9dc86ced1320d6846f2c192c4eb04e517963a.png","number":"035","name":"皮皮","type":"妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1865f85f9e417522f8de1a239fbff27f2106783b.png","number":"036","name":"皮可西","type":"妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f285c634efd141918f6ad066a6f59c20746d9050.png","number":"037","name":"六尾","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/89719dbcbddd11a1e6bc5f4366e00910a04eaf9f.png","number":"037","name":"六尾","type":"冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc96e6a4eee980724ebd725bb8785334d3290074.png","number":"038","name":"九尾","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/397b20ea73c8358185d6f1d2971b5825b0cb0baf.png","number":"038","name":"九尾","type":"冰, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7a2bec0dd522d66353f0cf3df9148070456a3349.png","number":"039","name":"胖丁","type":"一般, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b3724395d41de1d0def948966c69148bd9f0f9c1.png","number":"040","name":"胖可丁","type":"一般, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d54b9d9cefa287ea258517537ba26f4103dda36.png","number":"041","name":"超音蝠","type":"毒, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cedbf9afd3155d3df1e2ffebf049902598ebd74b.png","number":"042","name":"大嘴蝠","type":"毒, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6bad448cb0997a928b94e72b67eacb861271f796.png","number":"043","name":"走路草","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/62973d0fc5f9bd5d8c819b8c885bd1f216983ff1.png","number":"044","name":"臭臭花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a95af5f577260373074117cb756e5ea38cd674ef.png","number":"045","name":"霸王花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/837bcac8efc9329d9e3b9e46e95670a5d493b60a.png","number":"046","name":"派拉斯","type":"蟲, 草"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e5838e76eb33d88601ba9d6e045e1bdf7e20f46a.png","number":"047","name":"派拉斯特","type":"蟲, 草"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b550ab54d22a87dc784ee1af6cff4ad33aa10a2.png","number":"048","name":"毛球","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c57d464a64424f031a9872f2ec3f7c0b8052d3c1.png","number":"049","name":"摩魯蛾","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/583fa625d6fda586a5734f5f9e455952aa6af15f.png","number":"050","name":"地鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/19bd3a09933b3e9a0a7156ef294091922dbf771e.png","number":"050","name":"地鼠","type":"地面, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de7c2ea1a9f39427b4732a6122284f257f9e87aa.png","number":"051","name":"三地鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ba9403c475a889eadffb71b6cceae6e13c91a8e.png","number":"051","name":"三地鼠","type":"地面, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ea01871238908780334293e6407033650d803a9.png","number":"052","name":"喵喵","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57a0c88227aa0fe2327d79af31eb9516d4728752.png","number":"052","name":"喵喵","type":"惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/704fc0cde74c862f2063faefcf40eb67752a8637.png","number":"052","name":"喵喵","type":"鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/bff57f3b31012cef1da149224a84180492f90ed4.png","number":"052","name":"喵喵","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8da0bb6b5587f2150f41b08e0d61a80827d7229f.png","number":"053","name":"貓老大","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4341e35269528c91e75b6516b820804a37d9eebf.png","number":"053","name":"貓老大","type":"惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0783062d0d860b8ae7d8e859241a700359c4d981.png","number":"054","name":"可達鴨","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0dd5b6e921f55c5d49978b84ee66e458336518ae.png","number":"055","name":"哥達鴨","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00fb5703d7c2b7a89933bbed89f4c84e48c59ea2.png","number":"056","name":"猴怪","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/37a3edfcf9c5cbdb68bcf8945ff89fe2999e5a30.png","number":"057","name":"火爆猴","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/333e2aef290059dc46274b77ea4095094784316a.png","number":"058","name":"卡蒂狗","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ef9e71e9dc624e5558d7b4619f75ea8659eff55.png","number":"059","name":"風速狗","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8e8d47c5af6084904793496ddddb3e5f516e79f7.png","number":"060","name":"蚊香蝌蚪","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7e16ace7443d45cc1def215c8cf82beefc69041c.png","number":"061","name":"蚊香君","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/da2fce266d1c13743742451617b2976d6bfd483d.png","number":"062","name":"蚊香泳士","type":"水, 格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d05e6f2393a6a72fb36da26a79fd3db95ae7412.png","number":"063","name":"凱西","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/96613b8fe63edfdf800cde823078fadc6ea9aae9.png","number":"064","name":"勇基拉","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/265d42cf68deea0a54dacf3a4f1953198f55ad53.png","number":"065","name":"胡地","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ef57b70dc74663cc1c203d7006e69cbad6bb15f.png","number":"065","name":"超級胡地","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0074c7d90ce7d2a6926d28fe777d2bcb0b4ccb0b.png","number":"066","name":"腕力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/634e1c205ab72071fe941043f816a9e2f31db3ae.png","number":"067","name":"豪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8f2f69ae05bd6c76f0d6fe6d03f1e22ec1a8010a.png","number":"068","name":"怪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/aae2243d7c93e2cba33b000fbd92fcb050157d4e.png","number":"068","name":"怪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47ae88a63c66e32e957da303ad50b72268e097e4.png","number":"069","name":"喇叭芽","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b19541cee78bc2a00eb3f59f7a2fcca67469eb78.png","number":"070","name":"口呆花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f010b09344a212ecb98c6f209233c0661db0e7a8.png","number":"071","name":"大食花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3da5f9c26f39884f5f44a861e6965fdc1722241b.png","number":"072","name":"瑪瑙水母","type":"水, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e8720bf3fe40182141dc5f442f5fb83eff544a6e.png","number":"073","name":"毒刺水母","type":"水, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4b483c95c2124018519380eaa06cc657c5b76a64.png","number":"074","name":"小拳石","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c8870cfb5aae00c6b70d6550721b5bf51c73bf52.png","number":"074","name":"小拳石","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3ae64c5acf41a159e07b63da847cccc773bb184.png","number":"075","name":"隆隆石","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c91fbd40a228a6caa5f9b128715790fd536be2d6.png","number":"075","name":"隆隆石","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/02fb8976b07089e975a9911ae2ff1327b5e3340d.png","number":"076","name":"隆隆岩","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b7df1424a881e4d3232e6dd0ebc9d1908309e588.png","number":"076","name":"隆隆岩","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dacab2be1777c14ed7da12824dd85c2cdbd2ebf9.png","number":"077","name":"小火馬","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5dc1659954564f3015fc72060bbd87b98808aed4.png","number":"077","name":"小火馬","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cb874883fcffc227e8d065e275221e1e05ece46c.png","number":"078","name":"烈焰馬","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ef678c969aef014b48cf390e0e04e3f0096020c9.png","number":"078","name":"烈焰馬","type":"超能力, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/441132f5cdf87b0e46f96952f16c2dfc75911054.png","number":"079","name":"呆呆獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e1c9ec78e7a009185df15c4defd0db6b0c1a5727.png","number":"079","name":"呆呆獸","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4d93d1171a1b9551989b17b4ae6838e4e9e98378.png","number":"080","name":"呆殼獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b4ff1375aa8d23aff0cc09a2f96773fbdd8e3843.png","number":"080","name":"超級呆殼獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3862fc122debc9675749142a7c76f1a64dbbc60d.png","number":"080","name":"呆殼獸","type":"毒, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8dfff91e7e39b06d0a9fcfb414565b25de55bdf1.png","number":"081","name":"小磁怪","type":"電, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5f8732c548e90780b660f65926e5567755aa2a6c.png","number":"082","name":"三合一磁怪","type":"電, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/810c4dc60ff4f315216717a2ecaa3c7dfe3fcf09.png","number":"083","name":"大蔥鴨","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47201403d2e427655cb49df00895018ef8d750fd.png","number":"083","name":"大蔥鴨","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/63ff86cee884446925e664d99b82e3e8de988412.png","number":"084","name":"嘟嘟","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de41d6a29c38d65f1f39bc5ecb3afe30c5e057eb.png","number":"085","name":"嘟嘟利","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fc1342f9b5bc761333a44d74dc47ba0ff30ad6c8.png","number":"086","name":"小海獅","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2a2e293a8524ac94136bada7346ddfe57e12e47e.png","number":"087","name":"白海獅","type":"水, 冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57f22ceb2f8765f927ff3fd1f4b4bf52a7033097.png","number":"088","name":"臭泥","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/61096756c8bfed61fbcc938bd3d964012f00cc89.png","number":"088","name":"臭泥","type":"毒, 惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/db91b8849e602828aaff3939f9e0816dd9ce92ab.png","number":"089","name":"臭臭泥","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d83b601f999b3df4c958c5e5bc8f1e5b21b2594b.png","number":"089","name":"臭臭泥","type":"毒, 惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/36918010e6d91103c9017f4ce4d1764c9f145db8.png","number":"090","name":"大舌貝","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d5ebac9e1afe16f2a1d16a7593e022fc576aed9e.png","number":"091","name":"刺甲貝","type":"水, 冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5c619391fb78cbe0d3646a9b76da07372a18580e.png","number":"092","name":"鬼斯","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b8bcfb490b9a54a7cfc607ac82f413f4e582cb56.png","number":"093","name":"鬼斯通","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47549471dc54feb8acd4b3de3a27ea8e9e9fd25c.png","number":"094","name":"耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/933fa0ef096191382ab20f5d6597ac7f8fbe336a.png","number":"094","name":"超級耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd3052b825dd7dc2d4f78043ecd94b57f9cad36a.png","number":"094","name":"耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/134d26303c22ac0e0173bdf5121a3a3aae10e36c.png","number":"095","name":"大岩蛇","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1d82671099cdd52c4a0b84724d72033d305538bd.png","number":"096","name":"催眠貘","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9d0915f92dac45eca21a50d63799abe53404f7d4.png","number":"097","name":"引夢貘人","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/15ec38c5c458545368bf8e85da77d49f4b09104d.png","number":"098","name":"大鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/04f0bfa98547db408430513e07a15e3655095dca.png","number":"099","name":"巨鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/416c9cf7dbb527e3eac9d3b1eff2a98e03016087.png","number":"099","name":"巨鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cfa3cfb38563c9afdb4d6fac40607fa78db97721.png","number":"100","name":"霹靂電球","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/823f1e2536f6036d7423f17fa4969ecd7cf08e00.png","number":"101","name":"頑皮雷彈","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b23bf26e6063e8fe37a5122a112abb1a475b052.png","number":"102","name":"蛋蛋","type":"草, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a17a1d3fbeeba958495697c23b287b1966fd11dc.png","number":"103","name":"椰蛋樹","type":"草, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/12017db6ac167715bbdc052ec40ae093e8cb7b7c.png","number":"103","name":"椰蛋樹","type":"草, 龍"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c44a0ccb922bbb4345214f3fa0b9436a03c11f2.png","number":"104","name":"卡拉卡拉","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1a2a79bce9b5c63de4d6db9b895a34ce6bf6733d.png","number":"105","name":"嘎啦嘎啦","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cce0a0732b1db5e9efba7effa7c51020ed94de60.png","number":"105","name":"嘎啦嘎啦","type":"火, 幽靈"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e864b76679d4c2d1e46878dc241e06bdb8f8d1d.png","number":"106","name":"飛腿郎","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c57fef755afbd6ddda7f3c21f20bb38159494c6.png","number":"107","name":"快拳郎","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fe41bccc4b1fd3c2ab748d09a157e3c0c28c7700.png","number":"108","name":"大舌頭","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd10b57c1ac95c00638aed70b4a41d679e9af2b6.png","number":"109","name":"瓦斯彈","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4c76d556bda94f8eb8b73a9e58ef051262e78b7d.png","number":"110","name":"雙彈瓦斯","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c89593cd44d8354c16c11f5fa10143a6a8b4ab1f.png","number":"110","name":"雙彈瓦斯","type":"毒, 妖精"}]
-
-},{}],57:[function(require,module,exports){
+},{"./ToolboxModel":50,"./attributeControllerFolder/initializeAttributeControllers":55,"./buildInitialPageHelperFunctions":58,"./databaseHelperFunction":60,"./socketFunction":63,"automerge":1}],60:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27458,7 +27736,74 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage = exports.createNewPage = exports.updatePageNumberInNewOrder = exports.updatePageController = exports.createSwitchViewModeButton = exports.pageController = exports.functionButtonCreater = exports.createSubPanelItem = exports.createSubPanel = void 0;
+exports.processCreationDataHelper = exports.specialCreationMessageEnum = void 0;
+var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
+var specialCreationMessageEnum;
+(function (specialCreationMessageEnum) {
+    specialCreationMessageEnum["createNewFullPageObject"] = "createNewFullPageObject";
+    specialCreationMessageEnum["createNewOverviewPageObject"] = "createNewOverviewPageObject";
+})(specialCreationMessageEnum = exports.specialCreationMessageEnum || (exports.specialCreationMessageEnum = {}));
+function processCreationDataHelper(mainController, creationData) {
+    var specialCreationMessage = creationData.specialCreationMessage;
+    var objectData = mainController.getObjectById(creationData.objectID);
+    var newHTMLObject;
+    console.log(12121212, creationData);
+    if (specialCreationMessage == specialCreationMessageEnum.createNewFullPageObject || specialCreationMessage == specialCreationMessageEnum.createNewOverviewPageObject) { // do something special if there is spcial creation message
+        mainController.pageCurrentStatus.pendingObject.newPageArray.push(creationData);
+        // if there are two item in the array, then clear it and create a new object
+        if (mainController.pageCurrentStatus.pendingObject.newPageArray.length == 4) {
+            var newPageItemData = mainController.pageCurrentStatus.pendingObject.newPageArray[0];
+            var newSmallViewItemData = mainController.pageCurrentStatus.pendingObject.newPageArray[1];
+            var _newPageObjectData = mainController.getObjectById(newPageItemData.objectID);
+            var _newSmallViewObjectData = mainController.getObjectById(newSmallViewItemData.objectID);
+            var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
+            var overviewModeDiv = document.querySelector(".overviewModeDiv");
+            var _a = pageViewHelperFunction.createNewPage(mainController.pageCurrentStatus, fullPageModeDiv, overviewModeDiv, _newPageObjectData, _newSmallViewObjectData, false), newPage = _a[0], smallView = _a[1];
+            pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+            mainController.pageCurrentStatus.pendingObject.newPageArray = [];
+        }
+    }
+    if (!creationData.specialCreationMessage) {
+        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+        newHTMLObject.initializeHTMLObjectFromData(objectData);
+        var parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId);
+        // console.log("action = create", creationData.objectID, parentHTMLObject, objectData, newHTMLObject)
+        if (parentHTMLObject) {
+            parentHTMLObject.appendChild(newHTMLObject);
+        }
+    }
+}
+exports.processCreationDataHelper = processCreationDataHelper;
+
+},{"./pageViewHelperFunction":62}],61:[function(require,module,exports){
+// import * as Automerge from 'automerge'
+// import {mainController} from "./constructInitialCondition"
+// import * as GreatNoteDataClass from "./GreatNoteDataClass"
+// let pkmDatabase = [{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cf47f9fac4ed3037ff2a8ea83204e32aff8fb5f3.png","number":"001","name":"妙蛙種子","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3245e4f8c04aa0619cb31884dbf123c6918b3700.png","number":"002","name":"妙蛙草","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0186d64c5773c8d3d03cd05dc79574b2d2798d4f.png","number":"003","name":"妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3bfcc4360c44f37815dc1e59f75818935cbfc41b.png","number":"003","name":"超級妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6b55babb3825ef9fa9e5d9ff44a14bdb8406ce97.png","number":"003","name":"妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d0ee81f16175c97770192fb691fdda8da1f4f349.png","number":"004","name":"小火龍","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/285395ca77d82861fd30cea64567021a50c1169c.png","number":"005","name":"火恐龍","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2050f1fd1283f473d7d048f8631712e7e003f802.png","number":"006","name":"噴火龍","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ca3db4aad5c85a525d9be86852b26db1db7a22c0.png","number":"006","name":"超級噴火龍Ｘ","type":"火, 龍"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0aa78a0061bda9d88cbb0bbf739cd9cc56522fe9.png","number":"006","name":"超級噴火龍Ｙ","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fd12098f15628cce80d411e090189aeb7d758ff.png","number":"006","name":"噴火龍","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5794f0251b1180998d72d1f8568239620ff5279c.png","number":"007","name":"傑尼龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a3bc17e6215031332462cc64e59b7922ddd14b91.png","number":"008","name":"卡咪龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fe157db59153af8abd636ab03c7df6f28b08242.png","number":"009","name":"水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00186af714a048895ba8116e71b08671c3cfb8f5.png","number":"009","name":"超級水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/50eba0f85c4e9a039be078e7de0b10acc7323264.png","number":"009","name":"水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/68f0cec6bcba20a0c53db3d8cfce81bd319d2c82.png","number":"010","name":"綠毛蟲","type":"蟲"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/05fd4676fa4a4b58288510a97a5211e066e02464.png","number":"011","name":"鐵甲蛹","type":"蟲"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eacd20285cb634ba9fea41fc0fa13871c2fcbc66.png","number":"012","name":"巴大蝶","type":"蟲, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b76026363e301dbd8ac3f084e7d242232c46c95f.png","number":"012","name":"巴大蝶","type":"蟲, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5ae74d403ec682eaf13e066850afd4b0c20d85f7.png","number":"013","name":"獨角蟲","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd41f31a3c97f1f9d998361b125362584873157b.png","number":"014","name":"鐵殼蛹","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/70f4206271b72492c9ba71d708d6183a80ba0e96.png","number":"015","name":"大針蜂","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e12ce48ab99b2df6fbbc1e97038c4f6e192d09d7.png","number":"015","name":"超級大針蜂","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0e7c6e616404c683f00701b591eeab56e465641a.png","number":"016","name":"波波","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a2935587b7c61e6e6da88da3578d700c133246e5.png","number":"017","name":"比比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/01e13954dff668c1420407c98b308c81b83f6dda.png","number":"018","name":"大比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd6ab4ce8e7d05fb74e50cf66764e3ed8e11a097.png","number":"018","name":"超級大比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e4b38ab7545ebd938154d9aed9502cb068569d6.png","number":"019","name":"小拉達","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3567693e3479fb0cf15b9ec84ee8a033aa7b4310.png","number":"019","name":"小拉達","type":"惡, 一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e97c62e4e4b46017be60806d00f4d389d003f115.png","number":"020","name":"拉達","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a30454b7040a4a517bfe0914777e2e7c045f6c65.png","number":"020","name":"拉達","type":"惡, 一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e815cb4b8ba9c2d0841dfa364c87164880944e3a.png","number":"021","name":"烈雀","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b326a6f77b73b3c250ba95f3a97fc21b28c8f4b.png","number":"022","name":"大嘴雀","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ad90ec632849d032615d707ebe8ad741651eee06.png","number":"023","name":"阿柏蛇","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eb3c14ed44c1e4a2ba4c2d7970cddf07cd8ef67f.png","number":"024","name":"阿柏怪","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b3f6ff00db7a1efae21d85cfb8995eaff2da8d8.png","number":"025","name":"皮卡丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a90881f103830615ee7f85e16fe9f586d41f2332.png","number":"025","name":"皮卡丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9c28defa939e230800ec0d0c421d9f82c60df77a.png","number":"026","name":"雷丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8be55a3ff2b24890fac0b9e2415dda9d0f893c1f.png","number":"026","name":"雷丘","type":"電, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f5fcf7a292a180320138ace7235f8a2c16f6594a.png","number":"027","name":"穿山鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d9ea1612a6ec53ba12e2d9abe28f99e66021bde1.png","number":"027","name":"穿山鼠","type":"冰, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d00d72f082b7dae546fa8bd5cf09fcfe53ffcae8.png","number":"028","name":"穿山王","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc154af4dcd20d14aba494a6a679f528bb9f3d6d.png","number":"028","name":"穿山王","type":"冰, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/14179c8ab9c2003fc5b27a29e91e4cd195283d52.png","number":"029","name":"尼多蘭","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fed980fd2341745923812e9dcd88a039aaaf36ea.png","number":"030","name":"尼多娜","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5174a41a9db00baf5dd664c92a12254b0baa5fde.png","number":"031","name":"尼多后","type":"毒, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/237579eaf2141edad61d647c62f074d53653337b.png","number":"032","name":"尼多朗","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3d8e45646fb05516dff845922c3d62d9aa33cbe.png","number":"033","name":"尼多力諾","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ce24d9eb27f4e554ea5bd29840a35957f7bd9d30.png","number":"034","name":"尼多王","type":"毒, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/18e9dc86ced1320d6846f2c192c4eb04e517963a.png","number":"035","name":"皮皮","type":"妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1865f85f9e417522f8de1a239fbff27f2106783b.png","number":"036","name":"皮可西","type":"妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f285c634efd141918f6ad066a6f59c20746d9050.png","number":"037","name":"六尾","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/89719dbcbddd11a1e6bc5f4366e00910a04eaf9f.png","number":"037","name":"六尾","type":"冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc96e6a4eee980724ebd725bb8785334d3290074.png","number":"038","name":"九尾","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/397b20ea73c8358185d6f1d2971b5825b0cb0baf.png","number":"038","name":"九尾","type":"冰, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7a2bec0dd522d66353f0cf3df9148070456a3349.png","number":"039","name":"胖丁","type":"一般, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b3724395d41de1d0def948966c69148bd9f0f9c1.png","number":"040","name":"胖可丁","type":"一般, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d54b9d9cefa287ea258517537ba26f4103dda36.png","number":"041","name":"超音蝠","type":"毒, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cedbf9afd3155d3df1e2ffebf049902598ebd74b.png","number":"042","name":"大嘴蝠","type":"毒, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6bad448cb0997a928b94e72b67eacb861271f796.png","number":"043","name":"走路草","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/62973d0fc5f9bd5d8c819b8c885bd1f216983ff1.png","number":"044","name":"臭臭花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a95af5f577260373074117cb756e5ea38cd674ef.png","number":"045","name":"霸王花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/837bcac8efc9329d9e3b9e46e95670a5d493b60a.png","number":"046","name":"派拉斯","type":"蟲, 草"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e5838e76eb33d88601ba9d6e045e1bdf7e20f46a.png","number":"047","name":"派拉斯特","type":"蟲, 草"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b550ab54d22a87dc784ee1af6cff4ad33aa10a2.png","number":"048","name":"毛球","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c57d464a64424f031a9872f2ec3f7c0b8052d3c1.png","number":"049","name":"摩魯蛾","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/583fa625d6fda586a5734f5f9e455952aa6af15f.png","number":"050","name":"地鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/19bd3a09933b3e9a0a7156ef294091922dbf771e.png","number":"050","name":"地鼠","type":"地面, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de7c2ea1a9f39427b4732a6122284f257f9e87aa.png","number":"051","name":"三地鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ba9403c475a889eadffb71b6cceae6e13c91a8e.png","number":"051","name":"三地鼠","type":"地面, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ea01871238908780334293e6407033650d803a9.png","number":"052","name":"喵喵","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57a0c88227aa0fe2327d79af31eb9516d4728752.png","number":"052","name":"喵喵","type":"惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/704fc0cde74c862f2063faefcf40eb67752a8637.png","number":"052","name":"喵喵","type":"鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/bff57f3b31012cef1da149224a84180492f90ed4.png","number":"052","name":"喵喵","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8da0bb6b5587f2150f41b08e0d61a80827d7229f.png","number":"053","name":"貓老大","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4341e35269528c91e75b6516b820804a37d9eebf.png","number":"053","name":"貓老大","type":"惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0783062d0d860b8ae7d8e859241a700359c4d981.png","number":"054","name":"可達鴨","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0dd5b6e921f55c5d49978b84ee66e458336518ae.png","number":"055","name":"哥達鴨","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00fb5703d7c2b7a89933bbed89f4c84e48c59ea2.png","number":"056","name":"猴怪","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/37a3edfcf9c5cbdb68bcf8945ff89fe2999e5a30.png","number":"057","name":"火爆猴","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/333e2aef290059dc46274b77ea4095094784316a.png","number":"058","name":"卡蒂狗","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ef9e71e9dc624e5558d7b4619f75ea8659eff55.png","number":"059","name":"風速狗","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8e8d47c5af6084904793496ddddb3e5f516e79f7.png","number":"060","name":"蚊香蝌蚪","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7e16ace7443d45cc1def215c8cf82beefc69041c.png","number":"061","name":"蚊香君","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/da2fce266d1c13743742451617b2976d6bfd483d.png","number":"062","name":"蚊香泳士","type":"水, 格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d05e6f2393a6a72fb36da26a79fd3db95ae7412.png","number":"063","name":"凱西","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/96613b8fe63edfdf800cde823078fadc6ea9aae9.png","number":"064","name":"勇基拉","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/265d42cf68deea0a54dacf3a4f1953198f55ad53.png","number":"065","name":"胡地","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ef57b70dc74663cc1c203d7006e69cbad6bb15f.png","number":"065","name":"超級胡地","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0074c7d90ce7d2a6926d28fe777d2bcb0b4ccb0b.png","number":"066","name":"腕力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/634e1c205ab72071fe941043f816a9e2f31db3ae.png","number":"067","name":"豪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8f2f69ae05bd6c76f0d6fe6d03f1e22ec1a8010a.png","number":"068","name":"怪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/aae2243d7c93e2cba33b000fbd92fcb050157d4e.png","number":"068","name":"怪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47ae88a63c66e32e957da303ad50b72268e097e4.png","number":"069","name":"喇叭芽","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b19541cee78bc2a00eb3f59f7a2fcca67469eb78.png","number":"070","name":"口呆花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f010b09344a212ecb98c6f209233c0661db0e7a8.png","number":"071","name":"大食花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3da5f9c26f39884f5f44a861e6965fdc1722241b.png","number":"072","name":"瑪瑙水母","type":"水, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e8720bf3fe40182141dc5f442f5fb83eff544a6e.png","number":"073","name":"毒刺水母","type":"水, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4b483c95c2124018519380eaa06cc657c5b76a64.png","number":"074","name":"小拳石","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c8870cfb5aae00c6b70d6550721b5bf51c73bf52.png","number":"074","name":"小拳石","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3ae64c5acf41a159e07b63da847cccc773bb184.png","number":"075","name":"隆隆石","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c91fbd40a228a6caa5f9b128715790fd536be2d6.png","number":"075","name":"隆隆石","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/02fb8976b07089e975a9911ae2ff1327b5e3340d.png","number":"076","name":"隆隆岩","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b7df1424a881e4d3232e6dd0ebc9d1908309e588.png","number":"076","name":"隆隆岩","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dacab2be1777c14ed7da12824dd85c2cdbd2ebf9.png","number":"077","name":"小火馬","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5dc1659954564f3015fc72060bbd87b98808aed4.png","number":"077","name":"小火馬","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cb874883fcffc227e8d065e275221e1e05ece46c.png","number":"078","name":"烈焰馬","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ef678c969aef014b48cf390e0e04e3f0096020c9.png","number":"078","name":"烈焰馬","type":"超能力, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/441132f5cdf87b0e46f96952f16c2dfc75911054.png","number":"079","name":"呆呆獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e1c9ec78e7a009185df15c4defd0db6b0c1a5727.png","number":"079","name":"呆呆獸","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4d93d1171a1b9551989b17b4ae6838e4e9e98378.png","number":"080","name":"呆殼獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b4ff1375aa8d23aff0cc09a2f96773fbdd8e3843.png","number":"080","name":"超級呆殼獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3862fc122debc9675749142a7c76f1a64dbbc60d.png","number":"080","name":"呆殼獸","type":"毒, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8dfff91e7e39b06d0a9fcfb414565b25de55bdf1.png","number":"081","name":"小磁怪","type":"電, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5f8732c548e90780b660f65926e5567755aa2a6c.png","number":"082","name":"三合一磁怪","type":"電, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/810c4dc60ff4f315216717a2ecaa3c7dfe3fcf09.png","number":"083","name":"大蔥鴨","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47201403d2e427655cb49df00895018ef8d750fd.png","number":"083","name":"大蔥鴨","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/63ff86cee884446925e664d99b82e3e8de988412.png","number":"084","name":"嘟嘟","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de41d6a29c38d65f1f39bc5ecb3afe30c5e057eb.png","number":"085","name":"嘟嘟利","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fc1342f9b5bc761333a44d74dc47ba0ff30ad6c8.png","number":"086","name":"小海獅","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2a2e293a8524ac94136bada7346ddfe57e12e47e.png","number":"087","name":"白海獅","type":"水, 冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57f22ceb2f8765f927ff3fd1f4b4bf52a7033097.png","number":"088","name":"臭泥","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/61096756c8bfed61fbcc938bd3d964012f00cc89.png","number":"088","name":"臭泥","type":"毒, 惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/db91b8849e602828aaff3939f9e0816dd9ce92ab.png","number":"089","name":"臭臭泥","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d83b601f999b3df4c958c5e5bc8f1e5b21b2594b.png","number":"089","name":"臭臭泥","type":"毒, 惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/36918010e6d91103c9017f4ce4d1764c9f145db8.png","number":"090","name":"大舌貝","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d5ebac9e1afe16f2a1d16a7593e022fc576aed9e.png","number":"091","name":"刺甲貝","type":"水, 冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5c619391fb78cbe0d3646a9b76da07372a18580e.png","number":"092","name":"鬼斯","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b8bcfb490b9a54a7cfc607ac82f413f4e582cb56.png","number":"093","name":"鬼斯通","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47549471dc54feb8acd4b3de3a27ea8e9e9fd25c.png","number":"094","name":"耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/933fa0ef096191382ab20f5d6597ac7f8fbe336a.png","number":"094","name":"超級耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd3052b825dd7dc2d4f78043ecd94b57f9cad36a.png","number":"094","name":"耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/134d26303c22ac0e0173bdf5121a3a3aae10e36c.png","number":"095","name":"大岩蛇","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1d82671099cdd52c4a0b84724d72033d305538bd.png","number":"096","name":"催眠貘","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9d0915f92dac45eca21a50d63799abe53404f7d4.png","number":"097","name":"引夢貘人","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/15ec38c5c458545368bf8e85da77d49f4b09104d.png","number":"098","name":"大鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/04f0bfa98547db408430513e07a15e3655095dca.png","number":"099","name":"巨鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/416c9cf7dbb527e3eac9d3b1eff2a98e03016087.png","number":"099","name":"巨鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cfa3cfb38563c9afdb4d6fac40607fa78db97721.png","number":"100","name":"霹靂電球","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/823f1e2536f6036d7423f17fa4969ecd7cf08e00.png","number":"101","name":"頑皮雷彈","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b23bf26e6063e8fe37a5122a112abb1a475b052.png","number":"102","name":"蛋蛋","type":"草, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a17a1d3fbeeba958495697c23b287b1966fd11dc.png","number":"103","name":"椰蛋樹","type":"草, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/12017db6ac167715bbdc052ec40ae093e8cb7b7c.png","number":"103","name":"椰蛋樹","type":"草, 龍"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c44a0ccb922bbb4345214f3fa0b9436a03c11f2.png","number":"104","name":"卡拉卡拉","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1a2a79bce9b5c63de4d6db9b895a34ce6bf6733d.png","number":"105","name":"嘎啦嘎啦","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cce0a0732b1db5e9efba7effa7c51020ed94de60.png","number":"105","name":"嘎啦嘎啦","type":"火, 幽靈"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e864b76679d4c2d1e46878dc241e06bdb8f8d1d.png","number":"106","name":"飛腿郎","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c57fef755afbd6ddda7f3c21f20bb38159494c6.png","number":"107","name":"快拳郎","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fe41bccc4b1fd3c2ab748d09a157e3c0c28c7700.png","number":"108","name":"大舌頭","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd10b57c1ac95c00638aed70b4a41d679e9af2b6.png","number":"109","name":"瓦斯彈","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4c76d556bda94f8eb8b73a9e58ef051262e78b7d.png","number":"110","name":"雙彈瓦斯","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c89593cd44d8354c16c11f5fa10143a6a8b4ab1f.png","number":"110","name":"雙彈瓦斯","type":"毒, 妖精"}]
+
+},{}],62:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage = exports.fillInSmallViewDataContent = exports.fillInNewPageDataContent = exports.createNewPage = exports.updatePageNumberInNewOrder = exports.updatePageController = exports.createSwitchViewModeButton = exports.pageController = exports.functionButtonCreater = exports.createSubPanelItem = exports.createSubPanel = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
 var pkmDatabase = [{ "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cf47f9fac4ed3037ff2a8ea83204e32aff8fb5f3.png", "number": "001", "name": "妙蛙種子", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3245e4f8c04aa0619cb31884dbf123c6918b3700.png", "number": "002", "name": "妙蛙草", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0186d64c5773c8d3d03cd05dc79574b2d2798d4f.png", "number": "003", "name": "妙蛙花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3bfcc4360c44f37815dc1e59f75818935cbfc41b.png", "number": "003", "name": "超級妙蛙花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6b55babb3825ef9fa9e5d9ff44a14bdb8406ce97.png", "number": "003", "name": "妙蛙花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d0ee81f16175c97770192fb691fdda8da1f4f349.png", "number": "004", "name": "小火龍", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/285395ca77d82861fd30cea64567021a50c1169c.png", "number": "005", "name": "火恐龍", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2050f1fd1283f473d7d048f8631712e7e003f802.png", "number": "006", "name": "噴火龍", "type": "火, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ca3db4aad5c85a525d9be86852b26db1db7a22c0.png", "number": "006", "name": "超級噴火龍Ｘ", "type": "火, 龍" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0aa78a0061bda9d88cbb0bbf739cd9cc56522fe9.png", "number": "006", "name": "超級噴火龍Ｙ", "type": "火, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fd12098f15628cce80d411e090189aeb7d758ff.png", "number": "006", "name": "噴火龍", "type": "火, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5794f0251b1180998d72d1f8568239620ff5279c.png", "number": "007", "name": "傑尼龜", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a3bc17e6215031332462cc64e59b7922ddd14b91.png", "number": "008", "name": "卡咪龜", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fe157db59153af8abd636ab03c7df6f28b08242.png", "number": "009", "name": "水箭龜", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00186af714a048895ba8116e71b08671c3cfb8f5.png", "number": "009", "name": "超級水箭龜", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/50eba0f85c4e9a039be078e7de0b10acc7323264.png", "number": "009", "name": "水箭龜", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/68f0cec6bcba20a0c53db3d8cfce81bd319d2c82.png", "number": "010", "name": "綠毛蟲", "type": "蟲" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/05fd4676fa4a4b58288510a97a5211e066e02464.png", "number": "011", "name": "鐵甲蛹", "type": "蟲" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eacd20285cb634ba9fea41fc0fa13871c2fcbc66.png", "number": "012", "name": "巴大蝶", "type": "蟲, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b76026363e301dbd8ac3f084e7d242232c46c95f.png", "number": "012", "name": "巴大蝶", "type": "蟲, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5ae74d403ec682eaf13e066850afd4b0c20d85f7.png", "number": "013", "name": "獨角蟲", "type": "蟲, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd41f31a3c97f1f9d998361b125362584873157b.png", "number": "014", "name": "鐵殼蛹", "type": "蟲, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/70f4206271b72492c9ba71d708d6183a80ba0e96.png", "number": "015", "name": "大針蜂", "type": "蟲, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e12ce48ab99b2df6fbbc1e97038c4f6e192d09d7.png", "number": "015", "name": "超級大針蜂", "type": "蟲, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0e7c6e616404c683f00701b591eeab56e465641a.png", "number": "016", "name": "波波", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a2935587b7c61e6e6da88da3578d700c133246e5.png", "number": "017", "name": "比比鳥", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/01e13954dff668c1420407c98b308c81b83f6dda.png", "number": "018", "name": "大比鳥", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd6ab4ce8e7d05fb74e50cf66764e3ed8e11a097.png", "number": "018", "name": "超級大比鳥", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e4b38ab7545ebd938154d9aed9502cb068569d6.png", "number": "019", "name": "小拉達", "type": "一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3567693e3479fb0cf15b9ec84ee8a033aa7b4310.png", "number": "019", "name": "小拉達", "type": "惡, 一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e97c62e4e4b46017be60806d00f4d389d003f115.png", "number": "020", "name": "拉達", "type": "一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a30454b7040a4a517bfe0914777e2e7c045f6c65.png", "number": "020", "name": "拉達", "type": "惡, 一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e815cb4b8ba9c2d0841dfa364c87164880944e3a.png", "number": "021", "name": "烈雀", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b326a6f77b73b3c250ba95f3a97fc21b28c8f4b.png", "number": "022", "name": "大嘴雀", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ad90ec632849d032615d707ebe8ad741651eee06.png", "number": "023", "name": "阿柏蛇", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eb3c14ed44c1e4a2ba4c2d7970cddf07cd8ef67f.png", "number": "024", "name": "阿柏怪", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b3f6ff00db7a1efae21d85cfb8995eaff2da8d8.png", "number": "025", "name": "皮卡丘", "type": "電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a90881f103830615ee7f85e16fe9f586d41f2332.png", "number": "025", "name": "皮卡丘", "type": "電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9c28defa939e230800ec0d0c421d9f82c60df77a.png", "number": "026", "name": "雷丘", "type": "電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8be55a3ff2b24890fac0b9e2415dda9d0f893c1f.png", "number": "026", "name": "雷丘", "type": "電, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f5fcf7a292a180320138ace7235f8a2c16f6594a.png", "number": "027", "name": "穿山鼠", "type": "地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d9ea1612a6ec53ba12e2d9abe28f99e66021bde1.png", "number": "027", "name": "穿山鼠", "type": "冰, 鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d00d72f082b7dae546fa8bd5cf09fcfe53ffcae8.png", "number": "028", "name": "穿山王", "type": "地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc154af4dcd20d14aba494a6a679f528bb9f3d6d.png", "number": "028", "name": "穿山王", "type": "冰, 鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/14179c8ab9c2003fc5b27a29e91e4cd195283d52.png", "number": "029", "name": "尼多蘭", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fed980fd2341745923812e9dcd88a039aaaf36ea.png", "number": "030", "name": "尼多娜", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5174a41a9db00baf5dd664c92a12254b0baa5fde.png", "number": "031", "name": "尼多后", "type": "毒, 地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/237579eaf2141edad61d647c62f074d53653337b.png", "number": "032", "name": "尼多朗", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3d8e45646fb05516dff845922c3d62d9aa33cbe.png", "number": "033", "name": "尼多力諾", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ce24d9eb27f4e554ea5bd29840a35957f7bd9d30.png", "number": "034", "name": "尼多王", "type": "毒, 地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/18e9dc86ced1320d6846f2c192c4eb04e517963a.png", "number": "035", "name": "皮皮", "type": "妖精" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1865f85f9e417522f8de1a239fbff27f2106783b.png", "number": "036", "name": "皮可西", "type": "妖精" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f285c634efd141918f6ad066a6f59c20746d9050.png", "number": "037", "name": "六尾", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/89719dbcbddd11a1e6bc5f4366e00910a04eaf9f.png", "number": "037", "name": "六尾", "type": "冰" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc96e6a4eee980724ebd725bb8785334d3290074.png", "number": "038", "name": "九尾", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/397b20ea73c8358185d6f1d2971b5825b0cb0baf.png", "number": "038", "name": "九尾", "type": "冰, 妖精" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7a2bec0dd522d66353f0cf3df9148070456a3349.png", "number": "039", "name": "胖丁", "type": "一般, 妖精" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b3724395d41de1d0def948966c69148bd9f0f9c1.png", "number": "040", "name": "胖可丁", "type": "一般, 妖精" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d54b9d9cefa287ea258517537ba26f4103dda36.png", "number": "041", "name": "超音蝠", "type": "毒, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cedbf9afd3155d3df1e2ffebf049902598ebd74b.png", "number": "042", "name": "大嘴蝠", "type": "毒, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6bad448cb0997a928b94e72b67eacb861271f796.png", "number": "043", "name": "走路草", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/62973d0fc5f9bd5d8c819b8c885bd1f216983ff1.png", "number": "044", "name": "臭臭花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a95af5f577260373074117cb756e5ea38cd674ef.png", "number": "045", "name": "霸王花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/837bcac8efc9329d9e3b9e46e95670a5d493b60a.png", "number": "046", "name": "派拉斯", "type": "蟲, 草" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e5838e76eb33d88601ba9d6e045e1bdf7e20f46a.png", "number": "047", "name": "派拉斯特", "type": "蟲, 草" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b550ab54d22a87dc784ee1af6cff4ad33aa10a2.png", "number": "048", "name": "毛球", "type": "蟲, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c57d464a64424f031a9872f2ec3f7c0b8052d3c1.png", "number": "049", "name": "摩魯蛾", "type": "蟲, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/583fa625d6fda586a5734f5f9e455952aa6af15f.png", "number": "050", "name": "地鼠", "type": "地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/19bd3a09933b3e9a0a7156ef294091922dbf771e.png", "number": "050", "name": "地鼠", "type": "地面, 鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de7c2ea1a9f39427b4732a6122284f257f9e87aa.png", "number": "051", "name": "三地鼠", "type": "地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ba9403c475a889eadffb71b6cceae6e13c91a8e.png", "number": "051", "name": "三地鼠", "type": "地面, 鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ea01871238908780334293e6407033650d803a9.png", "number": "052", "name": "喵喵", "type": "一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57a0c88227aa0fe2327d79af31eb9516d4728752.png", "number": "052", "name": "喵喵", "type": "惡" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/704fc0cde74c862f2063faefcf40eb67752a8637.png", "number": "052", "name": "喵喵", "type": "鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/bff57f3b31012cef1da149224a84180492f90ed4.png", "number": "052", "name": "喵喵", "type": "一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8da0bb6b5587f2150f41b08e0d61a80827d7229f.png", "number": "053", "name": "貓老大", "type": "一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4341e35269528c91e75b6516b820804a37d9eebf.png", "number": "053", "name": "貓老大", "type": "惡" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0783062d0d860b8ae7d8e859241a700359c4d981.png", "number": "054", "name": "可達鴨", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0dd5b6e921f55c5d49978b84ee66e458336518ae.png", "number": "055", "name": "哥達鴨", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00fb5703d7c2b7a89933bbed89f4c84e48c59ea2.png", "number": "056", "name": "猴怪", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/37a3edfcf9c5cbdb68bcf8945ff89fe2999e5a30.png", "number": "057", "name": "火爆猴", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/333e2aef290059dc46274b77ea4095094784316a.png", "number": "058", "name": "卡蒂狗", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ef9e71e9dc624e5558d7b4619f75ea8659eff55.png", "number": "059", "name": "風速狗", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8e8d47c5af6084904793496ddddb3e5f516e79f7.png", "number": "060", "name": "蚊香蝌蚪", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7e16ace7443d45cc1def215c8cf82beefc69041c.png", "number": "061", "name": "蚊香君", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/da2fce266d1c13743742451617b2976d6bfd483d.png", "number": "062", "name": "蚊香泳士", "type": "水, 格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d05e6f2393a6a72fb36da26a79fd3db95ae7412.png", "number": "063", "name": "凱西", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/96613b8fe63edfdf800cde823078fadc6ea9aae9.png", "number": "064", "name": "勇基拉", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/265d42cf68deea0a54dacf3a4f1953198f55ad53.png", "number": "065", "name": "胡地", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ef57b70dc74663cc1c203d7006e69cbad6bb15f.png", "number": "065", "name": "超級胡地", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0074c7d90ce7d2a6926d28fe777d2bcb0b4ccb0b.png", "number": "066", "name": "腕力", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/634e1c205ab72071fe941043f816a9e2f31db3ae.png", "number": "067", "name": "豪力", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8f2f69ae05bd6c76f0d6fe6d03f1e22ec1a8010a.png", "number": "068", "name": "怪力", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/aae2243d7c93e2cba33b000fbd92fcb050157d4e.png", "number": "068", "name": "怪力", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47ae88a63c66e32e957da303ad50b72268e097e4.png", "number": "069", "name": "喇叭芽", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b19541cee78bc2a00eb3f59f7a2fcca67469eb78.png", "number": "070", "name": "口呆花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f010b09344a212ecb98c6f209233c0661db0e7a8.png", "number": "071", "name": "大食花", "type": "草, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3da5f9c26f39884f5f44a861e6965fdc1722241b.png", "number": "072", "name": "瑪瑙水母", "type": "水, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e8720bf3fe40182141dc5f442f5fb83eff544a6e.png", "number": "073", "name": "毒刺水母", "type": "水, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4b483c95c2124018519380eaa06cc657c5b76a64.png", "number": "074", "name": "小拳石", "type": "岩石, 地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c8870cfb5aae00c6b70d6550721b5bf51c73bf52.png", "number": "074", "name": "小拳石", "type": "岩石, 電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3ae64c5acf41a159e07b63da847cccc773bb184.png", "number": "075", "name": "隆隆石", "type": "岩石, 地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c91fbd40a228a6caa5f9b128715790fd536be2d6.png", "number": "075", "name": "隆隆石", "type": "岩石, 電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/02fb8976b07089e975a9911ae2ff1327b5e3340d.png", "number": "076", "name": "隆隆岩", "type": "岩石, 地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b7df1424a881e4d3232e6dd0ebc9d1908309e588.png", "number": "076", "name": "隆隆岩", "type": "岩石, 電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dacab2be1777c14ed7da12824dd85c2cdbd2ebf9.png", "number": "077", "name": "小火馬", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5dc1659954564f3015fc72060bbd87b98808aed4.png", "number": "077", "name": "小火馬", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cb874883fcffc227e8d065e275221e1e05ece46c.png", "number": "078", "name": "烈焰馬", "type": "火" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ef678c969aef014b48cf390e0e04e3f0096020c9.png", "number": "078", "name": "烈焰馬", "type": "超能力, 妖精" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/441132f5cdf87b0e46f96952f16c2dfc75911054.png", "number": "079", "name": "呆呆獸", "type": "水, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e1c9ec78e7a009185df15c4defd0db6b0c1a5727.png", "number": "079", "name": "呆呆獸", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4d93d1171a1b9551989b17b4ae6838e4e9e98378.png", "number": "080", "name": "呆殼獸", "type": "水, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b4ff1375aa8d23aff0cc09a2f96773fbdd8e3843.png", "number": "080", "name": "超級呆殼獸", "type": "水, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3862fc122debc9675749142a7c76f1a64dbbc60d.png", "number": "080", "name": "呆殼獸", "type": "毒, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8dfff91e7e39b06d0a9fcfb414565b25de55bdf1.png", "number": "081", "name": "小磁怪", "type": "電, 鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5f8732c548e90780b660f65926e5567755aa2a6c.png", "number": "082", "name": "三合一磁怪", "type": "電, 鋼" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/810c4dc60ff4f315216717a2ecaa3c7dfe3fcf09.png", "number": "083", "name": "大蔥鴨", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47201403d2e427655cb49df00895018ef8d750fd.png", "number": "083", "name": "大蔥鴨", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/63ff86cee884446925e664d99b82e3e8de988412.png", "number": "084", "name": "嘟嘟", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de41d6a29c38d65f1f39bc5ecb3afe30c5e057eb.png", "number": "085", "name": "嘟嘟利", "type": "一般, 飛行" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fc1342f9b5bc761333a44d74dc47ba0ff30ad6c8.png", "number": "086", "name": "小海獅", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2a2e293a8524ac94136bada7346ddfe57e12e47e.png", "number": "087", "name": "白海獅", "type": "水, 冰" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57f22ceb2f8765f927ff3fd1f4b4bf52a7033097.png", "number": "088", "name": "臭泥", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/61096756c8bfed61fbcc938bd3d964012f00cc89.png", "number": "088", "name": "臭泥", "type": "毒, 惡" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/db91b8849e602828aaff3939f9e0816dd9ce92ab.png", "number": "089", "name": "臭臭泥", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d83b601f999b3df4c958c5e5bc8f1e5b21b2594b.png", "number": "089", "name": "臭臭泥", "type": "毒, 惡" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/36918010e6d91103c9017f4ce4d1764c9f145db8.png", "number": "090", "name": "大舌貝", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d5ebac9e1afe16f2a1d16a7593e022fc576aed9e.png", "number": "091", "name": "刺甲貝", "type": "水, 冰" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5c619391fb78cbe0d3646a9b76da07372a18580e.png", "number": "092", "name": "鬼斯", "type": "幽靈, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b8bcfb490b9a54a7cfc607ac82f413f4e582cb56.png", "number": "093", "name": "鬼斯通", "type": "幽靈, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47549471dc54feb8acd4b3de3a27ea8e9e9fd25c.png", "number": "094", "name": "耿鬼", "type": "幽靈, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/933fa0ef096191382ab20f5d6597ac7f8fbe336a.png", "number": "094", "name": "超級耿鬼", "type": "幽靈, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd3052b825dd7dc2d4f78043ecd94b57f9cad36a.png", "number": "094", "name": "耿鬼", "type": "幽靈, 毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/134d26303c22ac0e0173bdf5121a3a3aae10e36c.png", "number": "095", "name": "大岩蛇", "type": "岩石, 地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1d82671099cdd52c4a0b84724d72033d305538bd.png", "number": "096", "name": "催眠貘", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9d0915f92dac45eca21a50d63799abe53404f7d4.png", "number": "097", "name": "引夢貘人", "type": "超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/15ec38c5c458545368bf8e85da77d49f4b09104d.png", "number": "098", "name": "大鉗蟹", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/04f0bfa98547db408430513e07a15e3655095dca.png", "number": "099", "name": "巨鉗蟹", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/416c9cf7dbb527e3eac9d3b1eff2a98e03016087.png", "number": "099", "name": "巨鉗蟹", "type": "水" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cfa3cfb38563c9afdb4d6fac40607fa78db97721.png", "number": "100", "name": "霹靂電球", "type": "電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/823f1e2536f6036d7423f17fa4969ecd7cf08e00.png", "number": "101", "name": "頑皮雷彈", "type": "電" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b23bf26e6063e8fe37a5122a112abb1a475b052.png", "number": "102", "name": "蛋蛋", "type": "草, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a17a1d3fbeeba958495697c23b287b1966fd11dc.png", "number": "103", "name": "椰蛋樹", "type": "草, 超能力" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/12017db6ac167715bbdc052ec40ae093e8cb7b7c.png", "number": "103", "name": "椰蛋樹", "type": "草, 龍" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c44a0ccb922bbb4345214f3fa0b9436a03c11f2.png", "number": "104", "name": "卡拉卡拉", "type": "地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1a2a79bce9b5c63de4d6db9b895a34ce6bf6733d.png", "number": "105", "name": "嘎啦嘎啦", "type": "地面" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cce0a0732b1db5e9efba7effa7c51020ed94de60.png", "number": "105", "name": "嘎啦嘎啦", "type": "火, 幽靈" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e864b76679d4c2d1e46878dc241e06bdb8f8d1d.png", "number": "106", "name": "飛腿郎", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c57fef755afbd6ddda7f3c21f20bb38159494c6.png", "number": "107", "name": "快拳郎", "type": "格鬥" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fe41bccc4b1fd3c2ab748d09a157e3c0c28c7700.png", "number": "108", "name": "大舌頭", "type": "一般" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd10b57c1ac95c00638aed70b4a41d679e9af2b6.png", "number": "109", "name": "瓦斯彈", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4c76d556bda94f8eb8b73a9e58ef051262e78b7d.png", "number": "110", "name": "雙彈瓦斯", "type": "毒" }, { "image": "https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c89593cd44d8354c16c11f5fa10143a6a8b4ab1f.png", "number": "110", "name": "雙彈瓦斯", "type": "毒, 妖精" }];
@@ -27538,13 +27883,14 @@ function pageController(currentStatus, subPanelContainer) {
             pageNumberInput.value = newPageNumber;
             leftPageArrayDiv.innerText = "";
             rightPageArrayDiv.innerText = "";
-            for (var i = 1; i < currentPageNumber - 1; i++) {
-                leftPageArrayDiv.innerText += i + " ";
-            }
-            for (var i = currentPageNumber; i < totalPageNumber; i++) {
-                rightPageArrayDiv.innerText += i + " ";
-            }
+            // for (let i=1; i< currentPageNumber-1; i++){
+            //     leftPageArrayDiv.innerText += `${i} `
+            // }
+            // for (let i=currentPageNumber; i< totalPageNumber; i++){
+            //     rightPageArrayDiv.innerText += `${i} `
+            // }
             // currentPage should be
+            currentStatus.currentPage = currentStatus.pageArrayFullPage[newPageNumber];
             currentStatus.pageArrayFullPage[currentPageNumber].style.left = "+100%";
             currentStatus.pageArrayFullPage[newPageNumber].style.left = "0%";
         }
@@ -27559,13 +27905,14 @@ function pageController(currentStatus, subPanelContainer) {
             pageNumberInput.value = newPageNumber;
             leftPageArrayDiv.innerText = "";
             rightPageArrayDiv.innerText = "";
-            for (var i = 1; i < currentPageNumber + 1; i++) {
-                leftPageArrayDiv.innerText += i + " ";
-            }
-            for (var i = currentPageNumber + 2; i < totalPageNumber; i++) {
-                rightPageArrayDiv.innerText += i + " ";
-            }
+            // for (let i=1; i< currentPageNumber+1; i++){
+            //     leftPageArrayDiv.innerText += `${i} `
+            // }
+            // for (let i=currentPageNumber+2; i< totalPageNumber; i++){
+            //     rightPageArrayDiv.innerText += `${i} `
+            // }
             // currentPage should be
+            currentStatus.currentPage = currentStatus.pageArrayFullPage[newPageNumber];
             currentStatus.pageArrayFullPage[currentPageNumber].style.left = "-100%";
             currentStatus.pageArrayFullPage[newPageNumber].style.left = "0%";
         } // if currentpage > 0
@@ -27611,29 +27958,30 @@ function updatePageNumberInNewOrder(currentStatus) {
 exports.updatePageNumberInNewOrder = updatePageNumberInNewOrder;
 function createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var newPage = GreatNoteDataClass.GNContainerDiv("fullPage", constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], false, false, saveToDatabase);
+    var newPage = GreatNoteDataClass.GNContainerDiv({ name: "fullPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject" });
     newPage.classList.add("divPage");
     newPage._dataStructure = ["innerText"];
     newPage._styleStructure = ["background", "width", "height"];
-    var smallViewAccesssPointer = saveToDatabase ? newPage.getAccessPointer() : false; // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
-    var smallView = GreatNoteDataClass.GNContainerDiv("overviewPage", constructInitialCondition_1.mainController.mainDocArray["mainArray_pageOverview"], false, smallViewAccesssPointer, saveToDatabase);
+    var newPageAccesssPointer = saveToDatabase ? newPage.getAccessPointer() : false; // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
+    var smallView = GreatNoteDataClass.GNContainerDiv({ name: "overviewPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject" });
     smallView.classList.add("divPageSmall");
     smallView._dataStructure = ["innerText"];
     smallView._styleStructure = ["background", "width", "height"];
     smallView.style.background = "pink";
     smallView.style.width = currentStatus.overviewPageSize[0] + "px";
     smallView.style.height = currentStatus.overviewPageSize[1] + "px";
-    var smallViewContent = document.createElement("div");
-    smallViewContent.classList.add("smallViewContent");
-    var smallViewDescription = document.createElement("div");
-    smallViewDescription.classList.add("smallViewDescription");
-    smallView.append(smallViewContent, smallViewDescription);
+    //
+    // let smallViewContent = document.createElement("div")
+    // smallViewContent.classList.add("smallViewContent")
+    // let smallViewDescription = document.createElement("div")
+    // smallViewDescription.classList.add("smallViewDescription")
+    // smallView.append(smallViewContent, smallViewDescription)
     // ==========================
     // add events to smallView
     // ==========================
     var dummyNumber = Math.floor(Math.random() * pkmDatabase.length);
     newPage.innerText = "" + pkmDatabase[dummyNumber].name;
-    smallViewDescription.innerText = "" + pkmDatabase[dummyNumber].name;
+    // smallViewDescription.innerText = `${pkmDatabase[dummyNumber].name}`
     // ==========================
     // add events to smallView
     // ==========================
@@ -27645,38 +27993,29 @@ function createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, fullPage
         smallView.saveHTMLObjectToDatabase();
     }
     if (fullPageData && overviewPageData) {
-        fillInDataContent(newPage, smallView, fullPageData, overviewPageData);
-        console.log("203, fullPageData, overviewPageData", fullPageData, overviewPageData);
+        fillInNewPageDataContent(newPage, fullPageData);
+        fillInSmallViewDataContent(smallView, overviewPageData);
         // fillInDataContent(fullPageData, overviewPageData)
         // socket.emit("clientAskServerToInitiateSynchronization")
     }
     return [newPage, smallView];
 }
 exports.createNewPage = createNewPage;
-function fillInDataContent(newPage, smallView, fullPageData, overviewPageData) {
+function fillInNewPageDataContent(newPage, fullPageData) {
     newPage.initializeHTMLObjectFromData(fullPageData);
+    console.log(227, fullPageData);
     newPage.innerText = fullPageData.data.innerText;
+}
+exports.fillInNewPageDataContent = fillInNewPageDataContent;
+function fillInSmallViewDataContent(smallView, overviewPageData) {
     smallView.initializeHTMLObjectFromData(overviewPageData);
     var smallViewDescription = smallView.querySelector(".smallViewDescription");
-    smallViewDescription.innerText = overviewPageData.data.innerText;
-    // this line is for rendering items in a page array into the page
-    // mainController.renderDataToHTML(fullPageData["array"], newPage)
-    //
-    // let svgBoard = GreatNoteSvgDataClass.GNSvg("svg", newPage.getAccessPointer())
-    // svgBoard.appendToContainer(newPage)
-    // console.log(2109, svgBoard.getAccessPointer())
-    // for (let i = 0; i< 3; i++){
-    //
-    //     let circle = GreatNoteSvgDataClass.GNSvgCircle("circle_"+i, svgBoard.getAccessPointer())
-    //     let randomCX = Math.random() * 400
-    //     let randomCY = Math.random() * 300
-    //     circle.applyStyle({"cx":randomCX , "cy":randomCY, r: 10})
-    //     circle.appendTo(svgBoard)
-    // }
+    // smallViewDescription.innerText = overviewPageData.data.innerText
 }
+exports.fillInSmallViewDataContent = fillInSmallViewDataContent;
 function addEventToNewPage(currentStatus, newPage) {
     newPage.addEventListener("click", function (e) {
-        console.log(e.target._identity);
+        console.log(240, "pageViewHelperFunction", e.target._identity);
         if (newPage.contains(e.target)) {
             // if (newPage.compareDocumentPosition(e.target)){
             if (currentStatus.selectedObject)
@@ -27696,19 +28035,14 @@ function insertNewPage(currentStatus, newFullPage, newSmallView, fullPageModeDiv
     currentStatus.pageArraySmallView.splice(newPageNumber, 0, newSmallView);
     currentStatus.previousPage = currentStatus.currentPage ? currentStatus.currentPage : null;
     currentStatus.currentPage = newFullPage;
-    // console.log(`currentPageNumber: ${newPageNumber}, nextPageNumber: ${currentStatus.newPageNumber}, pageArray: ${currentStatus.pageArray}, previousPage: ${currentStatus.previousPage}, currentPage: ${currentStatus.currentPage}`)
     // ==========================
     // appending new pages to the fullPageModeDiv and overviewModeDiv
     //==========================
     newFullPage.setAttribute("pageNumber", newPageNumber);
-    newSmallView.setAttribute("pageNumber", newPageNumber);
-    // insert to the one next to the currentPage
-    // select the object from the array
-    // append the new page to full mode div
-    var smallViewContent = newSmallView.querySelector(".smallViewContent");
-    smallViewContent.innerText = newPageNumber;
-    // first insert to the end of the html
     fullPageModeDiv.append(newFullPage);
+    newSmallView.setAttribute("pageNumber", newPageNumber);
+    var smallViewContent = newSmallView.querySelector(".smallViewContent");
+    // smallViewContent.innerText = newPageNumber
     overviewModeDiv.append(newSmallView);
     if (currentStatus.previousPage) {
         fullPageModeDiv.insertBefore(newFullPage, currentStatus.pageArrayFullPage[newPageNumber - 1]);
@@ -27765,10 +28099,12 @@ function highlightCurrentPageInOverviewMode(smallPageView, currentPageNumber, cu
     // smallPageView.parentNode.querySelector(`.divPageSmall[pageNumber='${currentPageNumber}']`)
     currentPageHtml.style.border = "3px red solid";
 }
+function layerController() {
+}
 // extract and create data object do not directly save object to the database.
 // What is saved to the database is controlled by the saveHTMLOBjectTODatabase function in the mainController file
 
-},{"./GreatNoteDataClass":46,"./constructInitialCondition":53}],58:[function(require,module,exports){
+},{"./GreatNoteDataClass":46,"./constructInitialCondition":59}],63:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27810,15 +28146,25 @@ exports.socket.on("askRootUserForInitialData", function (data) {
     data.initialData = constructInitialCondition_1.mainController.saveMainDoc(false);
     exports.socket.emit("sendInitialDataToServer", data);
 });
+exports.socket.on("saveDataToServer", function (data) {
+    console.log("receive save message from server");
+    console.log(data);
+    constructInitialCondition_1.mainController.saveMainDoc(true);
+});
 exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
     constructInitialCondition_1.mainController.loadMainDoc(data);
+    constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
+    constructInitialCondition_1.mainController.buildPageFromMainDoc();
 });
 exports.socket.on("processInitialData", function (data) {
     if (data.initialData) {
         constructInitialCondition_1.mainController.loadMainDoc(data.initialData);
+        constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
+        constructInitialCondition_1.mainController.buildPageFromMainDoc();
     }
-    constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
-    constructInitialCondition_1.mainController.buildPageFromMainDoc();
+    else {
+        exports.socket.emit("loadMainDoc");
+    }
 });
 exports.socket.on("serverInitiatesSynchronization", function () {
     // send back change data to the server
@@ -27827,6 +28173,7 @@ exports.socket.on("serverInitiatesSynchronization", function () {
     exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
 });
 exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {
+    console.log(changeDataArray);
     var changeToBeProcessedArray = new Set();
     changeDataArray.forEach(function (change) {
         var senderID = change.id;
@@ -27839,11 +28186,12 @@ exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray)
     });
     constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
     constructInitialCondition_1.mainController.processChangeData(changeToBeProcessedArray);
+    // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
     // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     // console.log(52, changes)
 });
 
-},{"./constructInitialCondition":53,"automerge":1,"socket.io-client":27}],59:[function(require,module,exports){
+},{"./constructInitialCondition":59,"automerge":1,"socket.io-client":27}],64:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var divTest = false;
@@ -28179,7 +28527,7 @@ var fillController;
 // //
 // // }
 
-},{}],60:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -28331,7 +28679,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],61:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -30112,7 +30460,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":60,"buffer":61,"ieee754":62}],62:[function(require,module,exports){
+},{"base64-js":65,"buffer":66,"ieee754":67}],67:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -30199,7 +30547,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],63:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -30385,4 +30733,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[44,45,46,48,49,50,51,52,53,54,55,56,57,58,59]);
+},{}]},{},[44,45,46,48,49,56,57,58,59,60,61,62,63,64,51,52,53,54,55]);
