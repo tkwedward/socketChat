@@ -4,7 +4,8 @@ export interface GNObjectInterface {
     controlledObject?:any
     controllerEvent?:any
 
-    _type: string // the GN type???
+    GNType: string // the GN type???
+    specialGNType?: string
     _name: string // a name to describe the object
 
     // these two are used for extracting data and create dataObject
@@ -40,6 +41,7 @@ export interface GNObjectInterface {
     reloadDataFromDatabase()
     saveHTMLObjectToDatabase()
     initializeHTMLObjectFromData(objectData:any)
+    generateGNObjectThroughGNType(_GNType: string, createDataObject: CreateGreatNoteObjectInterface)
 
     /** to save data from the database and extract data*/
     save()
@@ -57,6 +59,7 @@ function createDummyData(){
         "data": {},
         "array": [],
         "GNType": "",
+        "specialGNType": "",
         "_identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
         "_classList": [],
         "stylesheet": {}
@@ -77,7 +80,8 @@ export interface CreateGreatNoteObjectInterface {
     arrayID?: string,
     insertPosition?: number|boolean,
     dataPointer?: string|boolean,
-    saveToDatabase?: boolean=true
+    saveToDatabase?: boolean=true,
+    injectedData?: any
 }
 
 //@auto-fold here
@@ -86,7 +90,7 @@ export function GNInputField(createData: CreateGreatNoteObjectInterface) : GNInp
 
     let _object = <GNInputFieldInterface> document.createElement("input");
 
-    _object._type = GNInputField.name
+    _object.GNType = GNInputField.name
     _object._name = name
     _object._dataStructure = ["value"]
     _object._styleStructure = []
@@ -96,7 +100,8 @@ export function GNInputField(createData: CreateGreatNoteObjectInterface) : GNInp
         let dataObject = createDummyData()
 
         // data structure
-        dataObject["GNType"] = _object._type
+        dataObject["GNType"] = _object.GNType
+
         if (_object._identity) dataObject["_identity"] = _object._identity
 
         _object._dataStructure.forEach(p=>{
@@ -123,16 +128,16 @@ export function GNInputField(createData: CreateGreatNoteObjectInterface) : GNInp
     // if the object is assigned to the database, then this  addEventListener is to monitor the change
     // define what is the update action
 
-    let eventStatus = {t0: 0, t1: 0, run: true}
-    _object.addEventListener("input", (e)=>{
-        eventStatus.t0 = eventStatus.t1
-        eventStatus.t1 = e.timeStamp
-
-        if ( eventStatus.t1 - eventStatus.t0 > 100){
-            if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
-            if (_object.processUpdateData) _object.processUpdateData()
-        }
-    })//addEventListener
+    // let eventStatus = {t0: 0, t1: 0, run: true}
+    // _object.addEventListener("input", (e)=>{
+    //     eventStatus.t0 = eventStatus.t1
+    //     eventStatus.t1 = e.timeStamp
+    //
+    //     if ( eventStatus.t1 - eventStatus.t0 > 100){
+    //         if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
+    //         if (_object.processUpdateData) _object.processUpdateData()
+    //     }
+    // })//addEventListener
 
     return _object
 } // GNInputField
@@ -153,7 +158,7 @@ export function GNButton(_name:string, statusList: string[], arrayID: string, in
     let _object = <GNButtonInterface> document.createElement("button");
 
     _object._name = _name
-    _object._type = GNButton.name
+    _object.GNType = GNButton.name
     _object.statusList = statusList
     _object._dataStructure = ["innerText"]
     _object._styleStructure = []
@@ -167,7 +172,9 @@ export function GNButton(_name:string, statusList: string[], arrayID: string, in
         let dataObject = createDummyData()
 
         // data structure
-        dataObject["GNType"] = _object._type
+        dataObject["GNType"] = _object.GNType
+
+
         if (_object._identity) dataObject["_identity"] = _object._identity
 
         _object._dataStructure.forEach(p=>{
@@ -227,8 +234,8 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
     let _object = <GNContainerDivInterface> document.createElement("div");
     _object.childrenList = {}
 
-    _object._type = GNContainerDiv.name
-    _object._dataStructure = ["innerText"]
+    _object.GNType = GNContainerDiv.name
+    _object._dataStructure = ["innerHTML"]
     _object._styleStructure = ["background", "width", "height"]
 
     // functions
@@ -249,7 +256,7 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
     _object.createDataObject = function(){
         let dataObject = createDummyData()
 
-        dataObject["GNType"] = _object._type
+        dataObject["GNType"] = _object.GNType
         if (_object._identity) dataObject["_identity"] = _object._identity
 
         // data structure
@@ -276,8 +283,22 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
 
 
     _object.extract = () => _object.createDataObject()
+
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage)
+
+
+    // add events
+    let eventStatus = {t0: 0, t1: 0, run: true}
+    _object.addEventListener("input", (e)=>{
+        eventStatus.t0 = eventStatus.t1
+        eventStatus.t1 = e.timeStamp
+
+        if ( eventStatus.t1 - eventStatus.t0 > 100){
+            if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
+            if (_object.processUpdateData) _object.processUpdateData()
+        }
+    })//addEventListener
 
     return _object
 }
@@ -296,7 +317,7 @@ export function GNEditableDiv(_name:string, arrayID: string, insertPosition?: nu
     _object.contentEditable = "true"
 
     _object._name = _name
-    _object._type = GNEditableDiv.name
+    _object.GNType = GNEditableDiv.name
     _object._dataStructure = ["innerHTML"]
     _object._styleStructure = ["background", "width"]
 
@@ -304,7 +325,7 @@ export function GNEditableDiv(_name:string, arrayID: string, insertPosition?: nu
         let dataObject = createDummyData()
 
         // data structure
-        dataObject["GNType"] = _object._type
+        dataObject["GNType"] = _object.GNType
         if (_object._identity) dataObject["_identity"] = _object._identity
 
         _object._dataStructure.forEach(p=>{
@@ -350,7 +371,7 @@ export function GNImage(_name, imgsrc):GNImageInterface{
 
     _object._name = _name
     _object.src = imgsrc
-    _object._type = GNImage.name
+    _object.GNType = GNImage.name
     _object.style.width = "60%"
     _object._dataStructure = ["src"]
     _object._styleStructure = ["width", "height"]
@@ -361,7 +382,7 @@ export function GNImage(_name, imgsrc):GNImageInterface{
         let dataObject = createDummyData()
 
         // identity
-        dataObject["GNType"] = _object._type
+        dataObject["GNType"] = _object.GNType
         if (_object._identity) dataObject["_identity"] = _object._identity
 
         // data structure
@@ -409,7 +430,7 @@ export function GNDropdownList(_name:string, selectList: string[],arrayID: strin
     })
 
     _object._name = _name
-    _object._type = GNDropdownList.name
+    _object.GNType = GNDropdownList.name
     _object._dataStructure = ["value"]
 
     _object.extract = () => {
@@ -434,7 +455,7 @@ export function GNTemplate(_name:string, _parent?:any) : GNEditableDivInterface 
 
     // internal properties
     _object._name = _name
-    _object._type = GNImage.name
+    _object.GNType = GNImage.name
 
     // functions
     _object.extract = () => 123
@@ -495,7 +516,7 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
     _object.initializeHTMLObjectFromData = function(data: any){
         _object.setAttribute("accessPointer", data._identity.accessPointer)
         _object._identity = data._identity
-        _object._type = data._type
+        _object.GNType = data.GNType
     }
 
     _object.processUpdateData  = function(){
@@ -524,6 +545,10 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
     _object.appendTo = function(_parent:HTMLElement){
         _object._parent = _parent
         _parent.appendChild(_object)
+    }
+
+    _object.generateGNObjectThroughGNType = function(_GNType:string, createDataObject: CreateGreatNoteObjectInterface){
+        return mainController.createGNObjectThroughName(_GNType, createDataObject)
     }
 
     // ========================================

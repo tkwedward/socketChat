@@ -177,8 +177,6 @@ export function insertNewPage(currentStatus, newFullPage, newSmallView, fullPage
     fullPageModeDiv.append(newFullPage)
 
     newSmallView.setAttribute("pageNumber", newPageNumber)
-    let smallViewContent = newSmallView.querySelector(".smallViewContent")
-    // smallViewContent.innerText = newPageNumber
     overviewModeDiv.append(newSmallView)
 
     if (currentStatus.previousPage){

@@ -28,6 +28,7 @@ var socketFunction_1 = require("./socketFunction");
 var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
 var pageController = __importStar(require("./pageControllerFolder/pageController"));
 var LayerConroller = __importStar(require("./layerControllerFolder/layerController"));
+var GNCommentController = __importStar(require("./commentFolder/commentController"));
 function buildInitialPage(mainController, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = false; }
     mainController.GNDataStructureMapping = {
@@ -39,7 +40,8 @@ function buildInitialPage(mainController, saveToDatabase) {
         GNSvg: GreatNoteSvgDataClass.GNSvg,
         GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
         GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
-        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect
+        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
+        GNComment: GNCommentController.GNComment
     };
     var currentStatus = mainController.pageCurrentStatus;
     var pageFullArray = mainController.mainDoc["array"][0]["array"];
@@ -51,6 +53,8 @@ function buildInitialPage(mainController, saveToDatabase) {
         var _a = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
         console.log(37, pageFullArray[i], newPage);
         mainController.renderDataToHTML(pageFullArray[i], newPage);
+        // let commentContainer = CommentController.GNComment({name:"name", arrayID: newPage.getAccessPointer(), saveToDatabase:true})
+        // commentContainer.appendTo(newPage)
         // console.log(pageFullArray[i])
         pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
     }
@@ -153,6 +157,11 @@ function buildInitialHTMLSkeleton(mainController) {
     // To create a page Controller to navigate previous and nex page
     pageController.pageController(currentStatus, bookmarkSubPanelContent);
     var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer));
+    var deletePageButton = document.createElement("button");
+    deletePageButton.innerHTML = "delete page";
+    deletePageButton.addEventListener("click", function () {
+        currentStatus.currentPage.remove();
+    });
     var switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
     var saveButton = document.createElement("button");
     saveButton.innerHTML = "saveButton";
@@ -167,7 +176,7 @@ function buildInitialHTMLSkeleton(mainController) {
     objectIDGetterSubmit.addEventListener("click", function (e) {
         console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector("*[accessPointer='" + objectIDGetter.value + "']"));
     });
-    bookmarkSubPanelContent.append(createNewDivButton, switchViewModeButton, saveButton, objectIDGetter, objectIDGetterSubmit);
+    bookmarkSubPanelContent.append(createNewDivButton, deletePageButton, switchViewModeButton, saveButton, objectIDGetter, objectIDGetterSubmit);
     // commentSubPanel
     var commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false);
     panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel);

@@ -7,6 +7,7 @@ function createDummyData() {
         "data": {},
         "array": [],
         "GNType": "",
+        "specialGNType": "",
         "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
         "_classList": [],
         "stylesheet": {}
@@ -16,7 +17,7 @@ function createDummyData() {
 function GNInputField(createData) {
     var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
     var _object = document.createElement("input");
-    _object._type = GNInputField.name;
+    _object.GNType = GNInputField.name;
     _object._name = name;
     _object._dataStructure = ["value"];
     _object._styleStructure = [];
@@ -24,7 +25,7 @@ function GNInputField(createData) {
     _object.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
-        dataObject["GNType"] = _object._type;
+        dataObject["GNType"] = _object.GNType;
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         _object._dataStructure.forEach(function (p) {
@@ -43,17 +44,16 @@ function GNInputField(createData) {
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
     // if the object is assigned to the database, then this  addEventListener is to monitor the change
     // define what is the update action
-    var eventStatus = { t0: 0, t1: 0, run: true };
-    _object.addEventListener("input", function (e) {
-        eventStatus.t0 = eventStatus.t1;
-        eventStatus.t1 = e.timeStamp;
-        if (eventStatus.t1 - eventStatus.t0 > 100) {
-            if (_object._identity.accessPointer != "")
-                _object.saveHTMLObjectToDatabase();
-            if (_object.processUpdateData)
-                _object.processUpdateData();
-        }
-    }); //addEventListener
+    // let eventStatus = {t0: 0, t1: 0, run: true}
+    // _object.addEventListener("input", (e)=>{
+    //     eventStatus.t0 = eventStatus.t1
+    //     eventStatus.t1 = e.timeStamp
+    //
+    //     if ( eventStatus.t1 - eventStatus.t0 > 100){
+    //         if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
+    //         if (_object.processUpdateData) _object.processUpdateData()
+    //     }
+    // })//addEventListener
     return _object;
 } // GNInputField
 exports.GNInputField = GNInputField;
@@ -62,7 +62,7 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var _object = document.createElement("button");
     _object._name = _name;
-    _object._type = GNButton.name;
+    _object.GNType = GNButton.name;
     _object.statusList = statusList;
     _object._dataStructure = ["innerText"];
     _object._styleStructure = [];
@@ -72,7 +72,7 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     _object.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
-        dataObject["GNType"] = _object._type;
+        dataObject["GNType"] = _object.GNType;
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         _object._dataStructure.forEach(function (p) {
@@ -109,8 +109,8 @@ function GNContainerDiv(createData) {
     var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
     var _object = document.createElement("div");
     _object.childrenList = {};
-    _object._type = GNContainerDiv.name;
-    _object._dataStructure = ["innerText"];
+    _object.GNType = GNContainerDiv.name;
+    _object._dataStructure = ["innerHTML"];
     _object._styleStructure = ["background", "width", "height"];
     // functions
     _object.appendElements = function () {
@@ -131,7 +131,7 @@ function GNContainerDiv(createData) {
     };
     _object.createDataObject = function () {
         var dataObject = createDummyData();
-        dataObject["GNType"] = _object._type;
+        dataObject["GNType"] = _object.GNType;
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         // data structure
@@ -155,6 +155,18 @@ function GNContainerDiv(createData) {
     _object.extract = function () { return _object.createDataObject(); };
     // add extra funcitons to the object
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
+    // add events
+    var eventStatus = { t0: 0, t1: 0, run: true };
+    _object.addEventListener("input", function (e) {
+        eventStatus.t0 = eventStatus.t1;
+        eventStatus.t1 = e.timeStamp;
+        if (eventStatus.t1 - eventStatus.t0 > 100) {
+            if (_object._identity.accessPointer != "")
+                _object.saveHTMLObjectToDatabase();
+            if (_object.processUpdateData)
+                _object.processUpdateData();
+        }
+    }); //addEventListener
     return _object;
 }
 exports.GNContainerDiv = GNContainerDiv;
@@ -165,13 +177,13 @@ function GNEditableDiv(_name, arrayID, insertPosition, dataPointer, saveToDataba
     var _object = GNContainerDiv(_name, arrayID, insertPosition, dataPointer, saveToDatabase);
     _object.contentEditable = "true";
     _object._name = _name;
-    _object._type = GNEditableDiv.name;
+    _object.GNType = GNEditableDiv.name;
     _object._dataStructure = ["innerHTML"];
     _object._styleStructure = ["background", "width"];
     _object.createDataObject = function () {
         var dataObject = createDummyData();
         // data structure
-        dataObject["GNType"] = _object._type;
+        dataObject["GNType"] = _object.GNType;
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         _object._dataStructure.forEach(function (p) {
@@ -202,7 +214,7 @@ function GNImage(_name, imgsrc) {
     var _object = document.createElement("img");
     _object._name = _name;
     _object.src = imgsrc;
-    _object._type = GNImage.name;
+    _object.GNType = GNImage.name;
     _object.style.width = "60%";
     _object._dataStructure = ["src"];
     _object._styleStructure = ["width", "height"];
@@ -210,7 +222,7 @@ function GNImage(_name, imgsrc) {
     _object.createDataObject = function () {
         var dataObject = createDummyData();
         // identity
-        dataObject["GNType"] = _object._type;
+        dataObject["GNType"] = _object.GNType;
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         // data structure
@@ -241,7 +253,7 @@ function GNDropdownList(_name, selectList, arrayID, insertPosition, dataPointer,
         _object.appendChild(option);
     });
     _object._name = _name;
-    _object._type = GNDropdownList.name;
+    _object.GNType = GNDropdownList.name;
     _object._dataStructure = ["value"];
     _object.extract = function () {
         var _dummyData = _object.createDataObject();
@@ -256,7 +268,7 @@ function GNTemplate(_name, _parent) {
     var _object = document.createElement("div");
     // internal properties
     _object._name = _name;
-    _object._type = GNImage.name;
+    _object.GNType = GNImage.name;
     // functions
     _object.extract = function () { return 123; };
     _object.addEventListener("eventName", function (e) {
@@ -297,7 +309,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     _object.initializeHTMLObjectFromData = function (data) {
         _object.setAttribute("accessPointer", data._identity.accessPointer);
         _object._identity = data._identity;
-        _object._type = data._type;
+        _object.GNType = data.GNType;
     };
     _object.processUpdateData = function () {
         var objectData = _object.reloadDataFromDatabase();
@@ -320,6 +332,9 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     _object.appendTo = function (_parent) {
         _object._parent = _parent;
         _parent.appendChild(_object);
+    };
+    _object.generateGNObjectThroughGNType = function (_GNType, createDataObject) {
+        return constructInitialCondition_1.mainController.createGNObjectThroughName(_GNType, createDataObject);
     };
     // ========================================
     // =======   for database acces    ========

@@ -103,7 +103,8 @@ var MainController = /** @class */ (function () {
                     "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
                     "_classList": [],
                     "styleSheet": {},
-                    "GNType": ""
+                    "GNType": "",
+                    "specialGNType": ""
                 };
             };
             // let htmlObject = document.createEle ment("div")
@@ -283,6 +284,12 @@ var MainController = /** @class */ (function () {
         var newHTMLObject;
         // cannot save any obeject to the data base here
         data["array"].forEach(function (p) {
+            if (p.GNType == "GNComment") {
+                console.log("123, see a _commentContainer");
+                newHTMLObject = _this.createGNObjectThroughName("GNComment", { name: "", injectedData: p });
+                arrayHTMLObject.appendChild(newHTMLObject);
+                return;
+            }
             if (p.GNType == "GNSvg") {
                 // cannot save any obeject to the data base here because this will create an infinity loop and will append new obejct forever
                 newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });

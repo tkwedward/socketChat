@@ -8,6 +8,8 @@ import * as pageViewHelperFunction from "./pageViewHelperFunction"
 import {MainControllerInterface} from "./constructInitialCondition"
 import * as pageController from "./pageControllerFolder/pageController"
 import * as LayerConroller from "./layerControllerFolder/layerController"
+import * as GNCommentController from "./commentFolder/commentController"
+
 
 export function buildInitialPage(mainController:MainControllerInterface, saveToDatabase=false){
     mainController.GNDataStructureMapping = {
@@ -20,7 +22,8 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         GNSvg: GreatNoteSvgDataClass.GNSvg,
         GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
         GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
-        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect
+        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
+        GNComment: GNCommentController.GNComment
     }
 
     let currentStatus = mainController.pageCurrentStatus
@@ -35,6 +38,9 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         let [newPage, smallView] = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase)
         console.log(37, pageFullArray[i], newPage)
         mainController.renderDataToHTML(pageFullArray[i], newPage)
+
+        // let commentContainer = CommentController.GNComment({name:"name", arrayID: newPage.getAccessPointer(), saveToDatabase:true})
+        // commentContainer.appendTo(newPage)
 
         // console.log(pageFullArray[i])
         pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
@@ -173,6 +179,12 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
         "new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
       )
 
+      let deletePageButton = document.createElement("button")
+      deletePageButton.innerHTML = "delete page"
+      deletePageButton.addEventListener("click", function(){
+          currentStatus.currentPage.remove()
+      })
+
       let switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv)
 
       let saveButton = document.createElement("button")
@@ -196,7 +208,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       })
 
 
-      bookmarkSubPanelContent.append(createNewDivButton, switchViewModeButton, saveButton, objectIDGetter, objectIDGetterSubmit)
+      bookmarkSubPanelContent.append(createNewDivButton,deletePageButton, switchViewModeButton, saveButton, objectIDGetter, objectIDGetterSubmit)
 
       // commentSubPanel
       let commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false)

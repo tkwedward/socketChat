@@ -160,7 +160,8 @@ export class MainController implements MainControllerInterface{
                     "_identity": {"dataPointer": "", "accessPointer": "", "linkArray": []},
                     "_classList": [],
                     "styleSheet": {},
-                    "GNType": ""
+                    "GNType": "",
+                    "specialGNType": ""
                 }
             }
 
@@ -365,6 +366,15 @@ export class MainController implements MainControllerInterface{
         let newHTMLObject
         // cannot save any obeject to the data base here
         data["array"].forEach(p=>{
+            if (p.GNType=="GNComment"){
+              console.log("123, see a _commentContainer")
+              newHTMLObject = this.createGNObjectThroughName("GNComment", {name: "", injectedData: p})
+              arrayHTMLObject.appendChild(newHTMLObject)
+
+              return
+            }
+
+
             if (p.GNType=="GNSvg"){
               // cannot save any obeject to the data base here because this will create an infinity loop and will append new obejct forever
                 newHTMLObject = this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer() , saveToDatabase:false})

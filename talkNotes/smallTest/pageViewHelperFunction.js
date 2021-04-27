@@ -175,8 +175,6 @@ function insertNewPage(currentStatus, newFullPage, newSmallView, fullPageModeDiv
     newFullPage.setAttribute("pageNumber", newPageNumber);
     fullPageModeDiv.append(newFullPage);
     newSmallView.setAttribute("pageNumber", newPageNumber);
-    var smallViewContent = newSmallView.querySelector(".smallViewContent");
-    // smallViewContent.innerText = newPageNumber
     overviewModeDiv.append(newSmallView);
     if (currentStatus.previousPage) {
         fullPageModeDiv.insertBefore(newFullPage, currentStatus.pageArrayFullPage[newPageNumber - 1]);
