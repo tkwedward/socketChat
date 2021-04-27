@@ -19,7 +19,7 @@ function initializeContainerAndControllerEvent(htmlObject, controllerArray) {
 exports.initializeContainerAndControllerEvent = initializeContainerAndControllerEvent;
 function superController(controllerContainer) {
     // to add some function and common properties to an controller object
-    // controllerContainer.style.display = "none"
+    controllerContainer.style.display = "none";
     //** if the controller's targetHTMLType is not equal to the input htmlObject's tagname, then will hide the controller, but if they are the same, then the
     controllerContainer.responseToHtmlType = function (htmlObject) {
         console.log(htmlObject.tagName, controllerContainer.targetHTMLType);

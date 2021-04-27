@@ -363,17 +363,15 @@ export class MainController implements MainControllerInterface{
     /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database, not array, but the object includes array property */
     renderDataToHTML(data:communicationDataStructure, arrayHTMLObject?){
         let newHTMLObject
-        console.log(329, data, arrayHTMLObject)
         // cannot save any obeject to the data base here
         data["array"].forEach(p=>{
-            console.log(331, p)
             if (p.GNType=="GNSvg"){
               // cannot save any obeject to the data base here because this will create an infinity loop and will append new obejct forever
                 newHTMLObject = this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer() , saveToDatabase:false})
                 newHTMLObject._identity = p._identity
 
                 let objectData =  newHTMLObject.getDataFromDataBase()
-                console.log(352, objectData)
+
                 newHTMLObject.applyStyle(objectData.stylesheet)
 
                 newHTMLObject.addEventListener("click", function(){
@@ -386,7 +384,7 @@ export class MainController implements MainControllerInterface{
                 newHTMLObject._identity = p._identity
 
                 let objectData =  newHTMLObject.getDataFromDataBase()
-                console.log(352, objectData)
+
                 newHTMLObject.applyStyle(objectData.stylesheet)
             }
 
@@ -395,7 +393,7 @@ export class MainController implements MainControllerInterface{
                 newHTMLObject._identity = p._identity
                 //
                 let newPolylineData = newHTMLObject.getDataFromDataBase()
-                console.log(340, newPolylineData)
+
                 newHTMLObject.loadFromData(newPolylineData["data"])
 
                 let stylesheet = newPolylineData["stylesheet"]
@@ -420,7 +418,6 @@ export class MainController implements MainControllerInterface{
     saveMainDoc(sendRequest:boolean=false){
       let saveData = Automerge.save(this.mainDoc)
       if (sendRequest){
-        console.log(407, "save data to the server")
         socket.emit("saveMainDocToDisk", saveData)
         return saveData
       } else {
@@ -466,7 +463,7 @@ export class MainController implements MainControllerInterface{
 
     processChangeData(changeDataArray:Set<string>){
         let jsonfiedChangeDataArray = Array.from(changeDataArray).map(p=>JSON.parse(p))
-        console.log(447, jsonfiedChangeDataArray)
+
         jsonfiedChangeDataArray.forEach(p=>{
             let changeData = p
             if (changeData.action=="create"){

@@ -127,7 +127,6 @@ export function GNInputField(createData: CreateGreatNoteObjectInterface) : GNInp
     _object.addEventListener("input", (e)=>{
         eventStatus.t0 = eventStatus.t1
         eventStatus.t1 = e.timeStamp
-        console.log(eventStatus.t1 - eventStatus.t0, eventStatus.t1 - eventStatus.t0 > 100)
 
         if ( eventStatus.t1 - eventStatus.t0 > 100){
             if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
@@ -243,7 +242,6 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
 
     _object.loadFromData = (data) => {
         _object._dataStructure.forEach(key=>{
-            console.log(216, key, _object[key], _object)
             _object[key] = data[key]
         })
     }
@@ -265,7 +263,6 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
         _object._styleStructure.forEach(p=>{
           dataObject["stylesheet"][p] = _object["style"][p]
         })
-        // console.log(238, dataObject, _object)
 
         return dataObject
     }

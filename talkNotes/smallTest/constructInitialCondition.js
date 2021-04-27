@@ -281,16 +281,13 @@ var MainController = /** @class */ (function () {
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
         var _this = this;
         var newHTMLObject;
-        console.log(329, data, arrayHTMLObject);
         // cannot save any obeject to the data base here
         data["array"].forEach(function (p) {
-            console.log(331, p);
             if (p.GNType == "GNSvg") {
                 // cannot save any obeject to the data base here because this will create an infinity loop and will append new obejct forever
                 newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
                 newHTMLObject._identity = p._identity;
                 var objectData = newHTMLObject.getDataFromDataBase();
-                console.log(352, objectData);
                 newHTMLObject.applyStyle(objectData.stylesheet);
                 newHTMLObject.addEventListener("click", function () {
                     exports.mainController.toolBox.targetPage = newHTMLObject;
@@ -300,7 +297,6 @@ var MainController = /** @class */ (function () {
                 newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
                 newHTMLObject._identity = p._identity;
                 var objectData = newHTMLObject.getDataFromDataBase();
-                console.log(352, objectData);
                 newHTMLObject.applyStyle(objectData.stylesheet);
             }
             if (p.GNType == "GNSvgPolyLine") {
@@ -308,7 +304,6 @@ var MainController = /** @class */ (function () {
                 newHTMLObject._identity = p._identity;
                 //
                 var newPolylineData = newHTMLObject.getDataFromDataBase();
-                console.log(340, newPolylineData);
                 newHTMLObject.loadFromData(newPolylineData["data"]);
                 var stylesheet = newPolylineData["stylesheet"];
                 newHTMLObject.applyStyle({ "stroke": stylesheet["stroke"], "stroke-width": stylesheet["stroke-width"], "fill": stylesheet["fill"] });
@@ -329,7 +324,6 @@ var MainController = /** @class */ (function () {
         if (sendRequest === void 0) { sendRequest = false; }
         var saveData = Automerge.save(this.mainDoc);
         if (sendRequest) {
-            console.log(407, "save data to the server");
             socketFunction_1.socket.emit("saveMainDocToDisk", saveData);
             return saveData;
         }
@@ -367,7 +361,6 @@ var MainController = /** @class */ (function () {
     MainController.prototype.processChangeData = function (changeDataArray) {
         var _this = this;
         var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
-        console.log(447, jsonfiedChangeDataArray);
         jsonfiedChangeDataArray.forEach(function (p) {
             var changeData = p;
             if (changeData.action == "create") {

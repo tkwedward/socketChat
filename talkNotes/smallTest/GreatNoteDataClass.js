@@ -47,7 +47,6 @@ function GNInputField(createData) {
     _object.addEventListener("input", function (e) {
         eventStatus.t0 = eventStatus.t1;
         eventStatus.t1 = e.timeStamp;
-        console.log(eventStatus.t1 - eventStatus.t0, eventStatus.t1 - eventStatus.t0 > 100);
         if (eventStatus.t1 - eventStatus.t0 > 100) {
             if (_object._identity.accessPointer != "")
                 _object.saveHTMLObjectToDatabase();
@@ -127,7 +126,6 @@ function GNContainerDiv(createData) {
     };
     _object.loadFromData = function (data) {
         _object._dataStructure.forEach(function (key) {
-            console.log(216, key, _object[key], _object);
             _object[key] = data[key];
         });
     };
@@ -145,7 +143,6 @@ function GNContainerDiv(createData) {
         _object._styleStructure.forEach(function (p) {
             dataObject["stylesheet"][p] = _object["style"][p];
         });
-        // console.log(238, dataObject, _object)
         return dataObject;
     };
     _object.applyStyle = function (styleObject) {

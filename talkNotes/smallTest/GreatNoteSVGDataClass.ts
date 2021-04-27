@@ -38,7 +38,6 @@ export interface GNSvgContainerInterface extends SVG.LinkedHTMLElement, GreatNot
 //@auto-fold here
 export function GNSvg(createData: CreateGreatNoteObjectInterface) : GNSvgContainerInterface {
     let {name, arrayID, insertPosition, dataPointer, saveToDatabase, message} = createData
-    console.log(4141, createData)
     let svgDivContainer =  document.createElement("div")
     svgDivContainer.id = "testSvgDiv"
 
@@ -87,10 +86,9 @@ export function GNSvg(createData: CreateGreatNoteObjectInterface) : GNSvgContain
 
     //
     svgBoard.extract = () => svgBoard.createDataObject()
-    console.log(987, svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer)
     // add extra funcitons to the object
     GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer)
-    console.log(900, svgBoard._identity)
+
     return svgBoard
 }
 
@@ -134,7 +132,6 @@ export interface GNSvgCircleData {
 export function GNSvgCircle(createData: CreateGreatNoteObjectInterface) : GNSvgCircleInterface {
     let {name, arrayID, insertPosition, dataPointer, saveToDatabase} = createData
     let svgObjectSoul = new SVG.Circle()
-    console.log(119, svgObjectSoul)
     svgObjectSoul.radius(75)
     svgObjectSoul.fill("red")
     let svgObject = <GNSvgCircleInterface> svgObjectSoul.node
@@ -146,7 +143,6 @@ export function GNSvgCircle(createData: CreateGreatNoteObjectInterface) : GNSvgC
 
     // functions
     svgObject.loadFromData = (_GNData)=>{
-        console.log(145, "the data is updated", _GNData)
         svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200
         svgObject.style["cy"] = parseInt(_GNData["data"]["cy"])
         svgObject.style["r"]  = parseInt(_GNData["data"]["r"])
@@ -164,7 +160,6 @@ export function GNSvgCircle(createData: CreateGreatNoteObjectInterface) : GNSvgC
         dataObject["data"]["cx"] = svgObject.style["cx"]
         dataObject["data"]["cy"] = svgObject.style["cy"]
         dataObject["data"]["r"] = svgObject.style["r"]
-        console.log(159, dataObject["data"])
 
         // stylesheet data
         svgObject._styleStructure.forEach(p=>{
@@ -182,12 +177,10 @@ export function GNSvgCircle(createData: CreateGreatNoteObjectInterface) : GNSvgC
 
     svgObject.appendTo = function (parentSVGContainer){
       //self.targetPage.svgNode.appendChild(eraser.node)
-        console.log(139, parentSVGContainer, svgObject)
         parentSVGContainer.svgNode.appendChild(svgObject.node)
     }
 
     // add extra funcitons to the object
-    console.log(146, GreatNoteDataClass.superGNObject)
     GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
     SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
     return svgObject
@@ -223,7 +216,6 @@ export function GNSvgRect(name:string, arrayID: string, insertPosition?: number|
     svgObject.extract = () => svgObject.createDataObject()
 
     svgObject.applyStyle = function(attrList:GNSvgRectData){
-        console.log(attrList)
         Object.entries(attrList).forEach(([key, value], _)=>{
             svgObject.node.style[key] = value
 
@@ -306,12 +298,7 @@ export function GNSvgPolyLine(createData: CreateGreatNoteObjectInterface) : GNSv
 
     // functions
     svgObject.loadFromData = (data)=>{
-      // svgObject.soul.plot([[0, 0], [10, 100]])
-      console.log(309, data)
       svgObject.soul.plot(data["points"])
-
-      // console.log(303, svgObject.applyStyle, data["stylesheet"])
-      // svgObject.applyStyle(data["stylesheet"])
     }
 
     svgObject.createDataObject = function(){
@@ -349,7 +336,6 @@ export function GNSvgPolyLine(createData: CreateGreatNoteObjectInterface) : GNSv
     SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase)
     // add extra funcitons to the object
 
-    console.log(234, svgObject)
     return svgObject
 } //GNSvgPolyLine
 
@@ -398,8 +384,6 @@ export function GNSvgImage(name:string, arrayID?: string, insertPosition?: numbe
 
 function SuperSVG(svgObject, arrayID: string, insertPosition?: number|boolean, dataPointer?: string|boolean, saveToDatabase?: boolean){
     svgObject.appendTo = function (parentSVGContainer){
-      console.log(317, parentSVGContainer)
-        console.log(318, svgObject)
         svgObject.soul.addTo(parentSVGContainer.svgController)
     }
     //

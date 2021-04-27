@@ -37,7 +37,6 @@ function createDummyData() {
 //@auto-fold here
 function GNSvg(createData) {
     var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message;
-    console.log(4141, createData);
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
     var svgController = svg_js_1["default"](svgDivContainer);
@@ -78,10 +77,8 @@ function GNSvg(createData) {
     };
     //
     svgBoard.extract = function () { return svgBoard.createDataObject(); };
-    console.log(987, svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
     // add extra funcitons to the object
     GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
-    console.log(900, svgBoard._identity);
     return svgBoard;
 }
 exports.GNSvg = GNSvg;
@@ -89,7 +86,6 @@ exports.GNSvg = GNSvg;
 function GNSvgCircle(createData) {
     var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
     var svgObjectSoul = new svg_js_1["default"].Circle();
-    console.log(119, svgObjectSoul);
     svgObjectSoul.radius(75);
     svgObjectSoul.fill("red");
     var svgObject = svgObjectSoul.node;
@@ -100,7 +96,6 @@ function GNSvgCircle(createData) {
     svgObject._styleStructure = [];
     // functions
     svgObject.loadFromData = function (_GNData) {
-        console.log(145, "the data is updated", _GNData);
         svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200;
         svgObject.style["cy"] = parseInt(_GNData["data"]["cy"]);
         svgObject.style["r"] = parseInt(_GNData["data"]["r"]);
@@ -114,7 +109,6 @@ function GNSvgCircle(createData) {
         dataObject["data"]["cx"] = svgObject.style["cx"];
         dataObject["data"]["cy"] = svgObject.style["cy"];
         dataObject["data"]["r"] = svgObject.style["r"];
-        console.log(159, dataObject["data"]);
         // stylesheet data
         svgObject._styleStructure.forEach(function (p) {
             dataObject["stylesheet"][p] = svgObject["style"][p];
@@ -127,11 +121,9 @@ function GNSvgCircle(createData) {
     };
     svgObject.appendTo = function (parentSVGContainer) {
         //self.targetPage.svgNode.appendChild(eraser.node)
-        console.log(139, parentSVGContainer, svgObject);
         parentSVGContainer.svgNode.appendChild(svgObject.node);
     };
     // add extra funcitons to the object
-    console.log(146, GreatNoteDataClass.superGNObject);
     GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
     SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
     return svgObject;
@@ -149,7 +141,6 @@ function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.loadFromData = function (data) { svgObject = data; };
     svgObject.extract = function () { return svgObject.createDataObject(); };
     svgObject.applyStyle = function (attrList) {
-        console.log(attrList);
         Object.entries(attrList).forEach(function (_a, _) {
             var key = _a[0], value = _a[1];
             svgObject.node.style[key] = value;
@@ -194,11 +185,7 @@ function GNSvgPolyLine(createData) {
     svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
     // functions
     svgObject.loadFromData = function (data) {
-        // svgObject.soul.plot([[0, 0], [10, 100]])
-        console.log(309, data);
         svgObject.soul.plot(data["points"]);
-        // console.log(303, svgObject.applyStyle, data["stylesheet"])
-        // svgObject.applyStyle(data["stylesheet"])
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();
@@ -228,7 +215,6 @@ function GNSvgPolyLine(createData) {
     GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
     SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
     // add extra funcitons to the object
-    console.log(234, svgObject);
     return svgObject;
 } //GNSvgPolyLine
 exports.GNSvgPolyLine = GNSvgPolyLine;
@@ -257,8 +243,6 @@ function GNSvgImage(name, arrayID, insertPosition, dataPointer, saveToDatabase) 
 exports.GNSvgImage = GNSvgImage;
 function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase) {
     svgObject.appendTo = function (parentSVGContainer) {
-        console.log(317, parentSVGContainer);
-        console.log(318, svgObject);
         svgObject.soul.addTo(parentSVGContainer.svgController);
     };
     //

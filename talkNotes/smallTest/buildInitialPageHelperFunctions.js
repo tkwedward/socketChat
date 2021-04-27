@@ -26,6 +26,8 @@ var ToolBoxModel = __importStar(require("./ToolBoxModel"));
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
 var socketFunction_1 = require("./socketFunction");
 var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
+var pageController = __importStar(require("./pageControllerFolder/pageController"));
+var LayerConroller = __importStar(require("./layerControllerFolder/layerController"));
 function buildInitialPage(mainController, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = false; }
     mainController.GNDataStructureMapping = {
@@ -143,37 +145,13 @@ function buildInitialHTMLSkeleton(mainController) {
         var saveData = mainController.saveMainDoc(true);
     });
     editorController.append(addInputFieldButton, addSvgDivButton, syncButton, showMainDocButton, resetButton);
-    // layerController
-    var layerControllerTemplate = document.querySelector("#layerControllerTemplate");
-    var layerControllerHTMLObject = layerControllerTemplate.content.cloneNode(true);
-    var addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton");
-    addDivLayerButton.addEventListener("click", function () {
-        var currentPage = mainController.pageCurrentStatus.currentPage;
-        console.log("add a new div layer");
-        var divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
-        divLayer.applyStyle({ width: "100%", height: "100%", background: "blue", "position": "absolute", "left": "0px", "right": "0px" });
-        divLayer.classList.add("divLayer");
-        divLayer.appendTo(currentPage);
-    });
-    var addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton");
-    addSvgLayerButton.addEventListener("click", function () {
-        console.log("add a new svg layer");
-        var currentPage = mainController.pageCurrentStatus.currentPage;
-        var svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
-        console.log(mainController.toolBox.registerSvg);
-        mainController.toolBox.registerSvg(svgLayer);
-        svgLayer.applyStyle({ width: "100%", height: "100%", background: "gold", position: "absolute", left: "0px", top: "0px" });
-        mainController.saveHTMLObjectToDatabase(svgLayer);
-        console.log(svgLayer);
-        svgLayer.classList.add("svgLayer");
-        svgLayer.appendTo(currentPage);
-    });
+    var layerControllerHTMLObject = LayerConroller.createLayerController(mainController);
     pageControllerSubPanelContent.append(toolBoxHtmlObject, polylineItemButton, editorController, layerControllerHTMLObject);
     //===================== bookmarkSubPanel ==================//
     /** add new div, new svg*/
     // page controller
     // To create a page Controller to navigate previous and nex page
-    pageViewHelperFunction.pageController(currentStatus, bookmarkSubPanelContent);
+    pageController.pageController(currentStatus, bookmarkSubPanelContent);
     var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer));
     var switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
     var saveButton = document.createElement("button");

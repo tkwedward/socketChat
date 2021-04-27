@@ -6,6 +6,8 @@ import * as GreatNoteDataClass from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
 import * as pageViewHelperFunction from "./pageViewHelperFunction"
 import {MainControllerInterface} from "./constructInitialCondition"
+import * as pageController from "./pageControllerFolder/pageController"
+import * as LayerConroller from "./layerControllerFolder/layerController"
 
 export function buildInitialPage(mainController:MainControllerInterface, saveToDatabase=false){
     mainController.GNDataStructureMapping = {
@@ -154,37 +156,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
       editorController.append(addInputFieldButton, addSvgDivButton, syncButton, showMainDocButton, resetButton)
 
-      // layerController
-      let layerControllerTemplate = document.querySelector("#layerControllerTemplate")
-      let layerControllerHTMLObject = layerControllerTemplate.content.cloneNode(true);
-      let addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton")
-      addDivLayerButton.addEventListener("click", function(){
-          let currentPage = mainController.pageCurrentStatus.currentPage
-          console.log("add a new div layer")
-          let divLayer = GreatNoteDataClass.GNContainerDiv({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true})
-          divLayer.applyStyle({width: "100%", height: "100%", background:"blue", "position": "absolute", "left": "0px", "right": "0px"})
-          divLayer.classList.add("divLayer")
-          divLayer.appendTo(currentPage)
-
-      })
-      let addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton")
-      addSvgLayerButton.addEventListener("click", function(){
-          console.log("add a new svg layer")
-          let currentPage = mainController.pageCurrentStatus.currentPage
-          let svgLayer = GreatNoteSvgDataClass.GNSvg({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true})
-          console.log(mainController.toolBox.registerSvg)
-          mainController.toolBox.registerSvg(svgLayer)
-
-          svgLayer.applyStyle({width: "100%", height: "100%", background:"gold", position: "absolute", left: "0px", top: "0px"})
-          mainController.saveHTMLObjectToDatabase(svgLayer)
-          console.log(svgLayer)
-          svgLayer.classList.add("svgLayer")
-          svgLayer.appendTo(currentPage)
-      })
-
-
-
-
+      let layerControllerHTMLObject =  LayerConroller.createLayerController(mainController)
 
       pageControllerSubPanelContent.append(toolBoxHtmlObject, polylineItemButton, editorController, layerControllerHTMLObject)
 
@@ -195,7 +167,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
       // page controller
       // To create a page Controller to navigate previous and nex page
-      pageViewHelperFunction.pageController(currentStatus, bookmarkSubPanelContent)
+      pageController.pageController(currentStatus, bookmarkSubPanelContent)
 
       let createNewDivButton = pageViewHelperFunction.functionButtonCreater(
         "new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)

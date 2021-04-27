@@ -97,9 +97,20 @@ body {
 
 .bookmarkSubPanel{
     height: 230px;
+
+    .pageNavigator {
+        text-align: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .pageNumberInput{
+      width: 50%;
+      margin: 0 auto;
+    }
+
     .subPanelContent[status="open"]{
         display: block !important;
-
 
         .functionButton{
             width: 90%;
@@ -164,6 +175,7 @@ body {
     .layerView {
       background: grey;
       height: 150px;
+      overflow-y: scroll;
     }
 
     .layerControllerFunction {

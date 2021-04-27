@@ -79,6 +79,15 @@ body {
 .bookmarkSubPanel {
   height: 230px;
 }
+.bookmarkSubPanel .pageNavigator {
+  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.bookmarkSubPanel .pageNumberInput {
+  width: 50%;
+  margin: 0 auto;
+}
 .bookmarkSubPanel .subPanelContent[status=open] {
   display: block !important;
 }
@@ -131,6 +140,7 @@ body {
 .layerController .layerView {
   background: grey;
   height: 150px;
+  overflow-y: scroll;
 }
 .layerController .layerControllerFunction {
   background: lightblue;
