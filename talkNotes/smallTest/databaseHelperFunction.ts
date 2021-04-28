@@ -1,13 +1,16 @@
 import * as pageViewHelperFunction from "./pageViewHelperFunction"
+import {GNObjectInterface} from "./GreatNoteDataClass"
 
 export enum specialCreationMessageEnum{
     createNewFullPageObject = "createNewFullPageObject",
     createNewOverviewPageObject = "createNewOverviewPageObject"
 }
 
-export function processCreationDataHelper(mainController, creationData){
-    let specialCreationMessage = creationData.specialCreationMessage
+export async function processCreationDataHelper(mainController, creationData){
+    let specialCreationMessage = await creationData.specialCreationMessage
+
     let objectData = mainController.getObjectById(creationData.objectID)
+    console.log(12121212, "----------", objectData)
     let newHTMLObject
     console.log(12121212, creationData)
     if (specialCreationMessage==specialCreationMessageEnum.createNewFullPageObject || specialCreationMessage==specialCreationMessageEnum.createNewOverviewPageObject){ // do something special if there is spcial creation message
@@ -42,5 +45,29 @@ export function processCreationDataHelper(mainController, creationData){
         }
     }
 
+    await newHTMLObject
+}
 
+
+export function * changeEventGenerator(array){
+  yield *array
+}
+
+export async function processNewChangeData(mainController, generator, changeItem){
+    let changeData = changeItem.value
+    let updateFinished
+    if (changeData.action=="create"){
+        updateFinished = await processCreationDataHelper(this, changeData)
+        processNewChangeData(mainController, generator, generator.next())
+
+    }// create
+
+    if (changeData.action=="update"){
+        let _object =  document.querySelector(`*[accessPointer='${changeData.objectID}']`)
+        // console.log(457, _object, changeData.objectID)
+
+        let objectData = mainController.getObjectById(changeData.objectID)
+
+        _object.reloadDataFromDatabase()
+    }
 }

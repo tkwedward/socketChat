@@ -3,7 +3,7 @@ import * as buildInitialPageHelperFunctions from "./buildInitialPageHelperFuncti
 import {GNObjectInterface, CreateGreatNoteObjectInterface}  from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
 import {ToolBoxInterface} from "./ToolboxModel"
-import {processCreationDataHelper} from "./databaseHelperFunction"
+import {changeEventGenerator, processCreationDataHelper} from "./databaseHelperFunction"
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers"
 import * as PageController from "./pageControllerFolder/pageController"
 
@@ -472,11 +472,12 @@ export class MainController implements MainControllerInterface{
 
     processChangeData(changeDataArray:Set<string>){
         let jsonfiedChangeDataArray = Array.from(changeDataArray).map(p=>JSON.parse(p))
+        let jsonfiedChangeDataArrayGenerator = changeEventGenerator(jsonfiedChangeDataArray)
+        let nextEvent = jsonfiedChangeDataArrayGenerator.next()
 
         jsonfiedChangeDataArray.forEach(p=>{
             let changeData = p
             if (changeData.action=="create"){
-
                 processCreationDataHelper(this, changeData)
             }// create
 

@@ -22,6 +22,7 @@ exports.__esModule = true;
 exports.ToolBoxClass = void 0;
 var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSVGDataClass"));
 var constructInitialCondition_1 = require("./constructInitialCondition");
+var ToolboxEventFunction_1 = require("./ToolboxFolder/ToolboxEventFunction");
 var ToolBoxClass = /** @class */ (function () {
     function ToolBoxClass() {
     }
@@ -75,35 +76,18 @@ var ToolBoxClass = /** @class */ (function () {
         return toolBoxItem;
     };
     ToolBoxClass.prototype.createNewPolyLineItemButton = function (toolBoxHtmlObject) {
+        var _this = this;
         var self = this;
         var toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject);
-        toolBoxItem.eventName = "mousedown";
+        toolBoxItem.eventName = "touchstart";
+        // toolBoxItem.eventName = "mousedown"
         // take place when mouse down
-        toolBoxItem.eventFunction = function () {
-            console.log("polyline item button is activated");
-            var _a = constructInitialCondition_1.mainController.attributeControllerMapping.polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
-            var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: self.targetPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
-            polyline.soul.plot([[event["offsetX"], event["offsetY"]]]);
-            polyline.appendTo(self.targetPage);
-            polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
-            var t1 = 0;
-            var t2 = 0;
-            function updatePolyLine(e) {
-                t2 = e.timeStamp;
-                t1 = t2;
-                var newPoint = polyline.soul.array().value;
-                newPoint.push([event["offsetX"], event["offsetY"]]);
-                polyline.soul.plot(newPoint);
-            }
-            self.targetPage.addEventListener("mousemove", updatePolyLine);
-            function polylineMouseUpEvent(e) {
-                console.log(145, "save to database", new Date());
-                polyline.saveHTMLObjectToDatabase();
-                self.targetPage.removeEventListener("mousemove", updatePolyLine);
-                self.targetPage.removeEventListener("mouseup", polylineMouseUpEvent);
-            }
-            self.targetPage.addEventListener("mouseup", polylineMouseUpEvent);
-        }; // eventFunction
+        console.log("use new tool box function");
+        toolBoxItem.eventFunction = function (e) {
+            console.log(121, constructInitialCondition_1.mainController.attributeControllerMapping.polylineController);
+            ToolboxEventFunction_1.polylineMouseDownFunction(e, _this.targetPage, constructInitialCondition_1.mainController.attributeControllerMapping.polylineController, "touchmove", "touchend");
+            // polylineMouseDownFunction(e, this.targetPage, mainController.attributeControllerMapping.polylineController, "mousemove", "mouseup")
+        };
         toolBoxItem.addEventListener("click", function () {
             console.log("polyline item button is activated");
             self.activateButtonFunction(toolBoxItem);

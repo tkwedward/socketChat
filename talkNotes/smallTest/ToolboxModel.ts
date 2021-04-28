@@ -2,6 +2,8 @@ import * as EventModel from "./EventModel"
 import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
 import * as ControllerModel from "./dbtest"
 import {mainController} from "./constructInitialCondition"
+import {polylineMouseDownFunction, polylineMouseMoveFunction, polylineMouseUpFunction} from "./ToolboxFolder/ToolboxEventFunction"
+
 
 interface ToolBoxInterface extends HTMLDivElement{
     itemArray: any[]       // to mark the status of the button
@@ -110,42 +112,16 @@ export class ToolBoxClass implements ToolBoxInterface {
         let self = this
         let toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject)
 
-        toolBoxItem.eventName = "mousedown"
+        toolBoxItem.eventName = "touchstart"
+        // toolBoxItem.eventName = "mousedown"
 
         // take place when mouse down
-        toolBoxItem.eventFunction = ()=>{
-
-            console.log("polyline item button is activated")
-            let [strokeColor, strokeWidth]:[string, string] = mainController.attributeControllerMapping.polylineController.extract()
-
-            let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({name:"", arrayID: self.targetPage.getAccessPointer(), insertPosition:false, dataPointer:false, saveToDatabase:true, specialCreationMessage:"polylineCreated"})
-
-
-            polyline.soul.plot([[event["offsetX"], event["offsetY"]]])
-            polyline.appendTo(self.targetPage)
-            polyline.applyStyle({"stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none"})
-
-            let t1 = 0
-            let t2 = 0
-
-            function updatePolyLine(e){
-                t2 = e.timeStamp
-                t1 = t2
-                let newPoint = polyline.soul.array().value
-                newPoint.push([event["offsetX"], event["offsetY"]])
-                polyline.soul.plot(newPoint)
-            }
-
-            self.targetPage.addEventListener("mousemove", updatePolyLine)
-
-            function polylineMouseUpEvent(e){
-                console.log(145, "save to database", new Date())
-                polyline.saveHTMLObjectToDatabase())
-                self.targetPage.removeEventListener("mousemove", updatePolyLine)
-                self.targetPage.removeEventListener("mouseup", polylineMouseUpEvent)
-            }
-            self.targetPage.addEventListener("mouseup", polylineMouseUpEvent)
-        }// eventFunction
+        console.log("use new tool box function")
+        toolBoxItem.eventFunction = (e)=>{
+            console.log(121, mainController.attributeControllerMapping.polylineController)
+            polylineMouseDownFunction(e, this.targetPage, mainController.attributeControllerMapping.polylineController, "touchmove", "touchend")
+            // polylineMouseDownFunction(e, this.targetPage, mainController.attributeControllerMapping.polylineController, "mousemove", "mouseup")
+        }
 
         toolBoxItem.addEventListener("click", function(){
             console.log("polyline item button is activated")

@@ -364,6 +364,8 @@ var MainController = /** @class */ (function () {
     MainController.prototype.processChangeData = function (changeDataArray) {
         var _this = this;
         var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
+        var jsonfiedChangeDataArrayGenerator = databaseHelperFunction_1.changeEventGenerator(jsonfiedChangeDataArray);
+        var nextEvent = jsonfiedChangeDataArrayGenerator.next();
         jsonfiedChangeDataArray.forEach(function (p) {
             var changeData = p;
             if (changeData.action == "create") {
