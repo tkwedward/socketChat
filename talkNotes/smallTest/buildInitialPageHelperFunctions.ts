@@ -26,24 +26,23 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
         GNComment: GNCommentController.GNComment
     }
 
-    let currentStatus = mainController.pageCurrentStatus
+    let pageController = mainController.pageController
     let pageFullArray = mainController.mainDoc["array"][0]["array"]
     let pageOverviewArray = mainController.mainDoc["array"][1]["array"]
 
     console.log("pageFullArray", pageFullArray)
-    let fullPageModeDiv = document.querySelector(".fullPageModeDiv")
-    let overviewModeDiv = document.querySelector(".overviewModeDiv")
+    let fullPageModeDiv = <HTMLDivElement> document.querySelector(".fullPageModeDiv")
+    let overviewModeDiv = <HTMLDivElement> document.querySelector(".overviewModeDiv")
 
     for (let i = 0; i< pageFullArray.length; i++){
-        let [newPage, smallView] = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase)
-        console.log(37, pageFullArray[i], newPage)
+        let [newPage, smallView] = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase)
         mainController.renderDataToHTML(pageFullArray[i], newPage)
 
         // let commentContainer = CommentController.GNComment({name:"name", arrayID: newPage.getAccessPointer(), saveToDatabase:true})
         // commentContainer.appendTo(newPage)
 
         // console.log(pageFullArray[i])
-        pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv)
     }
 }// buildInitialPage
 
@@ -122,7 +121,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       let addInputFieldButton = document.createElement("button")
       addInputFieldButton.innerText = "addInput"
       addInputFieldButton.addEventListener("click", function(){
-          let currentPage = mainController.pageCurrentStatus.currentPage
+          let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
           let newInputField = GreatNoteDataClass.GNInputField({name: "", arrayID: currentPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true})
           newInputField.appendTo(currentPage)
       })
@@ -130,7 +129,7 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       let addSvgDivButton = document.createElement("button")
       addSvgDivButton.innerText = "addSvg"
       addSvgDivButton.addEventListener("click", function(){
-          let currentPage = mainController.pageCurrentStatus.currentPage
+          let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
 
           let svgBoard = GreatNoteSvgDataClass.GNSvg({name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase:true})
           svgBoard.addEventListener("click", function(){
@@ -173,16 +172,16 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
 
       // page controller
       // To create a page Controller to navigate previous and nex page
-      pageController.pageController(currentStatus, bookmarkSubPanelContent)
+      pageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent)
 
       let createNewDivButton = pageViewHelperFunction.functionButtonCreater(
-        "new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer)
+        "new Div", pageViewHelperFunction.createNewPageEvent(mainController.pageController, fullPageModeDiv, overviewModeDiv, pageContentContainer)
       )
 
       let deletePageButton = document.createElement("button")
       deletePageButton.innerHTML = "delete page"
       deletePageButton.addEventListener("click", function(){
-          currentStatus.currentPage.remove()
+          mainController.pageController.currentPage.remove()
       })
 
       let switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv)

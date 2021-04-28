@@ -1,7 +1,8 @@
 import {mainController} from "./constructInitialCondition"
 import * as GreatNoteDataClass from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
-import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
+import {pageController, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
+// import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 
 //@auto-fold here
 export function createSubPanel(name:string, first:boolean){
@@ -35,7 +36,7 @@ export function createSubPanelItem(name:string){
     subPanelItem.innerText = name[0]
     subPanelItem.addEventListener("click", function(){
         let subPanelArray = subPanelItem.parentNode.querySelectorAll(".subPanelItem")
-        Array.from(subPanelArray).forEach(p=>{
+        Array.from(subPanelArray).forEach(p =>{
             p.setAttribute("status", "off")
         })
         subPanelItem.setAttribute("status", "on")
@@ -79,7 +80,7 @@ export function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv){
     return switchViewModeButton
 }
 
-export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?, overviewPageData?, saveToDatabase=true){
+export function createNewPage(pageController, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?, overviewPageData?, saveToDatabase=true){
     let newPage = GreatNoteDataClass.GNContainerDiv({name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject"})
 
     newPage.classList.add("divPage")
@@ -92,15 +93,8 @@ export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, ove
     smallView._dataStructure = ["innerText"]
     smallView._styleStructure = ["background", "width", "height"]
     smallView.style.background = "pink"
-    smallView.style.width = `${currentStatus.overviewPageSize[0]}px`
-    smallView.style.height = `${currentStatus.overviewPageSize[1]}px`
-
-    //
-    // let smallViewContent = document.createElement("div")
-    // smallViewContent.classList.add("smallViewContent")
-    // let smallViewDescription = document.createElement("div")
-    // smallViewDescription.classList.add("smallViewDescription")
-    // smallView.append(smallViewContent, smallViewDescription)
+    smallView.style.width = `${pageController.overviewPageSize[0]}px`
+    smallView.style.height = `${pageController.overviewPageSize[1]}px`
 
     // ==========================
     // add events to smallView
@@ -110,8 +104,8 @@ export function createNewPage(currentStatus, fullPageModeDiv:HTMLDivElement, ove
     // ==========================
     // add events to smallView
     // ==========================
-    addEventToNewPage(currentStatus, newPage)
-    clickEventOfSmallPage(currentStatus, smallView)
+    addEventToNewPage(pageController, newPage)
+    clickEventOfSmallPage(pageController, smallView)
 
     // if saveToDatabase is false, then you do not need to save it
     if (saveToDatabase){
@@ -144,54 +138,33 @@ export function fillInSmallViewDataContent(smallView, overviewPageData){
 }
 
 
-export function addEventToNewPage(currentStatus, newPage){
+export function addEventToNewPage(pageController, newPage){
     newPage.addEventListener("click", function(e){
-      console.log(240, "pageViewHelperFunction", e.target._identity)
       if (newPage.contains(e.target)){
-
-      // if (newPage.compareDocumentPosition(e.target)){
-          if (currentStatus.selectedObject) currentStatus.selectedObject.classList.remove("selectedObject")
-          currentStatus.selectedObject = e.target
+          if (pageController.selectedObject) pageController.selectedObject.classList.remove("selectedObject")
+          pageController.selectedObject = e.target
           e.target.classList.add("selectedObject")
-          // e.target.style.background = "maroon"
       }
 
     })
 }
 
-export function insertNewPage(currentStatus, newFullPage, newSmallView, fullPageModeDiv, overviewModeDiv){
-    // get the new page number
-    let newPageNumber = currentStatus.newPageNumber
-
-    currentStatus.newPageNumber += 1
-    currentStatus.pageArrayFullPage.splice(newPageNumber, 0, newFullPage)
-    currentStatus.pageArraySmallView.splice(newPageNumber, 0, newSmallView)
-    currentStatus.previousPage = currentStatus.currentPage ? currentStatus.currentPage:null
-    currentStatus.currentPage = newFullPage
+export function insertNewPage(pageController, newFullPage, newSmallView, fullPageModeDiv, overviewModeDiv){
+    pageController.addPage(newFullPage, newSmallView)
 
     // ==========================
     // appending new pages to the fullPageModeDiv and overviewModeDiv
     //==========================
-
-    newFullPage.setAttribute("pageNumber", newPageNumber)
+    // newFullPage.setAttribute("pageNumber", newPageNumber)
     fullPageModeDiv.append(newFullPage)
 
-    newSmallView.setAttribute("pageNumber", newPageNumber)
+    // newSmallView.setAttribute("pageNumber", newPageNumber)
     overviewModeDiv.append(newSmallView)
 
-    if (currentStatus.previousPage){
-        fullPageModeDiv.insertBefore(newFullPage,  currentStatus.pageArrayFullPage[newPageNumber-1])
-        fullPageModeDiv.insertBefore( currentStatus.pageArrayFullPage[newPageNumber-1], newFullPage)
-        overviewModeDiv.insertBefore(newSmallView, currentStatus.pageArraySmallView[newPageNumber-1])
-        overviewModeDiv.insertBefore( currentStatus.pageArraySmallView[newPageNumber-1], newSmallView)
-    }
-
-    //
-    updatePageNumberInNewOrder(currentStatus)
     // highlight and update the pageNumberInput
-    let pageNumberInput = document.querySelector(".pageNumberInput")
-    pageNumberInput.value = newPageNumber
-    highlightCurrentPageInOverviewMode(newSmallView, newPageNumber, currentStatus)
+    let pageNumberInput = <HTMLInputElement> document.querySelector(".pageNumberInput")
+    pageNumberInput.value = pageController.currentPage.pageNumber
+    // highlightCurrentPageInOverviewMode(newSmallView, pageController)
 }
 
 //@auto-fold here
@@ -203,7 +176,6 @@ export function createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeD
           let [newPage, smallView] = createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv)
           insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
     }
-
 
     return clickEventAction
 }
@@ -229,7 +201,7 @@ function clickEventOfSmallPage(currentStatus, smallPage){
         }
 
 
-        updatePageController(currentStatus, clickedPageNumber)
+        // updatePageController(currentStatus, clickedPageNumber)
     })
 }
 

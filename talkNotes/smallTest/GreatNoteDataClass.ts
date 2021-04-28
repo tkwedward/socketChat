@@ -278,7 +278,7 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
         Object.entries(styleObject).forEach(([key, value], _)=>{
             _object[key] = value
         })
-        _object.saveHTMLObjectToDatabase()
+        _object.saveHTMLObjectToDatabase()//
     }
 
 
@@ -508,7 +508,7 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
             if (p!= accessPointer){
                 targetHTML?.loadFromData(dataObject)
             } else {
-                _object.saveHTMLObjectToDatabase()
+                // _object.saveHTMLObjectToDatabase()
             }
         })
     }

@@ -150,7 +150,7 @@ function GNContainerDiv(createData) {
             var key = _a[0], value = _a[1];
             _object[key] = value;
         });
-        _object.saveHTMLObjectToDatabase();
+        _object.saveHTMLObjectToDatabase(); //
     };
     _object.extract = function () { return _object.createDataObject(); };
     // add extra funcitons to the object
@@ -302,7 +302,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
                 targetHTML === null || targetHTML === void 0 ? void 0 : targetHTML.loadFromData(dataObject);
             }
             else {
-                _object.saveHTMLObjectToDatabase();
+                // _object.saveHTMLObjectToDatabase()
             }
         });
     };

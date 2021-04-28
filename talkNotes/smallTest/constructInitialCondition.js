@@ -25,6 +25,7 @@ var buildInitialPageHelperFunctions = __importStar(require("./buildInitialPageHe
 var socketFunction_1 = require("./socketFunction");
 var databaseHelperFunction_1 = require("./databaseHelperFunction");
 var InitializeAttributeControllerFunction = __importStar(require("./attributeControllerFolder/initializeAttributeControllers"));
+var PageController = __importStar(require("./pageControllerFolder/pageController"));
 var MainDocArrayEnum;
 (function (MainDocArrayEnum) {
     MainDocArrayEnum["mainArray_pageFull"] = "mainArray_pageFull";
@@ -60,20 +61,14 @@ var MainController = /** @class */ (function () {
         this.initalizeMainDoc();
         this.applyMainDocTemplate = false;
         this.pageCurrentStatus = {
-            "newPageNumber": 1,
-            "newPageDirection": 1,
             "pendingObject": {
                 "newPage": new Set(),
                 "newPageArray": []
             },
-            "currentPage": 0,
-            "previousPage": 0,
-            "nextPage": 0,
-            "pageArrayFullPage": [0],
-            "pageArraySmallView": [0],
             "fullPageSize": [1187, 720],
             "overviewPageSize": [237.4, 144]
         };
+        this.pageController = PageController.initializePageController();
     }
     //@auto-fold here
     MainController.prototype.initializeRootArray = function () {
@@ -247,6 +242,7 @@ var MainController = /** @class */ (function () {
                 });
             }
         });
+        // console.log(322, "ask server to InitiateSynchronizatioj", new Date(), message)
         socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
     }; // saveHTMLObjectToDatabase
     // ******************************************

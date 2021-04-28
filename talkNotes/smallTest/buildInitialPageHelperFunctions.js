@@ -43,20 +43,19 @@ function buildInitialPage(mainController, saveToDatabase) {
         GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
         GNComment: GNCommentController.GNComment
     };
-    var currentStatus = mainController.pageCurrentStatus;
+    var pageController = mainController.pageController;
     var pageFullArray = mainController.mainDoc["array"][0]["array"];
     var pageOverviewArray = mainController.mainDoc["array"][1]["array"];
     console.log("pageFullArray", pageFullArray);
     var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
     var overviewModeDiv = document.querySelector(".overviewModeDiv");
     for (var i = 0; i < pageFullArray.length; i++) {
-        var _a = pageViewHelperFunction.createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
-        console.log(37, pageFullArray[i], newPage);
+        var _a = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
         mainController.renderDataToHTML(pageFullArray[i], newPage);
         // let commentContainer = CommentController.GNComment({name:"name", arrayID: newPage.getAccessPointer(), saveToDatabase:true})
         // commentContainer.appendTo(newPage)
         // console.log(pageFullArray[i])
-        pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv);
     }
 } // buildInitialPage
 exports.buildInitialPage = buildInitialPage;
@@ -117,14 +116,14 @@ function buildInitialHTMLSkeleton(mainController) {
     var addInputFieldButton = document.createElement("button");
     addInputFieldButton.innerText = "addInput";
     addInputFieldButton.addEventListener("click", function () {
-        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
         var newInputField = GreatNoteDataClass.GNInputField({ name: "", arrayID: currentPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true });
         newInputField.appendTo(currentPage);
     });
     var addSvgDivButton = document.createElement("button");
     addSvgDivButton.innerText = "addSvg";
     addSvgDivButton.addEventListener("click", function () {
-        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
         var svgBoard = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
         svgBoard.addEventListener("click", function () {
             mainController.toolBox.targetPage = svgBoard;
@@ -155,12 +154,12 @@ function buildInitialHTMLSkeleton(mainController) {
     /** add new div, new svg*/
     // page controller
     // To create a page Controller to navigate previous and nex page
-    pageController.pageController(currentStatus, bookmarkSubPanelContent);
-    var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pageContentContainer));
+    pageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent);
+    var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(mainController.pageController, fullPageModeDiv, overviewModeDiv, pageContentContainer));
     var deletePageButton = document.createElement("button");
     deletePageButton.innerHTML = "delete page";
     deletePageButton.addEventListener("click", function () {
-        currentStatus.currentPage.remove();
+        mainController.pageController.currentPage.remove();
     });
     var switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
     var saveButton = document.createElement("button");

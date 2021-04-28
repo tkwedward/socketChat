@@ -11,20 +11,20 @@ export function createLayerController(mainController){
 
 
   let addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton")
-  addDivLayerButton.addEventListener("click", function(){
-      let currentPage = mainController.pageCurrentStatus.currentPage
-      console.log("add a new div layer")
+  addDivLayerButton.addEventListener("click", function(e){
+      console.log("15, The event detail is ", e.detail)
+      let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
       let divLayer = GreatNoteDataClass.GNContainerDiv({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true})
       divLayer.applyStyle({width: "100%", height: "100%", background:"blue", "position": "absolute", "left": "0px", "right": "0px"})
       divLayer.classList.add("divLayer")
       divLayer.appendTo(currentPage)
 
-  })
+  }, {detail: {"run": 12345}})
 
   let addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton")
   addSvgLayerButton.addEventListener("click", function(){
       console.log("add a new svg layer")
-      let currentPage = mainController.pageCurrentStatus.currentPage
+      let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
       let svgLayer = GreatNoteSvgDataClass.GNSvg({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true})
       console.log(mainController.toolBox.registerSvg)
       mainController.toolBox.registerSvg(svgLayer)
@@ -47,7 +47,7 @@ export function createLayerController(mainController){
 
 export function showCurrentPageButtonFunction(mainController, layerView){
     layerView.innerHTML = ""
-    let currentPageData = mainController.pageCurrentStatus.currentPage.getDataFromDataBase()
+    let currentPageData = mainController.pageController.currentPage.getDataFromDataBase()
     let layerObject = buildLayerContentFunction(currentPageData)
     console.log(layerObject)
     layerView.appendChild(layerObject)

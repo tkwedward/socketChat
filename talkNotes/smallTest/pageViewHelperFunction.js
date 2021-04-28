@@ -23,6 +23,7 @@ exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage =
 var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
 var pageController_1 = require("./pageControllerFolder/pageController");
+// import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 //@auto-fold here
 function createSubPanel(name, first) {
     var subPanelTemplate = document.querySelector("#subPanelTemplate");
@@ -92,7 +93,7 @@ function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv) {
     return switchViewModeButton;
 }
 exports.createSwitchViewModeButton = createSwitchViewModeButton;
-function createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase) {
+function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var newPage = GreatNoteDataClass.GNContainerDiv({ name: "fullPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject" });
     newPage.classList.add("divPage");
@@ -104,14 +105,8 @@ function createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, fullPage
     smallView._dataStructure = ["innerText"];
     smallView._styleStructure = ["background", "width", "height"];
     smallView.style.background = "pink";
-    smallView.style.width = currentStatus.overviewPageSize[0] + "px";
-    smallView.style.height = currentStatus.overviewPageSize[1] + "px";
-    //
-    // let smallViewContent = document.createElement("div")
-    // smallViewContent.classList.add("smallViewContent")
-    // let smallViewDescription = document.createElement("div")
-    // smallViewDescription.classList.add("smallViewDescription")
-    // smallView.append(smallViewContent, smallViewDescription)
+    smallView.style.width = pageController.overviewPageSize[0] + "px";
+    smallView.style.height = pageController.overviewPageSize[1] + "px";
     // ==========================
     // add events to smallView
     // ==========================
@@ -119,8 +114,8 @@ function createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv, fullPage
     // ==========================
     // add events to smallView
     // ==========================
-    addEventToNewPage(currentStatus, newPage);
-    clickEventOfSmallPage(currentStatus, smallView);
+    addEventToNewPage(pageController, newPage);
+    clickEventOfSmallPage(pageController, smallView);
     // if saveToDatabase is false, then you do not need to save it
     if (saveToDatabase) {
         newPage.saveHTMLObjectToDatabase();
@@ -147,47 +142,30 @@ function fillInSmallViewDataContent(smallView, overviewPageData) {
     // smallViewDescription.innerText = overviewPageData.data.innerText
 }
 exports.fillInSmallViewDataContent = fillInSmallViewDataContent;
-function addEventToNewPage(currentStatus, newPage) {
+function addEventToNewPage(pageController, newPage) {
     newPage.addEventListener("click", function (e) {
-        console.log(240, "pageViewHelperFunction", e.target._identity);
         if (newPage.contains(e.target)) {
-            // if (newPage.compareDocumentPosition(e.target)){
-            if (currentStatus.selectedObject)
-                currentStatus.selectedObject.classList.remove("selectedObject");
-            currentStatus.selectedObject = e.target;
+            if (pageController.selectedObject)
+                pageController.selectedObject.classList.remove("selectedObject");
+            pageController.selectedObject = e.target;
             e.target.classList.add("selectedObject");
-            // e.target.style.background = "maroon"
         }
     });
 }
 exports.addEventToNewPage = addEventToNewPage;
-function insertNewPage(currentStatus, newFullPage, newSmallView, fullPageModeDiv, overviewModeDiv) {
-    // get the new page number
-    var newPageNumber = currentStatus.newPageNumber;
-    currentStatus.newPageNumber += 1;
-    currentStatus.pageArrayFullPage.splice(newPageNumber, 0, newFullPage);
-    currentStatus.pageArraySmallView.splice(newPageNumber, 0, newSmallView);
-    currentStatus.previousPage = currentStatus.currentPage ? currentStatus.currentPage : null;
-    currentStatus.currentPage = newFullPage;
+function insertNewPage(pageController, newFullPage, newSmallView, fullPageModeDiv, overviewModeDiv) {
+    pageController.addPage(newFullPage, newSmallView);
     // ==========================
     // appending new pages to the fullPageModeDiv and overviewModeDiv
     //==========================
-    newFullPage.setAttribute("pageNumber", newPageNumber);
+    // newFullPage.setAttribute("pageNumber", newPageNumber)
     fullPageModeDiv.append(newFullPage);
-    newSmallView.setAttribute("pageNumber", newPageNumber);
+    // newSmallView.setAttribute("pageNumber", newPageNumber)
     overviewModeDiv.append(newSmallView);
-    if (currentStatus.previousPage) {
-        fullPageModeDiv.insertBefore(newFullPage, currentStatus.pageArrayFullPage[newPageNumber - 1]);
-        fullPageModeDiv.insertBefore(currentStatus.pageArrayFullPage[newPageNumber - 1], newFullPage);
-        overviewModeDiv.insertBefore(newSmallView, currentStatus.pageArraySmallView[newPageNumber - 1]);
-        overviewModeDiv.insertBefore(currentStatus.pageArraySmallView[newPageNumber - 1], newSmallView);
-    }
-    //
-    pageController_1.updatePageNumberInNewOrder(currentStatus);
     // highlight and update the pageNumberInput
     var pageNumberInput = document.querySelector(".pageNumberInput");
-    pageNumberInput.value = newPageNumber;
-    pageController_1.highlightCurrentPageInOverviewMode(newSmallView, newPageNumber, currentStatus);
+    pageNumberInput.value = pageController.currentPage.pageNumber;
+    // highlightCurrentPageInOverviewMode(newSmallView, pageController)
 }
 exports.insertNewPage = insertNewPage;
 //@auto-fold here
@@ -220,7 +198,7 @@ function clickEventOfSmallPage(currentStatus, smallPage) {
                 currentStatus.pageArrayFullPage[i].style.left = "+100vw";
             }
         }
-        pageController_1.updatePageController(currentStatus, clickedPageNumber);
+        // updatePageController(currentStatus, clickedPageNumber)
     });
 }
 // extract and create data object do not directly save object to the database.

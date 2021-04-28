@@ -53,7 +53,7 @@ socket.on("serverInitiatesSynchronization", ()=>{
     // send back change data to the server
     let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     mainController.previousDoc = mainController.mainDoc
-
+    console.log("56: the changes are: ", changes)
     socket.emit("clientSendChangesToServer", {"changeData": changes})
 })
 

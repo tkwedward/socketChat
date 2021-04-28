@@ -5,6 +5,7 @@ import {socket} from "./socketFunction"
 import {ToolBoxInterface} from "./ToolboxModel"
 import {processCreationDataHelper} from "./databaseHelperFunction"
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers"
+import * as PageController from "./pageControllerFolder/pageController"
 
 export enum MainDocArrayEnum {
     mainArray_pageFull = "mainArray_pageFull",
@@ -35,6 +36,7 @@ export interface MainControllerInterface {
     GNDataStructureMapping: any
     attributeControllerMapping: any
     pageCurrentStatus: any
+    pageController: any
     toolBox: ToolBoxInterface
 
     // getArrayID(MainDocArrayEnum):string
@@ -100,6 +102,7 @@ export class MainController implements MainControllerInterface{
   applyMainDocTemplate:boolean
   pageCurrentStatus: any
   toolBox: any
+  pageController: any
 
 
 // *****************************
@@ -111,20 +114,14 @@ export class MainController implements MainControllerInterface{
         this.initalizeMainDoc()
         this.applyMainDocTemplate = false
         this.pageCurrentStatus = {
-          "newPageNumber": 1,
-          "newPageDirection": 1,
           "pendingObject": {// an array for collecting enough data before enough data is collected to create new objects
               "newPage": new Set(),
               "newPageArray": []
           },
-          "currentPage": 0,
-          "previousPage": 0,
-          "nextPage": 0,
-          "pageArrayFullPage": [0],
-          "pageArraySmallView": [0],
           "fullPageSize": [1187, 720],
           "overviewPageSize": [237.4, 144]
         }
+        this.pageController = PageController.initializePageController()
     }
 
     //@auto-fold here
@@ -322,6 +319,8 @@ export class MainController implements MainControllerInterface{
                 })
             }
         })
+
+        // console.log(322, "ask server to InitiateSynchronizatioj", new Date(), message)
         socket.emit("clientAskServerToInitiateSynchronization")
     }// saveHTMLObjectToDatabase
 
@@ -488,6 +487,7 @@ export class MainController implements MainControllerInterface{
                 let objectData = mainController.getObjectById(changeData.objectID)
 
                 _object.reloadDataFromDatabase()
+
             }
         })
     }

@@ -112,11 +112,9 @@ export class ToolBoxClass implements ToolBoxInterface {
 
         toolBoxItem.eventName = "mousedown"
 
-        function polyLineOption(){
-
-        }
-
+        // take place when mouse down
         toolBoxItem.eventFunction = ()=>{
+
             console.log("polyline item button is activated")
             let [strokeColor, strokeWidth]:[string, string] = mainController.attributeControllerMapping.polylineController.extract()
 
@@ -140,10 +138,13 @@ export class ToolBoxClass implements ToolBoxInterface {
 
             self.targetPage.addEventListener("mousemove", updatePolyLine)
 
-            self.targetPage.addEventListener("mouseup", (e)=>{
+            function polylineMouseUpEvent(e){
+                console.log(145, "save to database", new Date())
+                polyline.saveHTMLObjectToDatabase())
                 self.targetPage.removeEventListener("mousemove", updatePolyLine)
-                polyline.saveHTMLObjectToDatabase()
-            })
+                self.targetPage.removeEventListener("mouseup", polylineMouseUpEvent)
+            }
+            self.targetPage.addEventListener("mouseup", polylineMouseUpEvent)
         }// eventFunction
 
         toolBoxItem.addEventListener("click", function(){
@@ -227,6 +228,7 @@ export class ToolBoxClass implements ToolBoxInterface {
       console.log(226, "registerSvg, yoyoyo")
         svgLayer.addEventListener("click", function(){
             console.log("The svg is register to the toolbox")
+            console.log("======================")
             self.targetPage = svgLayer
         })
     }

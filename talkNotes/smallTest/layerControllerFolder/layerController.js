@@ -29,18 +29,18 @@ function createLayerController(mainController) {
     var layerControllerHTMLObject = layerControllerTemplate["content"].cloneNode(true);
     var layerView = layerControllerHTMLObject.querySelector(".layerView");
     var addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton");
-    addDivLayerButton.addEventListener("click", function () {
-        var currentPage = mainController.pageCurrentStatus.currentPage;
-        console.log("add a new div layer");
+    addDivLayerButton.addEventListener("click", function (e) {
+        console.log("15, The event detail is ", e.detail);
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
         var divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
         divLayer.applyStyle({ width: "100%", height: "100%", background: "blue", "position": "absolute", "left": "0px", "right": "0px" });
         divLayer.classList.add("divLayer");
         divLayer.appendTo(currentPage);
-    });
+    }, { detail: { "run": 12345 } });
     var addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton");
     addSvgLayerButton.addEventListener("click", function () {
         console.log("add a new svg layer");
-        var currentPage = mainController.pageCurrentStatus.currentPage;
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
         var svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
         console.log(mainController.toolBox.registerSvg);
         mainController.toolBox.registerSvg(svgLayer);
@@ -59,7 +59,7 @@ function createLayerController(mainController) {
 exports.createLayerController = createLayerController;
 function showCurrentPageButtonFunction(mainController, layerView) {
     layerView.innerHTML = "";
-    var currentPageData = mainController.pageCurrentStatus.currentPage.getDataFromDataBase();
+    var currentPageData = mainController.pageController.currentPage.getDataFromDataBase();
     var layerObject = buildLayerContentFunction(currentPageData);
     console.log(layerObject);
     layerView.appendChild(layerObject);

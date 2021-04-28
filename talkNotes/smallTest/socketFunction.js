@@ -63,6 +63,7 @@ exports.socket.on("serverInitiatesSynchronization", function () {
     // send back change data to the server
     var changes = Automerge.getChanges(constructInitialCondition_1.mainController.previousDoc, constructInitialCondition_1.mainController.mainDoc);
     constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
+    console.log("56: the changes are: ", changes);
     exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
 });
 exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {

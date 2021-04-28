@@ -34,57 +34,12 @@ app.get("/editor", (req, res)=>{
 
 socketArray = []
 
-// io.on("connection", socket=>{
-//     socketArray.push(socket)
-//     socket.on("message", data=>{
-//       console.log(new Date());
-//       console.log(data);
-//       console.log(socket.id);
-//     })
-//
-//     socket.on("_clientAskServerToInitiateSynchronization", ()=>{
-//       console.log("server received a call from " + socket.id + " to initiate synchronization");
-//
-//       let allChanges = []
-//
-//       let promiseArray = socketArray.map(_s=>{
-//           return new Promise(res=>{
-//             _s.once("_clientSendChangesToServer", data=>{
-//               console.log("======================")
-//               console.log("received change data from " + _s.id)
-//               allChanges.push(data)
-//               res(true)
-//             })
-//           })// promise
-//       })// map
-//
-//       Promise.all(promiseArray).then(p=>{
-//         console.log(allChanges);
-//         io.emit("_deliverSynchronizeDataFromServer", allChanges)
-//       })
-//       io.emit("_serverInitiatesSynchronization")
-//     })
-//
-//
-//
-//     socket.on("disconnect", ()=>{
-//       console.log(socket.id + " disconnected");
-//       console.log(socketArray.map(p=>p.id));
-//       socketArray = socketArray.filter(s=>s.id!=socket.id)
-//       console.log(socketArray.map(p=>p.id));
-//
-//     })
-// })
-
 io.on("connection", socket=>{
     socketArray.push(socket)
     socket.on("message", data => {
         console.log(new Date());
-        console.log(data);
         console.log(Array.from( io.sockets.sockets.keys()));
     })
-
-
 
     setInterval(function(){
       io.sockets.to(socketArray[0].id).emit("saveDataToServer", "periodical save")
@@ -101,7 +56,7 @@ io.on("connection", socket=>{
             let sender = connectedUserList[0]
             let receiver = socket.id
             console.log(`${receiver} wants to get initial Data`);
-            console.log(`${sender} will send data to the new user ${socket.id}`);
+            console.log(`${sender.id} will send data to the new user ${socket.id}`);
             io.sockets.to(sender).emit("askRootUserForInitialData", { "receiver": receiver });
         // }
     })
@@ -151,7 +106,6 @@ io.on("connection", socket=>{
       // console.log(changeList);
         io.emit("deliverSynchronizeDataFromServer", changeList);
 
-        console.log("ask ", socketArray[0] , "to save data")
     })
 
     // to ask all the clients to send data to the server
@@ -161,7 +115,6 @@ io.on("connection", socket=>{
 
   socket.on("saveMainDocToDisk",async data => {
       let jsonFileLocation = path.join(__dirname, "./talkNotes/data/automergeData.txt")
-      console.log(data)
       await fs.writeFileSync(jsonFileLocation, data);
       await socket.emit("message", "save success")
   }) // saveMainDocToDisk
@@ -170,7 +123,7 @@ io.on("connection", socket=>{
       let jsonFileLocation = path.join(__dirname, "./talkNotes/data/automergeData.txt")
       let data = await fs.readFileSync(jsonFileLocation, 'utf8');
       socket.emit("serverResponseToLoadMainDocRequest", data)
-      callback(data)
+      if (callback) callback(data)
       return data
   }) // saveMainDocToDisk
 })

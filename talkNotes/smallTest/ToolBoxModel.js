@@ -78,8 +78,7 @@ var ToolBoxClass = /** @class */ (function () {
         var self = this;
         var toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject);
         toolBoxItem.eventName = "mousedown";
-        function polyLineOption() {
-        }
+        // take place when mouse down
         toolBoxItem.eventFunction = function () {
             console.log("polyline item button is activated");
             var _a = constructInitialCondition_1.mainController.attributeControllerMapping.polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
@@ -97,10 +96,13 @@ var ToolBoxClass = /** @class */ (function () {
                 polyline.soul.plot(newPoint);
             }
             self.targetPage.addEventListener("mousemove", updatePolyLine);
-            self.targetPage.addEventListener("mouseup", function (e) {
-                self.targetPage.removeEventListener("mousemove", updatePolyLine);
+            function polylineMouseUpEvent(e) {
+                console.log(145, "save to database", new Date());
                 polyline.saveHTMLObjectToDatabase();
-            });
+                self.targetPage.removeEventListener("mousemove", updatePolyLine);
+                self.targetPage.removeEventListener("mouseup", polylineMouseUpEvent);
+            }
+            self.targetPage.addEventListener("mouseup", polylineMouseUpEvent);
         }; // eventFunction
         toolBoxItem.addEventListener("click", function () {
             console.log("polyline item button is activated");
@@ -166,6 +168,7 @@ var ToolBoxClass = /** @class */ (function () {
         console.log(226, "registerSvg, yoyoyo");
         svgLayer.addEventListener("click", function () {
             console.log("The svg is register to the toolbox");
+            console.log("======================");
             self.targetPage = svgLayer;
         });
     };
