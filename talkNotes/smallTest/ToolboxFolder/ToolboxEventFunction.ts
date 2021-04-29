@@ -1,12 +1,12 @@
 import * as GreatNoteSvgDataClass from "../GreatNoteSvgDataClass"
 
 export function polylineMouseDownFunction(e, svgBoard, polylineController, moveEventName:string, upEventName:string){
-    console.log("polyline item button is activated")
     e.preventDefault()
     let [strokeColor, strokeWidth]:[string, string] = polylineController.extract()
     let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({name:"", arrayID: svgBoard.getAccessPointer(), insertPosition:false, dataPointer:false, saveToDatabase:true, specialCreationMessage:"polylineCreated"})
+    polyline.style.pointerEvents = "none"
 
-    console.log(e)
+
     let offsetX
     let offsetY
     if (e.type=="touchstart"){
@@ -14,6 +14,11 @@ export function polylineMouseDownFunction(e, svgBoard, polylineController, moveE
         offsetX = e.targetTouches[0].pageX - rect.left;
         offsetY = e.targetTouches[0].pageY - rect.top;
     }
+    if (e.type=="mousedown"){
+       offsetX = e.offsetX
+       offsetY = e.offsetY
+   }
+
     console.log(offsetX, offsetY)
     //
     polyline.soul.plot([[offsetX, offsetY]])

@@ -3,7 +3,7 @@ import * as buildInitialPageHelperFunctions from "./buildInitialPageHelperFuncti
 import {GNObjectInterface, CreateGreatNoteObjectInterface}  from "./GreatNoteDataClass"
 import {socket} from "./socketFunction"
 import {ToolBoxInterface} from "./ToolboxModel"
-import {changeEventGenerator, processCreationDataHelper} from "./databaseHelperFunction"
+import {changeEventGenerator, processCreationDataHelper,processNewChangeData} from "./databaseHelperFunction"
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers"
 import * as PageController from "./pageControllerFolder/pageController"
 
@@ -472,25 +472,33 @@ export class MainController implements MainControllerInterface{
 
     processChangeData(changeDataArray:Set<string>){
         let jsonfiedChangeDataArray = Array.from(changeDataArray).map(p=>JSON.parse(p))
-        let jsonfiedChangeDataArrayGenerator = changeEventGenerator(jsonfiedChangeDataArray)
-        let nextEvent = jsonfiedChangeDataArrayGenerator.next()
+        console.log("476----", jsonfiedChangeDataArray)
+
+        if (jsonfiedChangeDataArray.length == 1){
+            document.querySelector(".logField").style.background = "red"
+            console.log(1234, "========= fuck fuck fuck fuck fuck , ther is only one lenght")
+        }
 
         jsonfiedChangeDataArray.forEach(p=>{
+
             let changeData = p
             if (changeData.action=="create"){
                 processCreationDataHelper(this, changeData)
+                console.log("4853, processing change", p)
+                console.log(this.getHtmlObjectByID(p.objectID))
+                console.log(this.getHtmlObjectByID(p.parentHTMLObjectId))
             }// create
 
             if (changeData.action=="update"){
                 let _object = document.querySelector(`*[accessPointer='${changeData.objectID}']`)
                 // console.log(457, _object, changeData.objectID)
+                if (_object){
+                    let objectData = mainController.getObjectById(changeData.objectID)
 
-                let objectData = mainController.getObjectById(changeData.objectID)
-
-                _object.reloadDataFromDatabase()
-
-            }
-        })
+                    _object.reloadDataFromDatabase()
+                }
+            }  // update
+        })// aaforEach
     }
 
 }

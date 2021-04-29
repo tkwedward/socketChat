@@ -22,17 +22,20 @@ exports.__esModule = true;
 exports.polylineMouseUpFunction = exports.polylineMouseMoveFunction = exports.polylineMouseDownFunction = void 0;
 var GreatNoteSvgDataClass = __importStar(require("../GreatNoteSvgDataClass"));
 function polylineMouseDownFunction(e, svgBoard, polylineController, moveEventName, upEventName) {
-    console.log("polyline item button is activated");
     e.preventDefault();
     var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
     var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
-    console.log(e);
+    polyline.style.pointerEvents = "none";
     var offsetX;
     var offsetY;
     if (e.type == "touchstart") {
         var rect = e.target.getBoundingClientRect();
         offsetX = e.targetTouches[0].pageX - rect.left;
         offsetY = e.targetTouches[0].pageY - rect.top;
+    }
+    if (e.type == "mousedown") {
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
     }
     console.log(offsetX, offsetY);
     //

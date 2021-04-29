@@ -364,20 +364,28 @@ var MainController = /** @class */ (function () {
     MainController.prototype.processChangeData = function (changeDataArray) {
         var _this = this;
         var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
-        var jsonfiedChangeDataArrayGenerator = databaseHelperFunction_1.changeEventGenerator(jsonfiedChangeDataArray);
-        var nextEvent = jsonfiedChangeDataArrayGenerator.next();
+        console.log("476----", jsonfiedChangeDataArray);
+        if (jsonfiedChangeDataArray.length == 1) {
+            document.querySelector(".logField").style.background = "red";
+            console.log(1234, "========= fuck fuck fuck fuck fuck , ther is only one lenght");
+        }
         jsonfiedChangeDataArray.forEach(function (p) {
             var changeData = p;
             if (changeData.action == "create") {
                 databaseHelperFunction_1.processCreationDataHelper(_this, changeData);
+                console.log("4853, processing change", p);
+                console.log(_this.getHtmlObjectByID(p.objectID));
+                console.log(_this.getHtmlObjectByID(p.parentHTMLObjectId));
             } // create
             if (changeData.action == "update") {
                 var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
                 // console.log(457, _object, changeData.objectID)
-                var objectData = exports.mainController.getObjectById(changeData.objectID);
-                _object.reloadDataFromDatabase();
-            }
-        });
+                if (_object) {
+                    var objectData = exports.mainController.getObjectById(changeData.objectID);
+                    _object.reloadDataFromDatabase();
+                }
+            } // update
+        }); // aaforEach
     };
     return MainController;
 }());

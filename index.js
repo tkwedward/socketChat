@@ -41,9 +41,9 @@ io.on("connection", socket=>{
         console.log(Array.from( io.sockets.sockets.keys()));
     })
 
-    setInterval(function(){
-      io.sockets.to(socketArray[0].id).emit("saveDataToServer", "periodical save")
-    }, 30000)
+    // setInterval(function(){
+    //   io.sockets.to(socketArray[0].id).emit("saveDataToServer", "periodical save")
+    // }, 30000)
     // begin: server receives request from a particular client to synchronize data among all the clients.
     // action: server sends request to all clients to give him all the changes. Wait for clients to send back all the changes and then send back the collection of changes to the clients.
     // message to ask all clients to send back changes

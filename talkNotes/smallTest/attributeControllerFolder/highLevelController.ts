@@ -23,7 +23,7 @@ export function createPolylineController():PolylineControllerInterface{
       controllerType: inputFieldAndDropdownListController
   })
   polylineStrokeWidthController.classList.add("polylineStrokeWidthController")
-  polylineStrokeWidthController.querySelector("input").value = "10"
+  polylineStrokeWidthController.querySelector("input").value = "2"
 
   polylineControllerContainer.controllerArray = [polylineStrokeColorController, polylineStrokeWidthController]
   polylineControllerContainer.append(...polylineControllerContainer.controllerArray)

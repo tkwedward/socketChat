@@ -67,7 +67,6 @@ exports.socket.on("serverInitiatesSynchronization", function () {
     exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
 });
 exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {
-    console.log(changeDataArray);
     var changeToBeProcessedArray = new Set();
     changeDataArray.forEach(function (change) {
         var senderID = change.id;
@@ -78,8 +77,8 @@ exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray)
             });
         }
     });
-    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
     constructInitialCondition_1.mainController.processChangeData(changeToBeProcessedArray);
+    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
     // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
     // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     // console.log(52, changes)

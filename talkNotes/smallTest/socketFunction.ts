@@ -58,8 +58,10 @@ socket.on("serverInitiatesSynchronization", ()=>{
 })
 
 socket.on("deliverSynchronizeDataFromServer", changeDataArray=>{
-    console.log(changeDataArray)
     let changeToBeProcessedArray = new Set()
+
+
+
     changeDataArray.forEach(change=>{
         let senderID = change.id
         if (senderID != socket.id){
@@ -69,8 +71,8 @@ socket.on("deliverSynchronizeDataFromServer", changeDataArray=>{
             })
         }
     })
-    mainController.previousDoc = mainController.mainDoc
     mainController.processChangeData(changeToBeProcessedArray)
+    mainController.previousDoc = mainController.mainDoc
     // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
     // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     // console.log(52, changes)

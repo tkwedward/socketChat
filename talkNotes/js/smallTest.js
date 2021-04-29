@@ -26584,17 +26584,20 @@ exports.__esModule = true;
 exports.polylineMouseUpFunction = exports.polylineMouseMoveFunction = exports.polylineMouseDownFunction = void 0;
 var GreatNoteSvgDataClass = __importStar(require("../GreatNoteSvgDataClass"));
 function polylineMouseDownFunction(e, svgBoard, polylineController, moveEventName, upEventName) {
-    console.log("polyline item button is activated");
     e.preventDefault();
     var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
     var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
-    console.log(e);
+    polyline.style.pointerEvents = "none";
     var offsetX;
     var offsetY;
     if (e.type == "touchstart") {
         var rect = e.target.getBoundingClientRect();
         offsetX = e.targetTouches[0].pageX - rect.left;
         offsetY = e.targetTouches[0].pageY - rect.top;
+    }
+    if (e.type == "mousedown") {
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
     }
     console.log(offsetX, offsetY);
     //
@@ -26858,7 +26861,7 @@ function createPolylineController() {
         controllerType: basicControllerType_1.inputFieldAndDropdownListController
     });
     polylineStrokeWidthController.classList.add("polylineStrokeWidthController");
-    polylineStrokeWidthController.querySelector("input").value = "10";
+    polylineStrokeWidthController.querySelector("input").value = "2";
     polylineControllerContainer.controllerArray = [polylineStrokeColorController, polylineStrokeWidthController];
     polylineControllerContainer.append.apply(polylineControllerContainer, polylineControllerContainer.controllerArray);
     polylineControllerContainer.extract = function () {
@@ -27598,20 +27601,28 @@ var MainController = /** @class */ (function () {
     MainController.prototype.processChangeData = function (changeDataArray) {
         var _this = this;
         var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
-        var jsonfiedChangeDataArrayGenerator = databaseHelperFunction_1.changeEventGenerator(jsonfiedChangeDataArray);
-        var nextEvent = jsonfiedChangeDataArrayGenerator.next();
+        console.log("476----", jsonfiedChangeDataArray);
+        if (jsonfiedChangeDataArray.length == 1) {
+            document.querySelector(".logField").style.background = "red";
+            console.log(1234, "========= fuck fuck fuck fuck fuck , ther is only one lenght");
+        }
         jsonfiedChangeDataArray.forEach(function (p) {
             var changeData = p;
             if (changeData.action == "create") {
                 databaseHelperFunction_1.processCreationDataHelper(_this, changeData);
+                console.log("4853, processing change", p);
+                console.log(_this.getHtmlObjectByID(p.objectID));
+                console.log(_this.getHtmlObjectByID(p.parentHTMLObjectId));
             } // create
             if (changeData.action == "update") {
                 var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
                 // console.log(457, _object, changeData.objectID)
-                var objectData = exports.mainController.getObjectById(changeData.objectID);
-                _object.reloadDataFromDatabase();
-            }
-        });
+                if (_object) {
+                    var objectData = exports.mainController.getObjectById(changeData.objectID);
+                    _object.reloadDataFromDatabase();
+                }
+            } // update
+        }); // aaforEach
     };
     return MainController;
 }());
@@ -27717,42 +27728,37 @@ function processCreationDataHelper(mainController, creationData) {
     return __awaiter(this, void 0, void 0, function () {
         var specialCreationMessage, objectData, newHTMLObject, newPageItemData, newSmallViewItemData, _newPageObjectData, _newSmallViewObjectData, fullPageModeDiv, overviewModeDiv, _a, newPage, smallView, parentHTMLObject;
         return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, creationData.specialCreationMessage];
-                case 1:
-                    specialCreationMessage = _b.sent();
-                    objectData = mainController.getObjectById(creationData.objectID);
-                    console.log(12121212, "----------", objectData);
-                    console.log(12121212, creationData);
-                    if (specialCreationMessage == specialCreationMessageEnum.createNewFullPageObject || specialCreationMessage == specialCreationMessageEnum.createNewOverviewPageObject) { // do something special if there is spcial creation message
-                        mainController.pageCurrentStatus.pendingObject.newPageArray.push(creationData);
-                        // if there are two item in the array, then clear it and create a new object
-                        if (mainController.pageCurrentStatus.pendingObject.newPageArray.length == 4) {
-                            newPageItemData = mainController.pageCurrentStatus.pendingObject.newPageArray[0];
-                            newSmallViewItemData = mainController.pageCurrentStatus.pendingObject.newPageArray[1];
-                            _newPageObjectData = mainController.getObjectById(newPageItemData.objectID);
-                            _newSmallViewObjectData = mainController.getObjectById(newSmallViewItemData.objectID);
-                            fullPageModeDiv = document.querySelector(".fullPageModeDiv");
-                            overviewModeDiv = document.querySelector(".overviewModeDiv");
-                            _a = pageViewHelperFunction.createNewPage(mainController.pageCurrentStatus, fullPageModeDiv, overviewModeDiv, _newPageObjectData, _newSmallViewObjectData, false), newPage = _a[0], smallView = _a[1];
-                            pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
-                            mainController.pageCurrentStatus.pendingObject.newPageArray = [];
-                        }
-                    }
-                    if (!creationData.specialCreationMessage) {
-                        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
-                        newHTMLObject.initializeHTMLObjectFromData(objectData);
-                        parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId);
-                        // console.log("action = create", creationData.objectID, parentHTMLObject, objectData, newHTMLObject)
-                        if (parentHTMLObject) {
-                            parentHTMLObject.appendChild(newHTMLObject);
-                        }
-                    }
-                    return [4 /*yield*/, newHTMLObject];
-                case 2:
-                    _b.sent();
-                    return [2 /*return*/];
-            }
+            specialCreationMessage = creationData.specialCreationMessage;
+            objectData = mainController.getObjectById(creationData.objectID);
+            if (specialCreationMessage == specialCreationMessageEnum.createNewFullPageObject || specialCreationMessage == specialCreationMessageEnum.createNewOverviewPageObject) { // do something special if there is spcial creation message
+                mainController.pageCurrentStatus.pendingObject.newPageArray.push(creationData);
+                // if there are two item in the array, then clear it and create a new object
+                if (mainController.pageCurrentStatus.pendingObject.newPageArray.length == 4) {
+                    newPageItemData = mainController.pageCurrentStatus.pendingObject.newPageArray[0];
+                    newSmallViewItemData = mainController.pageCurrentStatus.pendingObject.newPageArray[1];
+                    _newPageObjectData = mainController.getObjectById(newPageItemData.objectID);
+                    _newSmallViewObjectData = mainController.getObjectById(newSmallViewItemData.objectID);
+                    fullPageModeDiv = document.querySelector(".fullPageModeDiv");
+                    overviewModeDiv = document.querySelector(".overviewModeDiv");
+                    _a = pageViewHelperFunction.createNewPage(mainController.pageCurrentStatus, fullPageModeDiv, overviewModeDiv, _newPageObjectData, _newSmallViewObjectData, false), newPage = _a[0], smallView = _a[1];
+                    pageViewHelperFunction.insertNewPage(mainController.pageCurrentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+                    mainController.pageCurrentStatus.pendingObject.newPageArray = [];
+                }
+                return [2 /*return*/, "finish process fullPage"];
+            } // if special Creation Message
+            if (!creationData.specialCreationMessage) {
+                if (objectData && objectData.GNType) {
+                    newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+                    console.log(newHTMLObject);
+                    newHTMLObject.initializeHTMLObjectFromData(objectData);
+                    parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId);
+                    // console.log("action = create", creationData.objectID, parentHTMLObject, objectData, newHTMLObject)
+                    if (parentHTMLObject) {
+                        parentHTMLObject.appendChild(newHTMLObject);
+                    } // parentHTMLObject
+                } // if (objectData
+            } // if not specialCreationMessage
+            return [2 /*return*/];
         });
     });
 }
@@ -27768,26 +27774,72 @@ function changeEventGenerator(array) {
     });
 }
 exports.changeEventGenerator = changeEventGenerator;
-function processNewChangeData(mainController, generator, changeItem) {
+var logContent = document.querySelector(".logContent");
+logContent.style.overflowY = "scroll";
+var color = ["pink", "orange", "red", "lightgreen", "Aliceblue"];
+var index = 0;
+function processNewChangeData(mainController, generator, awaitmessage) {
+    if (awaitmessage === void 0) { awaitmessage = false; }
     return __awaiter(this, void 0, void 0, function () {
-        var changeData, updateFinished, _object, objectData;
+        var generatorStatus, changeData, logDate, logDiv, logAction, logObjectID, logParentObject, logHR, updateFinished, _object, objectData;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    changeData = changeItem.value;
+                    generatorStatus = generator.next();
+                    if (!!generatorStatus.done) return [3 /*break*/, 4];
+                    changeData = generatorStatus.value;
+                    logDate = document.createElement("div");
+                    logDiv = document.createElement("div");
+                    logAction = document.createElement("div");
+                    logObjectID = document.createElement("div");
+                    logParentObject = document.createElement("div");
+                    logHR = document.createElement("hr");
+                    logDiv.append(logDate, logAction, logObjectID, logParentObject, logHR);
+                    if (changeData.action == "null") {
+                        logDiv.style.background = "grey";
+                    }
+                    else if (changeData.action == "create") {
+                        logDiv.style.background = "pink";
+                    }
+                    else if (changeData.action == "update") {
+                        logDiv.style.background = "orange";
+                    }
+                    logContent.insertBefore(logDiv, logContent.firstChild);
+                    updateFinished = void 0;
+                    logDate.innerText = "date: " + new Date();
+                    logAction.innerText = "action: " + changeData.action;
+                    logObjectID.innerText = "objectID: " + changeData.objectID;
+                    logParentObject.innerText = "parentId: " + changeData.parentHTMLObjectId;
+                    if (changeData.action == "null") {
+                        processNewChangeData(mainController, generator, updateFinished);
+                    }
                     if (!(changeData.action == "create")) return [3 /*break*/, 2];
-                    return [4 /*yield*/, processCreationDataHelper(this, changeData)];
+                    console.log(changeData);
+                    return [4 /*yield*/, processCreationDataHelper(mainController, changeData)
+                        // console.log("71717171========THis is await finished message", updateFinished)
+                        // console.log("81 -------------- creation event is finisheed")
+                    ];
                 case 1:
                     updateFinished = _a.sent();
-                    processNewChangeData(mainController, generator, generator.next());
+                    // console.log("71717171========THis is await finished message", updateFinished)
+                    // console.log("81 -------------- creation event is finisheed")
+                    processNewChangeData(mainController, generator, updateFinished);
                     _a.label = 2;
                 case 2:
-                    if (changeData.action == "update") {
-                        _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
-                        objectData = mainController.getObjectById(changeData.objectID);
-                        _object.reloadDataFromDatabase();
-                    }
-                    return [2 /*return*/];
+                    if (!(changeData.action == "update")) return [3 /*break*/, 4];
+                    _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                    objectData = mainController.getObjectById(changeData.objectID);
+                    if (!_object) return [3 /*break*/, 4];
+                    _object.reloadDataFromDatabase();
+                    return [4 /*yield*/, objectData
+                        // console.log("71717171========THis is await finished message", updateFinished)
+                    ];
+                case 3:
+                    updateFinished = _a.sent();
+                    // console.log("71717171========THis is await finished message", updateFinished)
+                    processNewChangeData(mainController, generator, updateFinished);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -28315,7 +28367,6 @@ exports.socket.on("serverInitiatesSynchronization", function () {
     exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
 });
 exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {
-    console.log(changeDataArray);
     var changeToBeProcessedArray = new Set();
     changeDataArray.forEach(function (change) {
         var senderID = change.id;
@@ -28326,8 +28377,8 @@ exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray)
             });
         }
     });
-    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
     constructInitialCondition_1.mainController.processChangeData(changeToBeProcessedArray);
+    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
     // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
     // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
     // console.log(52, changes)
