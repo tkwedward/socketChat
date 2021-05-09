@@ -1,11 +1,9 @@
 import * as Automerge from 'automerge'
 import {mainController} from "./constructInitialCondition"
-import * as GreatNoteDataClass from "./GreatNoteDataClass"
-import * as GreatNoteSvgDataClass from "./GreatNoteSvgDataClass"
-import * as GreatNoteControllerClass from "./GreatNoteControllerClass"
+import * as GreatNoteDataClass from "./GreatNoteClass/GreatNoteDataClass"
+import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass"
 import {MainDocArrayEnum}  from "./constructInitialCondition"
 import {socket} from "./socketFunction"
-import * as ControllerModel from "./dbtest"
 import * as EventModel from "./EventModel"
 import * as ToolBoxModel from "./ToolBoxModel"
 

@@ -1,9 +1,9 @@
 "use strict";
 exports.__esModule = true;
 exports.highlightCurrentPageInOverviewMode = exports.pageControllerHTMLObject = exports.initializePageController = void 0;
-function initializePageController() {
-    var startPage = { "previous": null, "next": null, pageNumber: 0 };
-    var endPage = { "previous": startPage, "next": null, pageNumber: 1 };
+function initializePageController(mainController) {
+    var startPage = { previous: null, next: null, pageNumber: 0, name: "startPage" };
+    var endPage = { previous: startPage, next: null, pageNumber: 1, name: "endPage" };
     startPage.next = endPage;
     var pageController = {
         "startPage": startPage,
@@ -36,14 +36,18 @@ function initializePageController() {
         pageController.currentPage = newPage;
         newPage.fullPageHTMLObject = fullPageHTMLObject;
         newPage.smallViewHTMLObject = smallViewHTMLObject;
-        newPage.fullPageHTMLObject.style.left = "0%";
+        newPage.fullPageHTMLObject.style.disply = "block";
         if (alpha.fullPageHTMLObject) {
-            alpha.fullPageHTMLObject.style.left = "-100%";
+            alpha.fullPageHTMLObject.style.disply = "none";
         }
         pageController.updatePageNumber(alpha);
         pageController.totalPageNumber += 1;
     };
     pageController.getPage = function (pageNumber) {
+        if (pageNumber == -999) {
+            var lastPage = pageController.endPage.previous;
+            return lastPage;
+        }
         var _currentPage = pageController.startPage;
         while (_currentPage) {
             if (_currentPage.pageNumber == pageNumber)
@@ -52,14 +56,24 @@ function initializePageController() {
         }
         return _currentPage;
     };
-    pageController.goToPage = function (pageNumber) {
-        var _targetPage = pageController.getPage(pageNumber);
-        console.log(_targetPage);
-        _targetPage.fullPageHTMLObject.style.left = "0%";
-        // set the position of the page according to the position relative to the targetPage
-        pageController.currentPage.fullPageHTMLObject.style.left = (_targetPage.pageNumber > pageController.currentPage.pageNumber) ? "-100%" : "+100%";
-        pageController.currentPage = _targetPage;
+    pageController.deletePage = function (targetPageNumber) {
+        var targetPage = pageController.getPage(targetPageNumber);
+        var alpha = targetPage.previous;
+        var beta = targetPage.next;
+        pageController.totalPageNumber -= 1;
+        alpha.next = beta;
+        beta.previous = alpha;
     };
+    pageController.goToPage = function (pageNumber, pageNumberInput) {
+        var _targetPage = pageController.getPage(pageNumber);
+        console.log(86868686, _targetPage);
+        _targetPage.fullPageHTMLObject.style.display = "block";
+        // set the position of the page according to the position relative to the targetPage
+        pageController.currentPage.fullPageHTMLObject.style.display = "none";
+        pageController.currentPage = _targetPage;
+        pageController.pagNumberInput.value = "" + pageNumber;
+        mainController.layerController.renderCurrentPageLayer();
+    }; // go To Page
     pageController.printAllPage = function () {
         var array = [];
         var _currentPage = pageController.startPage;
@@ -67,18 +81,16 @@ function initializePageController() {
             array.push(_currentPage);
             _currentPage = _currentPage.next;
         }
-        console.log(array);
-    };
+    }; // printAllPage
     pageController.transvereList = function (action) {
         var _currentPage = pageController.startPage;
         while (_currentPage) {
             action(_currentPage);
             _currentPage = _currentPage.next;
         }
-    };
+    }; // transvereList
     pageController.EventReceiver.addEventListener("goToPageEvent", function (e) {
         pageController.goToPage(e["detail"].pageNumber);
-        // console.log(pageController.currentPage.pageNumber)
     });
     return pageController;
 }
@@ -89,6 +101,7 @@ function pageControllerHTMLObject(pageController, subPanelContainer) {
     pageNavigator.classList.add("pageNavigator");
     var pageNumberInput = document.createElement("input");
     pageNumberInput.classList.add("pageNumberInput");
+    pageController.pagNumberInput = pageNumberInput;
     pageNumberInput.addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
             var goToPageEvent = new CustomEvent("goToPageEvent", { 'detail': { pageNumber: parseInt(pageNumberInput.value) } });
@@ -106,11 +119,7 @@ function pageControllerHTMLObject(pageController, subPanelContainer) {
     //@auto-fold here
     function leftButtonClickEvent() {
         if (pageController.currentPage.pageNumber > 1) {
-            pageController.currentPage.fullPageHTMLObject.style.left = "+100%";
-            // show the new page
-            pageController.currentPage = pageController.currentPage.previous;
-            pageController.currentPage.fullPageHTMLObject.style.left = "0%";
-            pageNumberInput.value = pageController.currentPage.pageNumber;
+            pageController.goToPage(+pageNumberInput.value - 1, pageNumberInput);
         }
     }
     leftButton.addEventListener("click", leftButtonClickEvent);
@@ -119,11 +128,7 @@ function pageControllerHTMLObject(pageController, subPanelContainer) {
     //@auto-fold here
     function rightButtonClickEvent() {
         if (pageController.currentPage.pageNumber < pageController.totalPageNumber) {
-            pageController.currentPage.fullPageHTMLObject.style.left = "-100%";
-            // show the new page
-            pageController.currentPage = pageController.currentPage.next;
-            pageController.currentPage.fullPageHTMLObject.style.left = "0%";
-            pageNumberInput.value = pageController.currentPage.pageNumber;
+            pageController.goToPage(+pageNumberInput.value + 1, pageNumberInput);
         }
     }
     rightButton.addEventListener("click", rightButtonClickEvent);

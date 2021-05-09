@@ -72,7 +72,6 @@ export function createDivControllerContainer():HTMLObjectControllerInterface{
         controllerType: dropdownListController
     })
 
-
     divControllerContainer.controllerArray = [widthController, heightController, positionController, backgroundColorController]
     divControllerContainer.append(...divControllerContainer.controllerArray)
 

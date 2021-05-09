@@ -1,5 +1,5 @@
 import * as pageViewHelperFunction from "./pageViewHelperFunction"
-import {GNObjectInterface} from "./GreatNoteDataClass"
+import {GNObjectInterface} from "./GreatNoteClass/GreatNoteDataClass"
 
 export enum specialCreationMessageEnum{
     createNewFullPageObject = "createNewFullPageObject",
@@ -35,8 +35,12 @@ export async function processCreationDataHelper(mainController, creationData){
 
     if(!creationData.specialCreationMessage){
         if (objectData && objectData.GNType){
+            if (objectData.GNType == "GNImageContainer"){
+                newHTMLObject =  mainController.createGNObjectThroughName(objectData.GNType, {name:"", arrayID:"", insertPosition:false, dataPointer: false, saveToDatabase: false, imgsrc: objectData["data"].src})
+            } else {
+                newHTMLObject =  mainController.createGNObjectThroughName(objectData.GNType, {name:"", arrayID:"", insertPosition:false, dataPointer: false, saveToDatabase: false})
+            }
 
-            newHTMLObject =  mainController.createGNObjectThroughName(objectData.GNType, {name:"", arrayID:"", insertPosition:false, dataPointer: false, saveToDatabase: false})
 
             console.log(newHTMLObject)
 
@@ -56,40 +60,13 @@ export function * changeEventGenerator(array){
   yield *array
 }
 
-let logContent = document.querySelector(".logContent")
-logContent.style.overflowY = "scroll"
-let color = ["pink", "orange", "red", "lightgreen", "Aliceblue"]
-let index = 0
 export async function processNewChangeData(mainController, generator, awaitmessage=false){
     let generatorStatus = generator.next()
     if (!generatorStatus.done){
         // check if the generator item is the last one or not
         let changeData = generatorStatus.value
-        let logDate = document.createElement("div")
-        let logDiv = document.createElement("div")
-        let logAction = document.createElement("div")
-        let logObjectID = document.createElement("div")
-        let logParentObject = document.createElement("div")
-        let logHR = document.createElement("hr")
-        logDiv.append(logDate, logAction, logObjectID, logParentObject, logHR)
-        if (changeData.action=="null"){
-          logDiv.style.background = "grey"
-        } else if (changeData.action=="create"){
-          logDiv.style.background = "pink"
-        } else if (changeData.action=="update"){
-          logDiv.style.background = "orange"
-        }
-
-
-        logContent.insertBefore(logDiv, logContent.firstChild)
-
-
-
         let updateFinished
-        logDate.innerText = "date: " + new Date()
-        logAction.innerText = "action: " + changeData.action
-        logObjectID.innerText = "objectID: " + changeData.objectID
-        logParentObject.innerText = "parentId: " + changeData.parentHTMLObjectId
+
 
         if (changeData.action=="null"){
             processNewChangeData(mainController, generator, updateFinished)
@@ -107,19 +84,18 @@ export async function processNewChangeData(mainController, generator, awaitmessa
             // console.log("81 -------------- update event is processing")
             // console.log("82 here is the accessPointer: ", changeData.objectID)
             let _object =  document.querySelector(`*[accessPointer='${changeData.objectID}']`)
-            // console.log("83 T/he html object is  ", _object)
-            // console.log(457, _object, changeData.objectID)
+            console.log("83 The html object is  ", _object)
+            console.log(457, _object, changeData.objectID)
 
             let objectData = mainController.getObjectById(changeData.objectID)
 
             if (_object){
+                console.log(939393, _object)
                 _object.reloadDataFromDatabase()
-
                 updateFinished = await objectData
                 // console.log("71717171========THis is await finished message", updateFinished)
                 processNewChangeData(mainController, generator, updateFinished)
             } // when there is no object, then there will be problem, so need to use it to solve this problem
-
         }
     }
 

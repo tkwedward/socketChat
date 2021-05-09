@@ -1,14 +1,14 @@
 import * as EventModel from "./EventModel"
-import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
-import * as ControllerModel from "./dbtest"
+import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSVGDataClass"
 import {mainController} from "./constructInitialCondition"
 import {polylineMouseDownFunction, polylineMouseMoveFunction, polylineMouseUpFunction} from "./ToolboxFolder/ToolboxEventFunction"
+import * as EraserFunction from "./ToolboxFolder/eraserFunction"
 
-
-interface ToolBoxInterface extends HTMLDivElement{
+export interface ToolBoxInterface extends HTMLDivElement{
     itemArray: any[]       // to mark the status of the button
     targetPage: any
     currentActiveButton: any
+    toolBoxItemStatus: any
     currentActiveEventFunction: (event)=>void
     currentActiveEventName:string
     selectionHTMLObject: HTMLDivElement
@@ -17,8 +17,12 @@ interface ToolBoxInterface extends HTMLDivElement{
 
     createToolBoxItem(name:string, toolBoxHtmlObject: HTMLDivElement):HTMLDivElement    // to create an item
 
+    checkToolBoxItemStatus(itemName):boolean
+    switchToolBoxItemStatus(itemName:string)
+
     registerSvg(svgLayer)
 }
+
 
 export interface ToolBoxItemInterface extends HTMLDivElement{
     status: boolean       // to mark the stats of the button
@@ -30,6 +34,16 @@ export interface ToolBoxItemInterface extends HTMLDivElement{
     resetButton()         // to reset the button when other buttons aare clked
 }
 
+interface ToolBoxItemStatusInterface {
+    currentActiveButton: string
+    polylineItemButton: {status: boolean, attributeController: string}
+    eraserItemButton: {status: boolean, attributeController: string}
+    selectionToolItemButton: {status: boolean, attributeController: string}
+    addCommentItemButton: {status: boolean, attributeController: string}
+    moveObjectInDivButton: {status: boolean, attributeController: string}
+}
+
+
 export class ToolBoxClass implements ToolBoxInterface {
     itemArray: any[]       // to mark the status of the button
     targetPage: any
@@ -39,10 +53,55 @@ export class ToolBoxClass implements ToolBoxInterface {
     selectionHTMLObject: HTMLDivElement
     optionHTMLObject: HTMLDivElement
     activateToolboxItem: any
+    //  check the item status
+    toolBoxItemStatus: ToolBoxItemStatusInterface= {
+        currentActiveButton: "",
+        polylineItemButton: {
+            status: false,
+            attributeController: "polylineController"
+        },
+        eraserItemButton: {
+            status: false,
+            attributeController: "eraserController"
+        },
+        selectionToolItemButton: {
+            status: false,
+            attributeController: "selectionTool"
+        },
+        addCommentItemButton: {
+            status: false,
+            attributeController: "addCommentController"
+        },
+        moveObjectInDivButton: {
+            status: false,
+            attributeController: "moveObjectInDivController"
+        }
+    }
 
 
-    constructor(){
+    checkToolBoxItemStatus(itemName){
+        return this.toolBoxItemStatus[itemName]["status"]
+    }
 
+    switchToolBoxItemStatus(itemName){
+      // turn off the attributeController and status of the buttom thaat is active
+      let currentActiveButton = this.toolBoxItemStatus.currentActiveButton
+        if (currentActiveButton){
+            this.toolBoxItemStatus[currentActiveButton]["status"] = !this.toolBoxItemStatus[currentActiveButton]["status"]
+
+            // turn off attributeControllerWant
+            let attributeControllerWantToTurnedOff = getAttributeController(this.toolBoxItemStatus, currentActiveButton)
+            if (attributeControllerWantToTurnedOff) attributeControllerWantToTurnedOff["style"].display = "none"
+            console.log(858585858, attributeControllerWantToTurnedOff)
+        }
+
+        this.toolBoxItemStatus.currentActiveButton = itemName
+        this.toolBoxItemStatus[itemName]["status"] = !this.toolBoxItemStatus[itemName]["status"]
+
+        // turn on attributeControllerWantToturn on
+        let attributeControllerWantToTurnedOn =  getAttributeController(this.toolBoxItemStatus, itemName)
+        if (attributeControllerWantToTurnedOn) attributeControllerWantToTurnedOn["style"].display = "block"
+        console.log(858585858, attributeControllerWantToTurnedOn)
     }
 
     createToolboxHtmlObject(){
@@ -50,44 +109,28 @@ export class ToolBoxClass implements ToolBoxInterface {
         let toolBoxContainer = <ToolBoxInterface>document.createElement("div")
 
         toolBoxContainer.classList.add("toolBoxHtml")
-        toolBoxContainer.style.height = "80px"
-        toolBoxContainer.style.background = "silver"
-        // toolBoxContainer.style.width = "90vw"
-        toolBoxContainer.style.width = "90%"
-        toolBoxContainer.style.margin = "0 auto"
-        toolBoxContainer.style.display = "grid"
-        toolBoxContainer.style.gridTemplateColumns = "4fr 3fr"
-
-        // toolBoxHtmlObject.style.width = "90%"
-        toolBoxContainer.itemArray = []
+        this.itemArray = []
 
         let toolBoxSelectionHtmlObject = document.createElement("div")
+        toolBoxSelectionHtmlObject.classList.add("toolBoxSelectionHtmlObject")
 
         let toolBoxOptionHtmlObject = document.createElement("div")
         toolBoxOptionHtmlObject.classList.add("toolBoxOption")
-        toolBoxOptionHtmlObject.style.height = "80px"
-        toolBoxOptionHtmlObject.style.background = "lightBlue"
 
         toolBoxContainer.selectionHTMLObject  = toolBoxSelectionHtmlObject
         toolBoxContainer.optionHTMLObject = toolBoxOptionHtmlObject
 
 
         toolBoxContainer.appendChild(toolBoxSelectionHtmlObject)
-        // toolBoxContainer.appendChild(toolBoxOptionHtmlObject)
         return toolBoxContainer
     }
 
     createToolBoxItem(name, toolBoxContainer):ToolBoxItemInterface{
         let toolBoxItem = <ToolBoxItemInterface> document.createElement("div")
         // the html style part
-        toolBoxItem.style.display = "inline-block"
-        toolBoxItem.classList.add("toolBoxItem")
+        toolBoxItem.classList.add("toolBoxItem", name)
         toolBoxItem.innerText = name[0]
-        toolBoxItem.style.background = "gold"
-        // toolBoxItem.style.display = "flex"
-        toolBoxItem.style.margin = "10px 5px"
-        toolBoxItem.style["align-items"] = "center"
-        toolBoxItem.style["justify-content"] = "center"
+
         let squreLength = "40px"
         toolBoxItem.style.width = squreLength
         toolBoxItem.style.height = squreLength
@@ -100,8 +143,8 @@ export class ToolBoxClass implements ToolBoxInterface {
         }
 
         toolBoxItem._parent = toolBoxContainer.selectionHTMLObject
-        toolBoxContainer.itemArray.push(toolBoxItem)
-        toolBoxContainer.selectionHTMLObject.appendChild(toolBoxItem)
+        this.itemArray.push(toolBoxItem)
+
 
         toolBoxItem.addEventListener(toolBoxItem.eventName, toolBoxItem.eventFunction)
 
@@ -109,23 +152,22 @@ export class ToolBoxClass implements ToolBoxInterface {
     }
 
     createNewPolyLineItemButton(toolBoxHtmlObject){
-        let self = this
         let toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject)
 
-        toolBoxItem.eventName = "touchstart"
-        // toolBoxItem.eventName = "mousedown"
-
-        // take place when mouse down
-        console.log("use new tool box function")
-        toolBoxItem.eventFunction = (e)=>{
-            console.log(121, mainController.attributeControllerMapping.polylineController)
-            polylineMouseDownFunction(e, this.targetPage, mainController.attributeControllerMapping.polylineController, "touchmove", "touchend")
-            // polylineMouseDownFunction(e, this.targetPage, mainController.attributeControllerMapping.polylineController, "mousemove", "mouseup")
-        }
-
-        toolBoxItem.addEventListener("click", function(){
+        toolBoxItem.addEventListener("click", (e)=>{
             console.log("polyline item button is activated")
-            self.activateButtonFunction(toolBoxItem)
+            this.activateButtonFunction(toolBoxItem, "polylineItemButton")
+        })
+
+        return toolBoxItem
+    }
+
+    createSelectionToolItemButton(toolBoxHtmlObject){
+        let toolBoxItem = this.createToolBoxItem("SelectionTool", toolBoxHtmlObject)
+
+        toolBoxItem.addEventListener("click", (e)=>{
+            console.log("Selection Tool item button is activated")
+            this.activateButtonFunction(toolBoxItem, "selectionToolItemButton")
         })
 
         return toolBoxItem
@@ -133,71 +175,49 @@ export class ToolBoxClass implements ToolBoxInterface {
 
 
     createEraserItemButton(toolBoxHtmlObject){
-        let self = this
+        // let self = this
         let toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject)
 
-        toolBoxItem.eventName = "mousedown"
-
-        toolBoxItem.eventFunction = ()=>{
-            let cx = event["offsetX"] + "px"
-            let cy = event["offsetY"] + "px"
-            let r = "10px"
-            let eraser = GreatNoteSvgDataClass.GNSvgCircle({name: "123", arrayID: mainController.mainDocArray["bookmark"], insertPosition: false, dataPointer: false, saveToDatabase: false})
-
-            eraser.style["cx"] = cx
-            eraser.style["cy"] = cy
-            eraser.style["r"] = r
-
-            function updateEraserPosition(e){
-                cx = event["offsetX"] + "px"
-                cy = event["offsetY"] + "px"
-                eraser.style["cx"] = cx
-                eraser.style["cy"] = cy
-            }
-
-            this.targetPage.addEventListener("mousemove", updateEraserPosition)
-
-            this.targetPage.addEventListener("mouseup", (e)=>{
-                this.targetPage.removeEventListener("mousemove", updateEraserPosition)
-                eraser.remove()
-            })
-
-            this.targetPage.addEventListener("mouseout", (e)=>{
-                // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
-                console.log("You are out of the boundary")
-            })
-            // self.targetPage.svgController
-            self.targetPage.appendChild(eraser)
-
-            // eraser.appendTo(self.targetPage)
-            // this.targetPage.appendChild(eraser.node)
-        }
-
-        toolBoxItem.addEventListener("click", function(){
-            console.log("eraser button is activated")
-            self.activateButtonFunction(toolBoxItem)
+        toolBoxItem.addEventListener("click", e=>{
+            this.activateButtonFunction(toolBoxItem, "eraserItemButton")
         })
-
 
         return toolBoxItem
     }
 
-    activateButtonFunction(toolBoxItem){
-        if (this.currentActiveButton){
-            console.log("clear the toolbox button status")
-            this.currentActiveButton.style.background = "gold"
-            this.targetPage.removeEventListener(this.currentActiveEventName, this.currentActiveEventFunction)
-        }
+    createAddCommentButton(toolBoxHtmlObject){
+        let toolBoxItem = this.createToolBoxItem("AddComment", toolBoxHtmlObject)
+
+        toolBoxItem.addEventListener("click", e=>{
+            this.activateButtonFunction(toolBoxItem, "addCommentItemButton")
+        })
+
+        return toolBoxItem
+    }
+
+
+    createMoveObjectInDivButton(toolBoxHtmlObject){
+      let toolBoxItem = this.createToolBoxItem("MoveObjectInDiv", toolBoxHtmlObject)
+
+      toolBoxItem.addEventListener("click", e=>{
+          this.activateButtonFunction(toolBoxItem, "moveObjectInDivButton")
+          console.log(this.toolBoxItemStatus)
+      })
+
+      return toolBoxItem
+    }
+
+    activateButtonFunction(toolBoxItem, itemName:string){
+        this.itemArray.forEach(p=>{
+          p.style.background = "gold"
+        })
+
+        this.switchToolBoxItemStatus(itemName)
 
         toolBoxItem.style.background = "red"
         this.currentActiveButton = toolBoxItem
-        this.currentActiveEventName = toolBoxItem.eventName
-        this.currentActiveEventFunction = toolBoxItem.eventFunction
-        // this.activateToolboxItem(toolBoxItem)
-
-        console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction)
-        this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction)
     }
+
 
     registerSvg(svgLayer){
       let self = this
@@ -209,5 +229,9 @@ export class ToolBoxClass implements ToolBoxInterface {
         })
     }
 
+}
 
+export function getAttributeController(toolBoxItemStatus, itemName){
+    let attributeControllerClassName = toolBoxItemStatus[itemName]["attributeController"]
+    return document.querySelector(`.${attributeControllerClassName}`)
 }

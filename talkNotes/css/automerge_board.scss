@@ -23,44 +23,95 @@ body {
 
     .panelContainer {
       background: gold;
+      height: 100vh;
+      overflow-y: scroll;
+    }
+
+    .toolBoxHtml {
+      height: "80px";
+      background: silver;
+      width : 90%;
+      margin : 0 auto;
+      display : "grid";
+      grid-template-columns: "4fr 3fr";
+
+      .toolBoxItem {
+        display: inline-block;
+        background: gold;
+        margin: 10px 5px;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .toolBoxOption{
+      height: 80px;
+      background: lightblue;
     }
 
     .pageContentContainer{
       background: silver;
       position: relative;
+      overflow: scroll;
+      z-index: 100;
+
       .divPage {
-          width: 100%;
-          height: 100vh;
+          transform-origin: top left;
+          transform: scale(1);
+          width: 1150px; height: 1678px; margin: 20px auto;
           background: pink;
-          position: absolute;
-          left: 0;
-          right: 0;
+          position: absolute; left: 0; right: 0;
+
+          .popUpBox{
+            width: 150px;
+            min-height: 100px;
+            background: grey;
+            position: fixed;
+            display: grid;
+            grid-row-gap: 5px;
+
+            .popUpBoxButton {
+                text-align: center;
+                padding: 5px;
+                font-size: 25px;
+            }
+
+            .popUpBoxButton:not(:last-child) {
+                border-bottom: 1px solid white;
+            }
+          } // popUpBox
 
           .divLayer {
-            width: 100%;
-            height: 100vh;
-            background: blue;
-            position: absolute;
-            left: 0;
-            right: 0;
+            width: 100%; height: 100%; background: blue;
+            position: absolute; left: 0; right: 0;
           }
-      }
+
+          .selectedObjectInDiv{
+            border: 1px solid blue;
+          }
+
+          ._commentContainer{
+              width: 400px;
+              // min-height: 400px;
+              background: wheat;
+              margin: 10px;
+
+              .commentField { margin: 10px; width: 90%;}
+              .replyField { margin: 10px; width: 90%;}
+
+          }
+      } // .divPage
 
       .overviewModeDiv{
+          position: absolute; top: 0px; left: 0px;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr 1fr;
           grid-row-gap: 15px;
-          .divPageSmall {
-              background: pink;
-          }
+          .divPageSmall { background: pink; margin: 10px; }
       }
 
-      .fullPageModeDiv[status="off"] {
-          display: none;
-      }
-      .overviewModeDiv[status="off"] {
-          display: none;
-      }
+      .fullPageModeDiv[status="off"] { display: none; }
+      .overviewModeDiv[status="off"] { display: none; }
     }
 
     .subPanel {
@@ -78,14 +129,10 @@ body {
             // display: grid;
             // grid-template-columns: 1fr 1fr;
         }
-        .subPanelContent[status="close"]{
-            display: none;
-
-        }
+        .subPanelContent[status="close"]{ display: none; }
 
         .subPanelItem{
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             background: azure;
             margin: 0 auto;
         }
@@ -96,7 +143,7 @@ body {
 }
 
 .bookmarkSubPanel{
-    height: 230px;
+    min-height: 230px;
 
     .pageNavigator {
         text-align: center;
@@ -111,14 +158,151 @@ body {
 
     .subPanelContent[status="open"]{
         display: block !important;
+        padding: 10px;
 
         .functionButton{
-            width: 90%;
-            height: 30px;
+            width: 90%; height: 30px; margin: 10px auto;
             background: grey;
-            margin: 10px auto;
         }
     }
+}
+
+.layerController{
+    margin: 10px 0px ;
+
+    .layerControllerFunction {
+      background: lightblue;
+      height: 50px;
+    }
+
+
+
+
+    .layerView{
+        background: grey;
+        height: 150px;
+        overflow-y: scroll;
+
+
+
+        .layerLevel[status="off"]{ display: none; }
+
+
+
+        .layerRow {
+          &.selectedRow{ background: skyblue; }
+
+          width: 100%; height: 30px; background: ivory;
+          display: grid; grid-template-columns: 1fr 3fr 1fr;
+          border: 1px black solid;
+
+          div { height: 100%; width: 100%; }
+
+          div:not(:last-child){ border-right: 1px black solid; }
+
+          .viewSwitch, .expandSwitch, .viewName{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .viewName {justify-content: left; font-size: 12px;}
+
+          .viewSwitch {
+            &[status="on"] { .visibility {display: block} }
+            &[status="off"]{ .visibility {display: none} }
+          }
+
+
+          .expandSwitch{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .expand_more, .expand_less { font-size:35px; }
+
+            &[status="off"]{
+                .expand_more{ display: block;}
+                .expand_less{ display: none;}
+            }
+
+            &[status="on"]{
+                .expand_more{ display: none;}
+                .expand_less{ display: block;}
+            }
+          } // expandSwitch
+
+        } // layerRow
+        // .layerlevel
+
+    }
+}
+
+
+
+
+
+//
+.testField.open {
+    width: 90vw;
+    height: 100vh;
+    background: lightblue;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 1000;
+
+    .scalableDiv {
+      $baseWidth: 600px;
+      $width: 800px;
+      width: $width;
+      height: $width * 3/2;
+      background: ivory;
+      transform-origin: top left;
+      transform: scale(0.1, 0.1);
+      // font-size: calc(100% * $width / $baseWidth);
+      p {margin: 0;}
+    }
+
+    .imageFrame {
+        width: 400px;
+        height: 400px;
+        background: lighten(yellow, 1%);
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        span.imageFrameCorner{
+            position: absolute;
+            display: block;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            width: 5px;
+            height: 5px;
+            background: black;
+        }
+
+        span.topLeft {
+          top: calc(0% - 2.5px);
+          left: calc(0% - 2.5px);
+        }
+        span.topRight {
+          top: calc(0% - 2.5px);
+          left: calc(100% - 2.5px);
+        }
+        span.bottomRight {
+          top: calc(100% - 2.5px);
+          left: calc(100% - 2.5px);
+          cursor: nwse-resize;
+        }
+        span.bottomLeft {
+          top: calc(100% - 2.5px);
+          left: calc(0% - 2.5px);
+        }
+    }
+
 }
 
 .commentSubPanel{
@@ -179,20 +363,6 @@ body {
 }
 
 
-.layerController{
-  margin: 10px;
-    .layerView {
-      background: grey;
-      height: 150px;
-      overflow-y: scroll;
-    }
-
-    .layerControllerFunction {
-      background: lightblue;
-      height: 50px;
-    }
-
-}
 
 
 div.selectedObject{
@@ -259,7 +429,44 @@ circle.selectedObject{
         }
     }
   }
+}
+
+.choiceController{
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-wrap: wrap;
+  width: 90%;
+  margin: auto 10px;
+  min-height: 150px;
+  background: CornflowerBlue;
+}
+
+@media (max-width:1025px){
+  body {
+    width: 100vw;
+  }
+    .pageWrapper{
+      display: grid;
+      grid-template-columns: 1fr 6fr;
+
+        .pageContentContainer{
+            width: 85.5vw;
+            .divPage {
+                margin: 25px;
+            }
+        }
 
 
+      .panelContainer{
+        width: 150px;
+        overflow-x: hidden;
 
+      }
+    }
+
+
+    .choiceController{
+      width: 150px;
+    }
 }

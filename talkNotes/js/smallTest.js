@@ -17315,7 +17315,7 @@ class WS extends Transport {
 module.exports = WS;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":69,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
+},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":91,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
     if (obj.hasOwnProperty(k)) {
@@ -17640,7 +17640,7 @@ formatters.j = function (v) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./common":18,"_process":71}],18:[function(require,module,exports){
+},{"./common":18,"_process":93}],18:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -19437,7 +19437,7 @@ exports.url = url;
 
 },{"debug":33,"parseuri":26}],33:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":34,"_process":71,"dup":17}],34:[function(require,module,exports){
+},{"./common":34,"_process":93,"dup":17}],34:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":35}],35:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -19864,7 +19864,7 @@ exports.hasBinary = hasBinary;
 
 },{}],39:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":40,"_process":71,"dup":17}],40:[function(require,module,exports){
+},{"./common":40,"_process":93,"dup":17}],40:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":41}],41:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -25542,6 +25542,298 @@ module.exports = yeast;
 
 },{}],44:[function(require,module,exports){
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.attachEventListenerToDivLayer = exports.attachEventListenerToSvgBoard = void 0;
+var ToolboxEventFunction_1 = require("../ToolboxFolder/ToolboxEventFunction");
+var EraserFunction = __importStar(require("../ToolboxFolder/eraserFunction"));
+var SelectionToolFunction = __importStar(require("../ToolboxFolder/selectionToolFunction"));
+var AddCommentFunction = __importStar(require("../ToolboxFolder/addCommentFunction"));
+var MoveObjectInDivFunction = __importStar(require("../ToolboxFolder/moveObjectInDivFunction"));
+function attachEventListenerToSvgBoard(mainController, svgBoard) {
+    var polylineMouseDown = {
+        eventNameList: ["touchstart"],
+        eventFunction: function (e) {
+            ToolboxEventFunction_1.polylineMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend");
+        }
+    };
+    var eraserMouseDownFunction = {
+        eventNameList: ["touchstart"],
+        eventFunction: function (e) {
+            EraserFunction.eraserMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend");
+        }
+    };
+    var selectionStatusObject = {
+        mode: "selectionMode",
+        polyline: null
+    };
+    var selectionToolMouseDownFunction = {
+        eventNameList: ["touchstart"],
+        eventFunction: function (e) {
+            SelectionToolFunction.selectionToolMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
+        }
+    };
+    var eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction];
+    eventArray.forEach(function (toolboxEvent) {
+        toolboxEvent.eventNameList.forEach(function (eventName) {
+            svgBoard.addEventListener(eventName, toolboxEvent.eventFunction);
+        });
+    });
+}
+exports.attachEventListenerToSvgBoard = attachEventListenerToSvgBoard;
+function attachEventListenerToDivLayer(mainController, divLayer) {
+    var addCommentMouseDownFunction = {
+        eventNameList: ["mousedown"],
+        eventFunction: function (e) {
+            AddCommentFunction.addCommentMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup");
+        }
+    }; // addCommentMouseDownFunction
+    var divSelctionObjectStatus = {
+        "selectedObject": null
+    };
+    var moveObjectInDivMouseDownFunction = {
+        eventNameList: ["mousedown"],
+        eventFunction: function (e) {
+            MoveObjectInDivFunction.moveObejectInDivMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup", divSelctionObjectStatus);
+            // AddCommentFunction.addCommentMouseDownFunction(e, mainController, divLayer, "mousemove", "mouseup")
+        }
+    };
+    var eventArray = [addCommentMouseDownFunction, moveObjectInDivMouseDownFunction];
+    // let eventArray = [addCommentMouseDownFunction]
+    eventArray.forEach(function (toolboxEvent) {
+        toolboxEvent.eventNameList.forEach(function (eventName) {
+            divLayer.style.background = "maroon";
+            divLayer.addEventListener(eventName, toolboxEvent.eventFunction);
+        });
+    });
+}
+exports.attachEventListenerToDivLayer = attachEventListenerToDivLayer;
+
+},{"../ToolboxFolder/ToolboxEventFunction":60,"../ToolboxFolder/addCommentFunction":61,"../ToolboxFolder/eraserFunction":62,"../ToolboxFolder/moveObjectInDivFunction":63,"../ToolboxFolder/selectionToolFunction":64}],45:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.attachEventListenerToDivLayer = exports.attachEventListenerToSvgBoard = void 0;
+var ToolboxEventFunction_1 = require("../ToolboxFolder/ToolboxEventFunction");
+var EraserFunction = __importStar(require("../ToolboxFolder/eraserFunction"));
+var SelectionToolFunction = __importStar(require("../ToolboxFolder/selectionToolFunction"));
+function attachEventListenerToSvgBoard(mainController, svgBoard) {
+    var polylineMouseDown = {
+        eventNameList: ["touchstart"],
+        eventFunction: function (e) {
+            ToolboxEventFunction_1.polylineMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend");
+        }
+    };
+    var eraserMouseDownFunction = {
+        eventNameList: ["touchstart"],
+        eventFunction: function (e) {
+            EraserFunction.eraserMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend");
+        }
+    };
+    var selectionStatusObject = {
+        mode: "selectionMode",
+        polyline: null
+    };
+    var selectionToolMouseDownFunction = {
+        eventNameList: ["touchstart"],
+        eventFunction: function (e) {
+            SelectionToolFunction.selectionToolMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
+        }
+    };
+    var eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction];
+    eventArray.forEach(function (toolboxEvent) {
+        toolboxEvent.eventNameList.forEach(function (eventName) {
+            svgBoard.addEventListener(eventName, toolboxEvent.eventFunction);
+        });
+    });
+}
+exports.attachEventListenerToSvgBoard = attachEventListenerToSvgBoard;
+function attachEventListenerToDivLayer(mainController, svgBoard) {
+}
+exports.attachEventListenerToDivLayer = attachEventListenerToDivLayer;
+
+},{"../ToolboxFolder/ToolboxEventFunction":60,"../ToolboxFolder/eraserFunction":62,"../ToolboxFolder/selectionToolFunction":64}],46:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.initalizeWindowObject = void 0;
+function initalizeWindowObject() {
+    var _window = window;
+    _window.selectedObjectArray = [];
+    _window.clearSelectedObjectArray = function () {
+        _window.selectedObjectArray = [];
+    };
+    _window.addSelectedObjectToWindow = function (item) {
+        _window.selectedObjectArray.push(item);
+    };
+    _window.trackCurrentObjectTheMouseIsInside = function () {
+        var _window = window;
+        _window.previousMouseInObject = null;
+        _window.addEventListener("mousemove", function (e) {
+            _window.currentMouseInObject = e.target;
+            if (_window.previousMouseInObject && _window.previousMouseInObject != _window.currentMouseInObject) {
+                var mouseuptEvent = new CustomEvent("mouseup2");
+                _window.previousMouseInObject.dispatchEvent(mouseuptEvent);
+            }
+            _window.previousMouseInObject = e.target;
+        });
+    };
+}
+exports.initalizeWindowObject = initalizeWindowObject;
+
+},{}],47:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.swipeDetection = void 0;
+var toolBoxHelperFunction_1 = require("../ToolboxFolder/toolBoxHelperFunction");
+function swipeDetection(mainController, pageContentContainer) {
+    pageContentContainer.addEventListener("touchstart", function (e) {
+        var _a, _b;
+        var initialPointX, initialPointY;
+        var finalPointX, finalPointY;
+        var initialPointX2, initialPointY2, finalPointX2, finalPointY2;
+        var touchIsFinger, touchIsFinger2;
+        var doubleFinger = false;
+        var deltaX, deltaX2;
+        if (e.type == "touchstart") {
+            _a = toolBoxHelperFunction_1.getTouchOffset(e, 0), initialPointX = _a[0], initialPointY = _a[1];
+            touchIsFinger = e.targetTouches[0].radiusX > 10 ? true : false;
+            if (e.targetTouches[1]) {
+                _b = toolBoxHelperFunction_1.getTouchOffset(e, 1), initialPointX2 = _b[0], initialPointY2 = _b[1];
+                touchIsFinger2 = e.targetTouches[1].radiusX > 10 ? true : false;
+            }
+            if (touchIsFinger && touchIsFinger2) {
+                doubleFinger = true;
+            }
+        }
+        var testInfo = document.querySelector(".testInfo");
+        var initialPoint = { x1: initialPointX, y1: initialPointY, x2: initialPointX2, y2: initialPointY2 };
+        testInfo["style"].width = "100%";
+        if (!doubleFinger)
+            return;
+        e.preventDefault();
+        var fullPageArray = document.querySelectorAll(".fullPage");
+        var distance1, distance2, scale, deltaScale;
+        var _c = [initialPointX, initialPointY, initialPointX2, initialPointY2], previousFinalPointX = _c[0], previousFinalPointY = _c[1], previousFinalPointX2 = _c[2], previousFinalPointY2 = _c[3];
+        var newFinalPointsDistance, previousFinalPointsDistance;
+        var scaleDirection = 1;
+        var mouseMoveFunction = function (e) {
+            // finalPointX =  e.targetTouches[0].pageX;
+            // finalPointY =  e.targetTouches[0].pageY;
+            // finalPointX2 =  e.targetTouches[1].pageX;
+            // finalPointY2 =  e.targetTouches[1].pageY;
+            var _a, _b, _c, _d;
+            _a = toolBoxHelperFunction_1.getTouchOffset(e, 0), finalPointX = _a[0], finalPointY = _a[1];
+            _b = toolBoxHelperFunction_1.getTouchOffset(e, 1), finalPointX2 = _b[0], finalPointY2 = _b[1];
+            newFinalPointsDistance = toolBoxHelperFunction_1.calculateDistance(finalPointX, finalPointY, finalPointX2, finalPointY2);
+            previousFinalPointsDistance = toolBoxHelperFunction_1.calculateDistance(previousFinalPointX, previousFinalPointY, previousFinalPointX2, previousFinalPointY2);
+            _c = toolBoxHelperFunction_1.getTouchOffset(e, 0), previousFinalPointX = _c[0], previousFinalPointY = _c[1];
+            _d = toolBoxHelperFunction_1.getTouchOffset(e, 1), previousFinalPointX2 = _d[0], previousFinalPointY2 = _d[1];
+            distance1 = toolBoxHelperFunction_1.calculateDistance(initialPointX2, initialPointY2, finalPointX2, finalPointY2);
+            distance2 = toolBoxHelperFunction_1.calculateDistance(initialPointX, initialPointY, finalPointX, finalPointY);
+            scale = toolBoxHelperFunction_1.getScale(fullPageArray[0]);
+            deltaScale = (distance1 + distance2) / 4000;
+            scaleDirection = newFinalPointsDistance - previousFinalPointsDistance > 0 ? +1 : -1;
+            testInfo.innerHTML = "distance_1 = " + distance1 + " <br>" + ("distance_2 = " + distance2 + " <br>") + ("totalDistance = " + (distance1 + distance2) + ", scale = " + scale + ", scale = " + (scale + scaleDirection * deltaScale) + ", direction = " + scaleDirection + ", finalX = " + finalPointX + ", finalY = " + finalPointY + ", finalX2 = " + finalPointX2 + ", finalY2 = " + finalPointY2 + ", width " + e.target.getBoundingClientRect().width);
+            var pageWidth = e.target.getBoundingClientRect().width;
+            // pageContentContainer["style"].transform = `scale(${scale + scaleDirection * deltaScale})`
+            if (newFinalPointsDistance > 100) {
+                Array.from(fullPageArray).forEach(function (p) {
+                    if (pageWidth < 4000 && pageWidth > 600) {
+                        p.style.transform = "scale(" + (scale + scaleDirection * deltaScale) + ")";
+                    }
+                    if (pageWidth > 4000)
+                        p.style.transform = "scale(" + (scale + scaleDirection * deltaScale) * 0.95 + ")";
+                    if (pageWidth < 600)
+                        p.style.transform = "scale(" + (scale + scaleDirection * deltaScale) * 1.25 + ")";
+                });
+            } // newFinalPointsDistance > 100
+            deltaX = finalPointX - initialPointX;
+            deltaX2 = finalPointX2 - initialPointX2;
+        };
+        pageContentContainer.addEventListener("touchmove", mouseMoveFunction);
+        // define the mouse move function
+        var mouseUpFunction = function (e) {
+            // remove the mouse move event
+            fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction, mouseUpFunction, deltaX, deltaX2, doubleFinger);
+        }; // mouseUpFunction
+        pageContentContainer.addEventListener("touchend", mouseUpFunction);
+    });
+} //swipeDetection//
+exports.swipeDetection = swipeDetection;
+function fingerPanPage(mainController, pageContentContainer, mouseMoveFunction, mouseUpFunction, initialPoint, finalPoint, doubleFinger) {
+}
+function fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction, mouseUpFunction, deltaX, deltaX2, doubleFinger) {
+    pageContentContainer.removeEventListener("touchmove", mouseMoveFunction);
+    pageContentContainer.removeEventListener("touchend", mouseUpFunction);
+    var currentPage = mainController.pageController.currentPage;
+    var pageMoveDirection = deltaX > 0 ? -1 : +1;
+    var targetPageNumber = currentPage.pageNumber + pageMoveDirection;
+    var turnPageBreakPoint = 300;
+    if (!doubleFinger)
+        return;
+    if (Math.abs(deltaX) > turnPageBreakPoint || Math.abs(deltaX2) > turnPageBreakPoint) { // if larager than the page Break Point
+        if (pageMoveDirection > 0) {
+            if (currentPage.next.name == "endPage") {
+                console.log("create a new page");
+            }
+            else { // not the end page
+                mainController.pageController.goToPage(targetPageNumber);
+                pageContentContainer.scrollTo(0, 0);
+                // e.preventDefault()
+            }
+        } // if (pageMoveDirection > 0 ){
+        if (pageMoveDirection < 0) {
+            if (currentPage.previous.name == "startPage") {
+                console.log("create a new page");
+            }
+            else { // not the end page
+                console.log("go to the previous page");
+                mainController.pageController.goToPage(targetPageNumber);
+                pageContentContainer.scrollTo(0, 0);
+                // e.preventDefault()
+            }
+        } // if (pageMoveDirection < 0)
+    } // if (Math.abs(deltaX) > turnPageBreakPoint){
+}
+
+},{"../ToolboxFolder/toolBoxHelperFunction":65}],48:[function(require,module,exports){
+"use strict";
 exports.__esModule = true;
 exports.addMovingEvent = void 0;
 function addMovingEvent(htmlObject) {
@@ -25612,217 +25904,11 @@ function addMovingEvent(htmlObject) {
 } // } // addMovingEvent
 exports.addMovingEvent = addMovingEvent;
 
-},{}],45:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
-exports.GNTemplate = exports.GNImageController = exports.GNTextController = exports.GNController = exports.GNControllerItem = void 0;
-var GreatNoteDataClass_1 = require("./GreatNoteDataClass");
-function GNControllerItem(controllerObject, eventType, controlledObject) {
-    controllerObject.addEventListener(eventType, controllerObject.controllerEvent);
-    controllerObject.controlledObject = controlledObject;
-    return controllerObject;
-}
-exports.GNControllerItem = GNControllerItem;
-function GNController(_name, _parent) {
-    var _object = document.createElement("div");
-    _object.classList.add(_name);
-    // internal properties
-    _object._name = _name;
-    _object._type = GNController.name;
-    _object._styleList = {
-        "height": "150px",
-        "background": "silver",
-        "margin": "10px"
-    };
-    _object.appendElements = function () {
-        var childrenList = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            childrenList[_i] = arguments[_i];
-        }
-        childrenList.forEach(function (p) {
-            p._parent = _object;
-            _object.appendChild(p);
-        });
-    };
-    // functions
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.receiveDataFromChild = function (data) {
-        console.log(data);
-    };
-    // events
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    // do something before return
-    GreatNoteDataClass_1.applyStyleHelperFunction(_object, _object._styleList);
-    return _object;
-}
-exports.GNController = GNController;
-/** to creat Text controller*/
-function GNTextController(_name, _parent) {
-    var _object = GNController(_name);
-    // internal properties
-    _object._name = _name;
-    _object._type = GNTextController.name;
-    // functions
-    _object.getControlledObject = function (target) {
-        _object.controlledObject = target;
-    };
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    /* part 2: controllers
-        textSizeController?: any,
-        textBoldController?: any,
-        textItalicController?: any,
-        textColorController: any,
-        textHighlightController?:any
-    */
-    // a)  create width controller
-    _object.textSizeController = GreatNoteDataClass_1.GNInputField("textSizeController");
-    _object.textSizeController.placeholder = "fontSize...";
-    _object.textSizeController.controllerEvent = function (e) {
-        if (_object.controlledObject) {
-            _object.controlledObject.style.fontSize = textSizeControllerItem.value + "px";
-        }
-        else {
-            console.log("please select an item");
-        }
-    };
-    var textSizeControllerItem = GNControllerItem(_object.textSizeController, "input");
-    // =========================================//
-    // a)  create text color  controller        //
-    // =========================================//
-    _object.textColorController = GreatNoteDataClass_1.GNInputField("textColorController");
-    _object.textColorController.placeholder = "color...";
-    _object.textColorController.controllerEvent = function (e) {
-        if (_object.controlledObject) {
-            _object.controlledObject.style.color = textColorControllerItem.value;
-        }
-        else {
-            console.log("please select an item");
-        }
-    };
-    var textColorControllerItem = GNControllerItem(_object.textColorController, "input");
-    _object.appendElements(_object.textSizeController, _object.textColorController);
-    return _object;
-}
-exports.GNTextController = GNTextController;
-/** to create GNImageController*/
-function GNImageController(_name, _parent) {
-    var _object = GNController(_name);
-    // internal properties
-    _object._name = _name;
-    _object._type = GNImageController.name;
-    // functions
-    _object.getControlledObject = function (target) {
-        _object.controlledObject = target;
-    };
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    /* part 2: controllers
-        // a)  create width controller
-        // b)  create height controller
-        // c) create transparency controller
-        // d) creatte rotation controller
-    */
-    // a)  create width controller
-    _object.imgWidthController = GreatNoteDataClass_1.GNInputField("imgWidthController");
-    _object.imgWidthController.controllerEvent = function (e) {
-        if (_object.controlledObject) {
-            _object.controlledObject.style.width = imgWidthInputControllerItem.value + "px";
-        }
-        else {
-            console.log("please select an item");
-        }
-    };
-    var imgWidthInputControllerItem = GNControllerItem(_object.imgWidthController, "input");
-    // b)  create height controller
-    // c) create transparency controller
-    // d) creatte rotation controller
-    // add item to the controller
-    _object.appendElements(imgWidthInputControllerItem);
-    return _object;
-}
-exports.GNImageController = GNImageController;
-function GNTemplate(_name, _parent) {
-    var _object = document.createElement("div");
-    // internal properties
-    _object._name = _name;
-    _object._type = GNTemplate.name;
-    // functions
-    _object.update = function (data) { data; };
-    _object.extract = function () { return 123; };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    return _object;
-}
-exports.GNTemplate = GNTemplate;
-
-},{"./GreatNoteDataClass":46}],46:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-exports.superGNObject = exports.GNTemplate = exports.GNDropdownList = exports.GNImage = exports.GNEditableDiv = exports.GNContainerDiv = exports.GNButton = exports.GNInputField = void 0;
-var constructInitialCondition_1 = require("./constructInitialCondition");
-function createDummyData() {
-    return {
-        "data": {},
-        "array": [],
-        "GNType": "",
-        "specialGNType": "",
-        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-        "_classList": [],
-        "stylesheet": {}
-    };
-}
-//@auto-fold here
-function GNInputField(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
-    var _object = document.createElement("input");
-    _object.GNType = GNInputField.name;
-    _object._name = name;
-    _object._dataStructure = ["value"];
-    _object._styleStructure = [];
-    // functions
-    _object.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = _object.GNType;
-        if (_object._identity)
-            dataObject["_identity"] = _object._identity;
-        _object._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = _object[p];
-        });
-        // stylesheet data
-        _object._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = _object["style"][p];
-        });
-        return dataObject;
-    };
-    _object.extract = function () { return _object.createDataObject(); };
-    _object.loadFromData = function (data) { return _object.value = data.value; };
-    //@auto-fold here
-    // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
-    // if the object is assigned to the database, then this  addEventListener is to monitor the change
-    // define what is the update action
-    // let eventStatus = {t0: 0, t1: 0, run: true}
-    // _object.addEventListener("input", (e)=>{
-    //     eventStatus.t0 = eventStatus.t1
-    //     eventStatus.t1 = e.timeStamp
-    //
-    //     if ( eventStatus.t1 - eventStatus.t0 > 100){
-    //         if (_object._identity.accessPointer!="") _object.saveHTMLObjectToDatabase()
-    //         if (_object.processUpdateData) _object.processUpdateData()
-    //     }
-    // })//addEventListener
-    return _object;
-} // GNInputField
-exports.GNInputField = GNInputField;
+exports.GNButton = void 0;
+var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
 //@auto-fold here
 function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
@@ -25836,9 +25922,10 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
     // functions
     _object.loadFromData = function (data) { _object.innerHTML = data; };
     _object.createDataObject = function () {
-        var dataObject = createDummyData();
+        var dataObject = GreateNoteObjectHelperFunction_1.createDummyData();
         // data structure
         dataObject["GNType"] = _object.GNType;
+        dataObject["classList"] = Array.from(_object.classList);
         if (_object._identity)
             dataObject["_identity"] = _object._identity;
         _object._dataStructure.forEach(function (p) {
@@ -25865,149 +25952,17 @@ function GNButton(_name, statusList, arrayID, insertPosition, dataPointer, saveT
         _object.updateLinkObject();
     });
     // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
+    GreateNoteObjectHelperFunction_1.superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer);
     // _object.editEvent("input")
     return _object;
 }
 exports.GNButton = GNButton;
-//@auto-fold here
-function GNContainerDiv(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
-    var _object = document.createElement("div");
-    _object.childrenList = {};
-    _object.GNType = GNContainerDiv.name;
-    _object._dataStructure = ["innerHTML"];
-    _object._styleStructure = ["background", "width", "height"];
-    // functions
-    _object.appendElements = function () {
-        var childrenArray = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            childrenArray[_i] = arguments[_i];
-        }
-        childrenArray.forEach(function (p) {
-            _object.appendChild(p);
-            _object.childrenList[p._name] = p;
-            p._parent = _object;
-        });
-    };
-    _object.loadFromData = function (data) {
-        _object._dataStructure.forEach(function (key) {
-            _object[key] = data[key];
-        });
-    };
-    _object.createDataObject = function () {
-        var dataObject = createDummyData();
-        dataObject["GNType"] = _object.GNType;
-        if (_object._identity)
-            dataObject["_identity"] = _object._identity;
-        // data structure
-        _object._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = _object[p];
-        });
-        dataObject["_classList"] = Array.from(_object.classList);
-        // stylesheet data
-        _object._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = _object["style"][p];
-        });
-        return dataObject;
-    };
-    _object.applyStyle = function (styleObject) {
-        Object.entries(styleObject).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            _object[key] = value;
-        });
-        _object.saveHTMLObjectToDatabase(); //
-    };
-    _object.extract = function () { return _object.createDataObject(); };
-    // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
-    // add events
-    var eventStatus = { t0: 0, t1: 0, run: true };
-    _object.addEventListener("input", function (e) {
-        eventStatus.t0 = eventStatus.t1;
-        eventStatus.t1 = e.timeStamp;
-        if (eventStatus.t1 - eventStatus.t0 > 100) {
-            if (_object._identity.accessPointer != "")
-                _object.saveHTMLObjectToDatabase();
-            if (_object.processUpdateData)
-                _object.processUpdateData();
-        }
-    }); //addEventListener
-    return _object;
-}
-exports.GNContainerDiv = GNContainerDiv;
-var testArray = [];
-//@auto-fold here
-function GNEditableDiv(_name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var _object = GNContainerDiv(_name, arrayID, insertPosition, dataPointer, saveToDatabase);
-    _object.contentEditable = "true";
-    _object._name = _name;
-    _object.GNType = GNEditableDiv.name;
-    _object._dataStructure = ["innerHTML"];
-    _object._styleStructure = ["background", "width"];
-    _object.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = _object.GNType;
-        if (_object._identity)
-            dataObject["_identity"] = _object._identity;
-        _object._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = _object[p];
-        });
-        // stylesheet data
-        _object._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = _object["style"][p];
-        });
-        return dataObject;
-    };
-    _object.extract = function () {
-        var _dummyData = _object.createDataObject();
-        return _dummyData;
-    };
-    _object.loadFromData = function (data) {
-        _object._dataStructure.forEach(function (key) {
-            _object[key] = data[key];
-        });
-    };
-    // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
-    return _object;
-}
-exports.GNEditableDiv = GNEditableDiv;
-//@auto-fold here
-function GNImage(_name, imgsrc) {
-    var _object = document.createElement("img");
-    _object._name = _name;
-    _object.src = imgsrc;
-    _object.GNType = GNImage.name;
-    _object.style.width = "60%";
-    _object._dataStructure = ["src"];
-    _object._styleStructure = ["width", "height"];
-    _object.loadFromData = function (data) { data; };
-    _object.createDataObject = function () {
-        var dataObject = createDummyData();
-        // identity
-        dataObject["GNType"] = _object.GNType;
-        if (_object._identity)
-            dataObject["_identity"] = _object._identity;
-        // data structure
-        _object._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = _object[p];
-        });
-        // stylesheet data
-        _object._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = _object["style"][p];
-        });
-        return dataObject;
-    };
-    _object.extract = function () { return _object.createDataObject(); };
-    _object.addEventListener("eventName", function (e) {
-        // do something
-    });
-    return _object;
-} // GNImage
-exports.GNImage = GNImage;
+
+},{"./GreateNoteObjectHelperFunction":58}],50:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.GNDropdownList = void 0;
+var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
 //@auto-fold here
 function GNDropdownList(_name, selectList, arrayID, insertPosition, dataPointer, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
@@ -26026,25 +25981,741 @@ function GNDropdownList(_name, selectList, arrayID, insertPosition, dataPointer,
         return _dummyData;
     };
     // add extra funcitons to the object
-    superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
+    GreateNoteObjectHelperFunction_1.superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, "input");
     return _object;
 }
 exports.GNDropdownList = GNDropdownList;
-function GNTemplate(_name, _parent) {
+
+},{"./GreateNoteObjectHelperFunction":58}],51:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.GNImageContainer = void 0;
+var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
+//@auto-fold here
+function GNImageContainer(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage, imgsrc = createData.imgsrc;
     var _object = document.createElement("div");
-    // internal properties
-    _object._name = _name;
-    _object.GNType = GNImage.name;
-    // functions
-    _object.extract = function () { return 123; };
+    _object.draggable = false;
+    _object._name = name;
+    _object.GNType = GNImageContainer.name;
+    _object._dataStructure = ["src"];
+    _object._styleStructure = ["width", "height"];
+    var image = document.createElement("img");
+    image.src = imgsrc;
+    image.style.width = "100%";
+    image.draggable = false;
+    image.onload = function () {
+        _object.imageWidthToHeightRatio = image.width / image.height;
+    };
+    _object.appendChild(image);
+    _object.loadFromData = function (data) { data; };
+    _object.setMovable = function () {
+        var eventName = "mousedown";
+        var moveEventName = "mousemove";
+        var attributeX = "left";
+        var attributeY = "top";
+        _object.style.position = "absolute";
+        _object.addEventListener("mousedown", function (e) {
+            var startX = e["screenX"];
+            var startY = e["screenY"];
+            var objectInitialX = 0;
+            var objectInitialY = 0;
+            var initialLeftValue = parseInt(_object.style[attributeX].replace("px", "")) || 0;
+            var initialTopValue = parseInt(_object.style[attributeY].replace("px", "")) || 0;
+            var currentX;
+            var currentY;
+            var deltaX = 0;
+            var deltaY = 0;
+            var mousemoveFunction = function (e) {
+                currentY = e.screenY;
+                currentX = e.screenX;
+                deltaX = currentX - startX;
+                deltaY = currentY - startY;
+                var newX = _object.style[attributeX] = initialLeftValue + deltaX + "px";
+                _object.style[attributeY] = initialTopValue + deltaY + "px";
+            };
+            _object.addEventListener("mousemove", mousemoveFunction, false);
+            function endDragEvent(e) {
+                Array.from(_object.parentNode["children"]).forEach(function (p) {
+                    p["style"]["pointerEvents"] = "inherit";
+                });
+                var endX = e["screenX"];
+                var endY = e["screenY"];
+                _object.removeEventListener("mousemove", mousemoveFunction);
+            }
+            _object.addEventListener("mouseup", function (e) {
+                endDragEvent(e);
+            }, false);
+            _object.addEventListener("mouseout", function (e) {
+                endDragEvent(e);
+            }, false);
+        });
+    };
+    _object.createDataObject = function () {
+        var dataObject = GreateNoteObjectHelperFunction_1.createDummyData();
+        // identity
+        dataObject["GNType"] = _object.GNType;
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        // data
+        dataObject["data"]["src"] = imgsrc;
+        // stylesheet data
+        // _object._styleStructure.forEach(p=>{
+        //   dataObject["stylesheet"][p] = _object["style"][p]
+        // })
+        return dataObject;
+    };
+    _object.extract = function () { return _object.createDataObject(); };
+    // image special function
+    _object.addCaption = function () {
+        // do something
+    };
+    _object.setImageSize = function (sizeData) {
+        var width = sizeData.width, height = sizeData.height;
+        if (!height)
+            height = width * 1 / _object.imageWidthToHeightRatio;
+        if (!width)
+            width = height * _object.imageWidthToHeightRatio;
+        _object.style.width = width + "px";
+        _object.style.height = height + "px";
+    };
+    GreateNoteObjectHelperFunction_1.superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
     _object.addEventListener("eventName", function (e) {
         // do something
     });
     return _object;
-}
-exports.GNTemplate = GNTemplate;
+} // GNImage
+exports.GNImageContainer = GNImageContainer;
+
+},{"./GreateNoteObjectHelperFunction":58}],52:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.GNInputField = void 0;
+var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
 //@auto-fold here
-function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage) {
+function GNInputField(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage;
+    var _object = document.createElement("input");
+    _object.GNType = GNInputField.name;
+    _object._name = name;
+    _object._dataStructure = ["value"];
+    _object._styleStructure = [];
+    // functions
+    _object.createDataObject = function () {
+        var dataObject = GreateNoteObjectHelperFunction_1.createDummyData();
+        // data structure
+        dataObject["GNType"] = _object.GNType;
+        dataObject["classList"] = Array.from(_object.classList);
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        _object._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = _object[p];
+        });
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
+        return dataObject;
+    };
+    _object.extract = function () { return _object.createDataObject(); };
+    _object.loadFromData = function (data) { return _object.value = data.value; };
+    //@auto-fold here
+    // add extra funcitons to the object
+    GreateNoteObjectHelperFunction_1.superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage);
+    // if the object is assigned to the database, then this  addEventListener is to monitor the change
+    // define what is the update action
+    return _object;
+} // GNInputField
+exports.GNInputField = GNInputField;
+
+},{"./GreateNoteObjectHelperFunction":58}],53:[function(require,module,exports){
+// import {GNObjectInterface, GNInputField, GNContainerDivInterface, GNDropdownListInterface, GNInputFieldInterface, GNButtonInterface} from "./GreatNoteDataClass"
+//
+// export interface GNControllerInterface extends  GNContainerDivInterface{
+//     /** to get the controlledObject passed when click event happened and something is selected*/
+//     getControlledObject(any)
+//     receiveDataFromChild(data)
+//     // "controllerItemList": GNControllerItemInterface[]
+// }
+//
+// export function GNControllerItem(controllerObject: any,  eventType: string, controlledObject?: any):GNDropdownListInterface | GNInputFieldInterface | GNButtonInterface {
+//     controllerObject.addEventListener(eventType, controllerObject.controllerEvent)
+//     controllerObject.controlledObject = controlledObject
+//
+//     return controllerObject
+// }
+//
+//
+// export function GNController(_name:string, _parent?:any) : GNControllerInterface {
+//     let _object = <GNControllerInterface> document.createElement("div");
+//     _object.classList.add(_name)
+//
+//     // internal properties
+//     _object._name = _name
+//     _object._type = GNController.name
+//     _object._styleList = {
+//       "height": "150px",
+//       "background": "silver",
+//       "margin": "10px"
+//     }
+//
+//     _object.appendElements = function(...childrenList){
+//         childrenList.forEach(p=>{
+//             p._parent = _object
+//             _object.appendChild(p)
+//         })
+//
+//     }
+//
+//     // functions
+//     _object.update = (data) => {data}
+//     _object.extract = () => 123
+//     _object.receiveDataFromChild = function(data){
+//       console.log(data)
+//     }
+//
+//
+//     // events
+//     _object.addEventListener("eventName", (e)=>{
+//         // do something
+//
+//     })
+//
+//     // do something before return
+//     applyStyleHelperFunction(_object, _object._styleList)
+//
+//     return _object
+// }
+//
+//
+//
+// export interface GNTextControllerInterface extends GNControllerInterface{
+//     textSizeController?: any,
+//     textBoldController?: any,
+//     textItalicController?: any,
+//     textColorController: any,
+//     textHighlightController?:any
+// }
+//
+// /** to creat Text controller*/
+// export function GNTextController(_name:string, _parent?:any) : GNTextControllerInterface {
+//   let _object = <GNTextControllerInterface> GNController(_name);
+//
+//   // internal properties
+//   _object._name = _name
+//   _object._type = GNTextController.name
+//
+//
+//   // functions
+//   _object.getControlledObject = function(target){
+//     _object.controlledObject = target
+//   }
+//   _object.update = (data) => {data}
+//   _object.extract = () => 123
+//
+//
+//     /* part 2: controllers
+//         textSizeController?: any,
+//         textBoldController?: any,
+//         textItalicController?: any,
+//         textColorController: any,
+//         textHighlightController?:any
+//     */
+//
+//     // a)  create width controller
+//     _object.textSizeController = GNInputField("textSizeController")
+//     _object.textSizeController.placeholder = "fontSize..."
+//     _object.textSizeController.controllerEvent = function(e){
+//         if (_object.controlledObject){
+//             _object.controlledObject.style.fontSize = textSizeControllerItem.value + "px"
+//         } else {
+//             console.log("please select an item")
+//         }
+//     }
+//     let textSizeControllerItem = <GNInputFieldInterface> GNControllerItem(_object.textSizeController, "input")
+//
+//     // =========================================//
+//     // a)  create text color  controller        //
+//     // =========================================//
+//     _object.textColorController = GNInputField("textColorController")
+//     _object.textColorController.placeholder = "color..."
+//     _object.textColorController.controllerEvent = function(e){
+//         if (_object.controlledObject){
+//             _object.controlledObject.style.color = textColorControllerItem.value
+//         } else {
+//             console.log("please select an item")
+//         }
+//     }
+//     let textColorControllerItem = <GNInputFieldInterface> GNControllerItem(_object.textColorController, "input")
+//
+//
+//
+//   _object.appendElements(_object.textSizeController, _object.textColorController)
+//   return _object
+// }
+//
+//
+// export interface GNImageControllerInterface extends GNControllerInterface{
+//     imgWidthController: any,
+//     imgHeightController: any,
+//     imgTransparencyController: any,
+//     imgRotationController?:any
+// }
+//
+// /** to create GNImageController*/
+// export function GNImageController(_name:string, _parent?:any) : GNImageControllerInterface {
+//
+//     let _object = <GNImageControllerInterface> GNController(_name);
+//
+//     // internal properties
+//     _object._name = _name
+//     _object._type = GNImageController.name
+//
+//     // functions
+//     _object.getControlledObject = function(target){
+//       _object.controlledObject = target
+//     }
+//     _object.update = (data) => {data}
+//     _object.extract = () => 123
+//
+//
+//     _object.addEventListener("eventName", (e)=>{
+//         // do something
+//     })
+//
+//
+//     /* part 2: controllers
+//         // a)  create width controller
+//         // b)  create height controller
+//         // c) create transparency controller
+//         // d) creatte rotation controller
+//     */
+//
+//     // a)  create width controller
+//     _object.imgWidthController = GNInputField("imgWidthController")
+//     _object.imgWidthController.controllerEvent = function(e){
+//         if (_object.controlledObject){
+//             _object.controlledObject.style.width = imgWidthInputControllerItem.value + "px"
+//         } else {
+//             console.log("please select an item")
+//         }
+//     }
+//     let imgWidthInputControllerItem = <GNInputFieldInterface> GNControllerItem(_object.imgWidthController, "input")
+//
+//
+//     // b)  create height controller
+//
+//
+//     // c) create transparency controller
+//
+//     // d) creatte rotation controller
+//
+//
+//     // add item to the controller
+//     _object.appendElements(imgWidthInputControllerItem)
+//
+//     return _object
+// }
+//
+//
+//
+// export interface GNTemplateInterface extends GNObjectInterface, HTMLImageElement {
+//
+// }
+//
+// export function GNTemplate(_name:string, _parent?:any) : GNObjectInterface {
+//     let _object = <GNContainerDivInterface> document.createElement("div");
+//
+//     // internal properties
+//     _object._name = _name
+//     _object._type = GNTemplate.name
+//
+//     // functions
+//     _object.update = (data) => {data}
+//     _object.extract = () => 123
+//
+//     _object.addEventListener("eventName", (e)=>{
+//         // do something
+//
+//     })
+//
+//     return _object
+// }
+
+},{}],54:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.GNContainerDiv = void 0;
+var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
+//@auto-fold here
+function GNContainerDiv(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage, injectedData = createData.injectedData;
+    var _object = document.createElement("div");
+    _object.childrenList = {};
+    _object.GNType = GNContainerDiv.name;
+    _object.GNSpecialCreationMessage = specialCreationMessage || "";
+    _object._dataStructure = ["textContent"];
+    _object._styleStructure = ["background", "width", "height", "position", "left", "top"];
+    // functions
+    _object.appendElements = function () {
+        var childrenArray = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            childrenArray[_i] = arguments[_i];
+        }
+        childrenArray.forEach(function (p) {
+            _object.appendChild(p);
+            _object.childrenList[p._name] = p;
+            p._parent = _object;
+        });
+    };
+    _object.loadFromData = function (data) {
+        _object.GNSpecialCreationMessage = data.GNSpecialCreationMessage;
+        _object.specialGNType = data.specialGNType;
+        if (data.classList)
+            data.classList.forEach(function (p) { return _object.classList.add(p); });
+        _object._identity = data._identity;
+        console.log(256, data);
+        _object._dataStructure.forEach(function (key) {
+            _object[key] = data["data"][key];
+        });
+    };
+    _object.createDataObject = function () {
+        var dataObject = GreateNoteObjectHelperFunction_1.createDummyData();
+        dataObject["GNType"] = _object.GNType;
+        dataObject["GNSpecialCreationMessage"] = _object.GNSpecialCreationMessage;
+        dataObject["specialGNType"] = _object.specialGNType || "";
+        if (_object._identity)
+            dataObject["_identity"] = _object._identity;
+        dataObject["classList"] = Array.from(_object.classList);
+        // data structure
+        _object._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = _object[p];
+        });
+        dataObject["classList"] = Array.from(_object.classList);
+        // stylesheet data
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object.style[p];
+        });
+        return dataObject;
+    };
+    _object.applyStyle = function (styleObject, saveToDatabase) {
+        if (saveToDatabase === void 0) { saveToDatabase = true; }
+        Object.entries(styleObject).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            _object["style"][key] = value;
+        });
+        if (saveToDatabase)
+            _object.saveHTMLObjectToDatabase();
+    };
+    _object.extract = function () { return _object.createDataObject(); };
+    // add extra funcitons to the object
+    GreateNoteObjectHelperFunction_1.superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage, injectedData);
+    if (injectedData) {
+        console.log(307, injectedData);
+        _object.loadFromData(injectedData);
+        _object.applyStyle(injectedData.stylesheet, false); //
+    }
+    // add events
+    var eventStatus = { t0: 0, t1: 0, run: true };
+    _object.addEventListener("input", function (e) {
+        e.stopPropagation();
+        eventStatus.t0 = eventStatus.t1;
+        eventStatus.t1 = e.timeStamp;
+        if (eventStatus.t1 - eventStatus.t0 > 100) {
+            console.log(9595959, _object.textContent);
+            // let target = e["target"]
+            if (_object._identity.accessPointer != "")
+                _object.saveHTMLObjectToDatabase();
+            console.log(_object.extract());
+            if (_object.processUpdateData)
+                _object.processUpdateData();
+        }
+    }, false); //addEventListener
+    return _object;
+}
+exports.GNContainerDiv = GNContainerDiv;
+
+},{"./GreateNoteObjectHelperFunction":58}],55:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+
+},{}],56:[function(require,module,exports){
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+exports.__esModule = true;
+exports.GNSvgImage = exports.GNSvgPolyLine = exports.GNSvgLine = exports.GNSvgRect = exports.GNSvgCircle = exports.GNSvg = void 0;
+var svg_js_1 = __importDefault(require("svg.js"));
+var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
+function createDummyData() {
+    return {
+        "data": {},
+        "array": [],
+        "GNType": "",
+        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+        "stylesheet": {}
+    };
+}
+//@auto-fold here
+function GNSvg(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message;
+    var svgDivContainer = document.createElement("div");
+    svgDivContainer.id = "testSvgDiv";
+    var svgController = svg_js_1["default"](svgDivContainer);
+    svgController.width("800px");
+    svgController.height("300px");
+    var svgBoard = svgController.node;
+    svgBoard.svgController = svgController;
+    svgBoard.style.background = "gold";
+    svgBoard.GNType = GNSvg.name;
+    svgBoard._name = name;
+    svgBoard._dataStructure = ["innerHTML"];
+    svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
+    // // functions
+    // svgObject.loadFromData = (data)=>{ svgObject.value = data }
+    svgBoard.appendToContainer = function (parent) {
+        parent.appendChild(svgDivContainer);
+    };
+    svgBoard.applyStyle = function (stylesheet) {
+        Object.entries(stylesheet).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgBoard["style"][key] = value;
+        });
+    };
+    svgBoard.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgBoard.GNType;
+        if (svgBoard._identity)
+            dataObject["_identity"] = svgBoard._identity;
+        svgBoard._dataStructure.forEach(function (p) {
+            dataObject["data"][p] = svgBoard[p];
+        });
+        // stylesheet data
+        svgBoard._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgBoard["style"][p];
+        });
+        return dataObject;
+    };
+    //
+    svgBoard.extract = function () { return svgBoard.createDataObject(); };
+    // add extra funcitons to the object
+    GreateNoteObjectHelperFunction_1.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
+    return svgBoard;
+}
+exports.GNSvg = GNSvg;
+//@auto-fold here
+function GNSvgCircle(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
+    var svgObjectSoul = new svg_js_1["default"].Circle();
+    svgObjectSoul.radius(75);
+    svgObjectSoul.fill("red");
+    var svgObject = svgObjectSoul.node;
+    svgObject.soul = svgObjectSoul;
+    svgObject.GNType = GNSvgCircle.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["cx", "cy", "r"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (_GNData) {
+        svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200;
+        svgObject.style["cy"] = parseInt(_GNData["data"]["cy"]);
+        svgObject.style["r"] = parseInt(_GNData["data"]["r"]);
+    };
+    svgObject.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgObject.GNType;
+        if (svgObject["_identity"])
+            dataObject["_identity"] = svgObject["_identity"];
+        dataObject["data"]["cx"] = svgObject.style["cx"];
+        dataObject["data"]["cy"] = svgObject.style["cy"];
+        dataObject["data"]["r"] = svgObject.style["r"];
+        // stylesheet data
+        svgObject._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = svgObject["style"][p];
+        });
+        return dataObject;
+    };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObjectSoul.attr(attrList);
+    };
+    svgObject.appendTo = function (parentSVGContainer) {
+        //self.targetPage.svgNode.appendChild(eraser.node)
+        parentSVGContainer.svgNode.appendChild(svgObject.node);
+    };
+    // add extra funcitons to the object
+    GreateNoteObjectHelperFunction_1.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgCircle = GNSvgCircle;
+// ==============
+//@auto-fold here
+function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObject = new svg_js_1["default"].Rect();
+    svgObject.GNType = GNSvgRect.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["value"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        Object.entries(attrList).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            svgObject.node.style[key] = value;
+        });
+    };
+    // add extra funcitons to the object
+    // superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgRect = GNSvgRect;
+//@auto-fold here
+function GNSvgLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObject = new svg_js_1["default"].Line();
+    svgObject.GNType = GNSvgLine.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["value"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject.plot(attrList["points"]);
+        svgObject.attr(attrList["attribute"]);
+    };
+    // add extra funcitons to the object
+    // superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgLine = GNSvgLine;
+//@auto-fold here
+function GNSvgPolyLine(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
+    var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
+    var svgObject = svgObjectSoul.node;
+    svgObject.soul = svgObjectSoul;
+    svgObject.GNType = GNSvgPolyLine.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["points"];
+    svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
+    // functions
+    svgObject.loadFromData = function (data) {
+        svgObject.soul.plot(data["points"]);
+    };
+    svgObject.createDataObject = function () {
+        var dataObject = createDummyData();
+        // data structure
+        dataObject["GNType"] = svgObject.GNType;
+        if (svgObject._identity)
+            dataObject["_identity"] = svgObject._identity;
+        dataObject["data"]["points"] = svgObject.soul.array().value.toString();
+        // stylesheet data
+        dataObject["stylesheet"]["stroke"] = svgObject["style"]["stroke"];
+        dataObject["stylesheet"]["stroke-width"] = svgObject["style"]["stroke-width"];
+        dataObject["stylesheet"]["fill"] = svgObject["style"]["fill"];
+        return dataObject;
+    };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject._styleStructure.forEach(function (p) {
+            if (p == "fill") {
+                svgObject["style"]["fill"] = attrList["fill"] || "none";
+            }
+            else {
+                svgObject["style"][p] = attrList[p];
+            }
+        });
+    };
+    // to share same data function
+    GreateNoteObjectHelperFunction_1.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    // add extra funcitons to the object
+    return svgObject;
+} //GNSvgPolyLine
+exports.GNSvgPolyLine = GNSvgPolyLine;
+//@auto-fold here
+function GNSvgImage(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = true; }
+    var svgObject = svg_js_1["default"](document.createElement("image")).image();
+    svgObject.setImgSrc = function (src) {
+        svgObject.load(src);
+    };
+    svgObject.GNType = GNSvgImage.name;
+    svgObject._name = name;
+    svgObject._dataStructure = ["value"];
+    svgObject._styleStructure = [];
+    // functions
+    svgObject.loadFromData = function (data) { svgObject = data; };
+    svgObject.extract = function () { return svgObject.createDataObject(); };
+    svgObject.applyStyle = function (attrList) {
+        svgObject.attr(attrList["attribute"]);
+    };
+    // add extra funcitons to the object
+    // superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
+    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
+    return svgObject;
+}
+exports.GNSvgImage = GNSvgImage;
+function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase) {
+    svgObject.appendTo = function (parentSVGContainer) {
+        svgObject.soul.addTo(parentSVGContainer.svgController);
+    };
+    //
+    // svgObject.applyStyle = function (attributeSheet){
+    //
+}
+
+},{"./GreateNoteObjectHelperFunction":58,"svg.js":42}],57:[function(require,module,exports){
+arguments[4][56][0].apply(exports,arguments)
+},{"./GreateNoteObjectHelperFunction":58,"dup":56,"svg.js":42}],58:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.superGNObject = exports.createDummyData = void 0;
+var constructInitialCondition_1 = require("../constructInitialCondition");
+var ToolBoxEvents = __importStar(require("../EventFolder/attachToolBoxEventsToLayers"));
+function createDummyData() {
+    return {
+        "data": {},
+        "array": [],
+        "GNType": "",
+        "specialGNType": "",
+        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+        "classList": [],
+        "stylesheet": {}
+    };
+}
+exports.createDummyData = createDummyData;
+//@auto-fold here
+function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage, injectedData, attachEventListener) {
+    if (attachEventListener === void 0) { attachEventListener = true; }
     _object = _object;
     /** important function to extract data from individual elements*/
     // when the data is first created, add it to the database
@@ -26076,6 +26747,7 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         _object.setAttribute("accessPointer", data._identity.accessPointer);
         _object._identity = data._identity;
         _object.GNType = data.GNType;
+        _object.GNSpecialCreationMessage = data.GNSpecialCreationMessage;
     };
     _object.processUpdateData = function () {
         var objectData = _object.reloadDataFromDatabase();
@@ -26085,7 +26757,8 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
         var dataPointer = _object.getDataPointer();
         var accessPointer = _object.getAccessPointer();
         var dataPointerObject = constructInitialCondition_1.mainController.getObjectById(dataPointer);
-        _object.loadFromData(dataPointerObject.data);
+        _object.loadFromData(dataPointerObject);
+        //
         if (dataPointer != accessPointer) {
             var accessPointerObject = constructInitialCondition_1.mainController.getObjectById(accessPointer);
             _object.applyStyle(accessPointerObject.stylesheet);
@@ -26124,342 +26797,103 @@ function superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPoi
     // ========================================
     // =======   database operations   ========
     // ========================================
-    _object.GNdelete = function () {
+    _object.deleteFromDatabase = function () {
         // mainController
-        _object.getLinkArray().forEach(function (p) {
-            var target = document.querySelector("*[accessPointer='" + p + "']");
-            target === null || target === void 0 ? void 0 : target.remove();
-        });
+        constructInitialCondition_1.mainController.deleteFromDataBase(_object);
     };
     _object.getDataFromDataBase = function () {
         return constructInitialCondition_1.mainController.getObjectById(_object.getDataPointer());
     };
+    if (attachEventListener) {
+        attachEventListenerToLayer(constructInitialCondition_1.mainController, arrayID, _object, injectedData);
+    }
     if (saveToDatabase) {
         _object.addToDatabase(arrayID, insertPosition, dataPointer, specialCreationMessage);
         // _object.editEvent(editEvent)
     }
 }
 exports.superGNObject = superGNObject;
-
-},{"./constructInitialCondition":60}],47:[function(require,module,exports){
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-exports.GNSvgImage = exports.GNSvgPolyLine = exports.GNSvgLine = exports.GNSvgRect = exports.GNSvgCircle = exports.GNSvg = void 0;
-var svg_js_1 = __importDefault(require("svg.js"));
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-function createDummyData() {
-    return {
-        "data": {},
-        "array": [],
-        "GNType": "",
-        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-        "stylesheet": {}
-    };
-}
-//@auto-fold here
-function GNSvg(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message;
-    var svgDivContainer = document.createElement("div");
-    svgDivContainer.id = "testSvgDiv";
-    var svgController = svg_js_1["default"](svgDivContainer);
-    svgController.width("800px");
-    svgController.height("300px");
-    var svgBoard = svgController.node;
-    svgBoard.svgController = svgController;
-    svgBoard.style.background = "gold";
-    svgBoard._type = GNSvg.name;
-    svgBoard._name = name;
-    svgBoard._dataStructure = ["innerHTML"];
-    svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
-    // // functions
-    // svgObject.loadFromData = (data)=>{ svgObject.value = data }
-    svgBoard.appendToContainer = function (parent) {
-        parent.appendChild(svgDivContainer);
-    };
-    svgBoard.applyStyle = function (stylesheet) {
-        Object.entries(stylesheet).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            svgBoard["style"][key] = value;
-        });
-    };
-    svgBoard.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = svgBoard._type;
-        if (svgBoard._identity)
-            dataObject["_identity"] = svgBoard._identity;
-        svgBoard._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = svgBoard[p];
-        });
-        // stylesheet data
-        svgBoard._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = svgBoard["style"][p];
-        });
-        return dataObject;
-    };
-    //
-    svgBoard.extract = function () { return svgBoard.createDataObject(); };
-    // add extra funcitons to the object
-    GreatNoteDataClass.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
-    return svgBoard;
-}
-exports.GNSvg = GNSvg;
-//@auto-fold here
-function GNSvgCircle(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
-    var svgObjectSoul = new svg_js_1["default"].Circle();
-    svgObjectSoul.radius(75);
-    svgObjectSoul.fill("red");
-    var svgObject = svgObjectSoul.node;
-    svgObject.soul = svgObjectSoul;
-    svgObject._type = GNSvgCircle.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["cx", "cy", "r"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (_GNData) {
-        svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200;
-        svgObject.style["cy"] = parseInt(_GNData["data"]["cy"]);
-        svgObject.style["r"] = parseInt(_GNData["data"]["r"]);
-    };
-    svgObject.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = svgObject._type;
-        if (svgObject["_identity"])
-            dataObject["_identity"] = svgObject["_identity"];
-        dataObject["data"]["cx"] = svgObject.style["cx"];
-        dataObject["data"]["cy"] = svgObject.style["cy"];
-        dataObject["data"]["r"] = svgObject.style["r"];
-        // stylesheet data
-        svgObject._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = svgObject["style"][p];
-        });
-        return dataObject;
-    };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList);
-    };
-    svgObject.appendTo = function (parentSVGContainer) {
-        //self.targetPage.svgNode.appendChild(eraser.node)
-        parentSVGContainer.svgNode.appendChild(svgObject.node);
-    };
-    // add extra funcitons to the object
-    GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgCircle = GNSvgCircle;
-//@auto-fold here
-function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = new svg_js_1["default"].Rect();
-    svgObject._type = GNSvgRect.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["value"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        Object.entries(attrList).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            svgObject.node.style[key] = value;
-        });
-    };
-    // add extra funcitons to the object
-    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgRect = GNSvgRect;
-//@auto-fold here
-function GNSvgLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = new svg_js_1["default"].Line();
-    svgObject._type = GNSvgLine.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["value"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject.plot(attrList["points"]);
-        svgObject.attr(attrList["attribute"]);
-    };
-    // add extra funcitons to the object
-    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgLine = GNSvgLine;
-//@auto-fold here
-function GNSvgPolyLine(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
-    var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
-    var svgObject = svgObjectSoul.node;
-    svgObject.soul = svgObjectSoul;
-    svgObject._type = GNSvgPolyLine.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["points"];
-    svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
-    // functions
-    svgObject.loadFromData = function (data) {
-        svgObject.soul.plot(data["points"]);
-    };
-    svgObject.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = svgObject._type;
-        if (svgObject._identity)
-            dataObject["_identity"] = svgObject._identity;
-        dataObject["data"]["points"] = svgObject.soul.array().value.toString();
-        // stylesheet data
-        dataObject["stylesheet"]["stroke"] = svgObject["style"]["stroke"];
-        dataObject["stylesheet"]["stroke-width"] = svgObject["style"]["stroke-width"];
-        dataObject["stylesheet"]["fill"] = svgObject["style"]["fill"];
-        return dataObject;
-    };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject._styleStructure.forEach(function (p) {
-            if (p == "fill") {
-                svgObject["style"]["fill"] = attrList["fill"] || "none";
-            }
-            else {
-                svgObject["style"][p] = attrList[p];
-            }
-        });
-    };
-    // to share same data function
-    GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    // add extra funcitons to the object
-    return svgObject;
-} //GNSvgPolyLine
-exports.GNSvgPolyLine = GNSvgPolyLine;
-//@auto-fold here
-function GNSvgImage(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = svg_js_1["default"](document.createElement("image")).image();
-    svgObject.setImgSrc = function (src) {
-        svgObject.load(src);
-    };
-    svgObject._type = GNSvgImage.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["value"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList["attribute"]);
-    };
-    // add extra funcitons to the object
-    // GreatNoteDataClass.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgImage = GNSvgImage;
-function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    svgObject.appendTo = function (parentSVGContainer) {
-        svgObject.soul.addTo(parentSVGContainer.svgController);
-    };
-    //
-    // svgObject.applyStyle = function (attributeSheet){
-    //
+function attachEventListenerToLayer(mainController, arrayID, _object, injectedData) {
+    if (_object.GNType == "GNSvg") {
+        ToolBoxEvents.attachEventListenerToSvgBoard(mainController, _object);
+    }
+    if (injectedData === null || injectedData === void 0 ? void 0 : injectedData.GNSpecialCreationMessage) {
+        ToolBoxEvents.attachEventListenerToDivLayer(mainController, _object);
+    }
 }
 
-},{"./GreatNoteDataClass":46,"svg.js":42}],48:[function(require,module,exports){
-arguments[4][47][0].apply(exports,arguments)
-},{"./GreatNoteDataClass":46,"dup":47,"svg.js":42}],49:[function(require,module,exports){
+},{"../EventFolder/attachToolBoxEventsToLayers":44,"../constructInitialCondition":77}],59:[function(require,module,exports){
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 exports.__esModule = true;
-exports.ToolBoxClass = void 0;
-var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSVGDataClass"));
-var constructInitialCondition_1 = require("./constructInitialCondition");
-var ToolboxEventFunction_1 = require("./ToolboxFolder/ToolboxEventFunction");
+exports.getAttributeController = exports.ToolBoxClass = void 0;
 var ToolBoxClass = /** @class */ (function () {
     function ToolBoxClass() {
+        //  check the item status
+        this.toolBoxItemStatus = {
+            currentActiveButton: "",
+            polylineItemButton: {
+                status: false,
+                attributeController: "polylineController"
+            },
+            eraserItemButton: {
+                status: false,
+                attributeController: "eraserController"
+            },
+            selectionToolItemButton: {
+                status: false,
+                attributeController: "selectionTool"
+            },
+            addCommentItemButton: {
+                status: false,
+                attributeController: "addCommentController"
+            },
+            moveObjectInDivButton: {
+                status: false,
+                attributeController: "moveObjectInDivController"
+            }
+        };
     }
+    ToolBoxClass.prototype.checkToolBoxItemStatus = function (itemName) {
+        return this.toolBoxItemStatus[itemName]["status"];
+    };
+    ToolBoxClass.prototype.switchToolBoxItemStatus = function (itemName) {
+        // turn off the attributeController and status of the buttom thaat is active
+        var currentActiveButton = this.toolBoxItemStatus.currentActiveButton;
+        if (currentActiveButton) {
+            this.toolBoxItemStatus[currentActiveButton]["status"] = !this.toolBoxItemStatus[currentActiveButton]["status"];
+            // turn off attributeControllerWant
+            var attributeControllerWantToTurnedOff = getAttributeController(this.toolBoxItemStatus, currentActiveButton);
+            if (attributeControllerWantToTurnedOff)
+                attributeControllerWantToTurnedOff["style"].display = "none";
+            console.log(858585858, attributeControllerWantToTurnedOff);
+        }
+        this.toolBoxItemStatus.currentActiveButton = itemName;
+        this.toolBoxItemStatus[itemName]["status"] = !this.toolBoxItemStatus[itemName]["status"];
+        // turn on attributeControllerWantToturn on
+        var attributeControllerWantToTurnedOn = getAttributeController(this.toolBoxItemStatus, itemName);
+        if (attributeControllerWantToTurnedOn)
+            attributeControllerWantToTurnedOn["style"].display = "block";
+        console.log(858585858, attributeControllerWantToTurnedOn);
+    };
     ToolBoxClass.prototype.createToolboxHtmlObject = function () {
         var self = this;
         var toolBoxContainer = document.createElement("div");
         toolBoxContainer.classList.add("toolBoxHtml");
-        toolBoxContainer.style.height = "80px";
-        toolBoxContainer.style.background = "silver";
-        // toolBoxContainer.style.width = "90vw"
-        toolBoxContainer.style.width = "90%";
-        toolBoxContainer.style.margin = "0 auto";
-        toolBoxContainer.style.display = "grid";
-        toolBoxContainer.style.gridTemplateColumns = "4fr 3fr";
-        // toolBoxHtmlObject.style.width = "90%"
-        toolBoxContainer.itemArray = [];
+        this.itemArray = [];
         var toolBoxSelectionHtmlObject = document.createElement("div");
+        toolBoxSelectionHtmlObject.classList.add("toolBoxSelectionHtmlObject");
         var toolBoxOptionHtmlObject = document.createElement("div");
         toolBoxOptionHtmlObject.classList.add("toolBoxOption");
-        toolBoxOptionHtmlObject.style.height = "80px";
-        toolBoxOptionHtmlObject.style.background = "lightBlue";
         toolBoxContainer.selectionHTMLObject = toolBoxSelectionHtmlObject;
         toolBoxContainer.optionHTMLObject = toolBoxOptionHtmlObject;
         toolBoxContainer.appendChild(toolBoxSelectionHtmlObject);
-        // toolBoxContainer.appendChild(toolBoxOptionHtmlObject)
         return toolBoxContainer;
     };
     ToolBoxClass.prototype.createToolBoxItem = function (name, toolBoxContainer) {
         var toolBoxItem = document.createElement("div");
         // the html style part
-        toolBoxItem.style.display = "inline-block";
-        toolBoxItem.classList.add("toolBoxItem");
+        toolBoxItem.classList.add("toolBoxItem", name);
         toolBoxItem.innerText = name[0];
-        toolBoxItem.style.background = "gold";
-        // toolBoxItem.style.display = "flex"
-        toolBoxItem.style.margin = "10px 5px";
-        toolBoxItem.style["align-items"] = "center";
-        toolBoxItem.style["justify-content"] = "center";
         var squreLength = "40px";
         toolBoxItem.style.width = squreLength;
         toolBoxItem.style.height = squreLength;
@@ -26469,82 +26903,61 @@ var ToolBoxClass = /** @class */ (function () {
             toolBoxItem.status = false;
         };
         toolBoxItem._parent = toolBoxContainer.selectionHTMLObject;
-        toolBoxContainer.itemArray.push(toolBoxItem);
-        toolBoxContainer.selectionHTMLObject.appendChild(toolBoxItem);
+        this.itemArray.push(toolBoxItem);
         toolBoxItem.addEventListener(toolBoxItem.eventName, toolBoxItem.eventFunction);
         return toolBoxItem;
     };
     ToolBoxClass.prototype.createNewPolyLineItemButton = function (toolBoxHtmlObject) {
         var _this = this;
-        var self = this;
         var toolBoxItem = this.createToolBoxItem("PolyLine", toolBoxHtmlObject);
-        toolBoxItem.eventName = "touchstart";
-        // toolBoxItem.eventName = "mousedown"
-        // take place when mouse down
-        console.log("use new tool box function");
-        toolBoxItem.eventFunction = function (e) {
-            console.log(121, constructInitialCondition_1.mainController.attributeControllerMapping.polylineController);
-            ToolboxEventFunction_1.polylineMouseDownFunction(e, _this.targetPage, constructInitialCondition_1.mainController.attributeControllerMapping.polylineController, "touchmove", "touchend");
-            // polylineMouseDownFunction(e, this.targetPage, mainController.attributeControllerMapping.polylineController, "mousemove", "mouseup")
-        };
-        toolBoxItem.addEventListener("click", function () {
+        toolBoxItem.addEventListener("click", function (e) {
             console.log("polyline item button is activated");
-            self.activateButtonFunction(toolBoxItem);
+            _this.activateButtonFunction(toolBoxItem, "polylineItemButton");
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.createSelectionToolItemButton = function (toolBoxHtmlObject) {
+        var _this = this;
+        var toolBoxItem = this.createToolBoxItem("SelectionTool", toolBoxHtmlObject);
+        toolBoxItem.addEventListener("click", function (e) {
+            console.log("Selection Tool item button is activated");
+            _this.activateButtonFunction(toolBoxItem, "selectionToolItemButton");
         });
         return toolBoxItem;
     };
     ToolBoxClass.prototype.createEraserItemButton = function (toolBoxHtmlObject) {
         var _this = this;
-        var self = this;
+        // let self = this
         var toolBoxItem = this.createToolBoxItem("Eraser", toolBoxHtmlObject);
-        toolBoxItem.eventName = "mousedown";
-        toolBoxItem.eventFunction = function () {
-            var cx = event["offsetX"] + "px";
-            var cy = event["offsetY"] + "px";
-            var r = "10px";
-            var eraser = GreatNoteSvgDataClass.GNSvgCircle({ name: "123", arrayID: constructInitialCondition_1.mainController.mainDocArray["bookmark"], insertPosition: false, dataPointer: false, saveToDatabase: false });
-            eraser.style["cx"] = cx;
-            eraser.style["cy"] = cy;
-            eraser.style["r"] = r;
-            function updateEraserPosition(e) {
-                cx = event["offsetX"] + "px";
-                cy = event["offsetY"] + "px";
-                eraser.style["cx"] = cx;
-                eraser.style["cy"] = cy;
-            }
-            _this.targetPage.addEventListener("mousemove", updateEraserPosition);
-            _this.targetPage.addEventListener("mouseup", function (e) {
-                _this.targetPage.removeEventListener("mousemove", updateEraserPosition);
-                eraser.remove();
-            });
-            _this.targetPage.addEventListener("mouseout", function (e) {
-                // this.targetPage.removeEventListener("mousemove", updateEraserPosition)
-                console.log("You are out of the boundary");
-            });
-            // self.targetPage.svgController
-            self.targetPage.appendChild(eraser);
-            // eraser.appendTo(self.targetPage)
-            // this.targetPage.appendChild(eraser.node)
-        };
-        toolBoxItem.addEventListener("click", function () {
-            console.log("eraser button is activated");
-            self.activateButtonFunction(toolBoxItem);
+        toolBoxItem.addEventListener("click", function (e) {
+            _this.activateButtonFunction(toolBoxItem, "eraserItemButton");
         });
         return toolBoxItem;
     };
-    ToolBoxClass.prototype.activateButtonFunction = function (toolBoxItem) {
-        if (this.currentActiveButton) {
-            console.log("clear the toolbox button status");
-            this.currentActiveButton.style.background = "gold";
-            this.targetPage.removeEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
-        }
+    ToolBoxClass.prototype.createAddCommentButton = function (toolBoxHtmlObject) {
+        var _this = this;
+        var toolBoxItem = this.createToolBoxItem("AddComment", toolBoxHtmlObject);
+        toolBoxItem.addEventListener("click", function (e) {
+            _this.activateButtonFunction(toolBoxItem, "addCommentItemButton");
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.createMoveObjectInDivButton = function (toolBoxHtmlObject) {
+        var _this = this;
+        var toolBoxItem = this.createToolBoxItem("MoveObjectInDiv", toolBoxHtmlObject);
+        toolBoxItem.addEventListener("click", function (e) {
+            _this.activateButtonFunction(toolBoxItem, "moveObjectInDivButton");
+            console.log(_this.toolBoxItemStatus);
+        });
+        return toolBoxItem;
+    };
+    ToolBoxClass.prototype.activateButtonFunction = function (toolBoxItem, itemName) {
+        this.itemArray.forEach(function (p) {
+            p.style.background = "gold";
+        });
+        this.switchToolBoxItemStatus(itemName);
         toolBoxItem.style.background = "red";
         this.currentActiveButton = toolBoxItem;
-        this.currentActiveEventName = toolBoxItem.eventName;
-        this.currentActiveEventFunction = toolBoxItem.eventFunction;
-        // this.activateToolboxItem(toolBoxItem)
-        console.log(this.targetPage, this.currentActiveEventName, this.currentActiveEventFunction);
-        this.targetPage.addEventListener(this.currentActiveEventName, this.currentActiveEventFunction);
     };
     ToolBoxClass.prototype.registerSvg = function (svgLayer) {
         var self = this;
@@ -26558,8 +26971,13 @@ var ToolBoxClass = /** @class */ (function () {
     return ToolBoxClass;
 }());
 exports.ToolBoxClass = ToolBoxClass;
+function getAttributeController(toolBoxItemStatus, itemName) {
+    var attributeControllerClassName = toolBoxItemStatus[itemName]["attributeController"];
+    return document.querySelector("." + attributeControllerClassName);
+}
+exports.getAttributeController = getAttributeController;
 
-},{"./GreatNoteSVGDataClass":47,"./ToolboxFolder/ToolboxEventFunction":50,"./constructInitialCondition":60}],50:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -26582,55 +27000,69 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 exports.__esModule = true;
 exports.polylineMouseUpFunction = exports.polylineMouseMoveFunction = exports.polylineMouseDownFunction = void 0;
-var GreatNoteSvgDataClass = __importStar(require("../GreatNoteSvgDataClass"));
-function polylineMouseDownFunction(e, svgBoard, polylineController, moveEventName, upEventName) {
-    e.preventDefault();
-    var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
-    var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
-    polyline.style.pointerEvents = "none";
-    var offsetX;
-    var offsetY;
+var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
+var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
+function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName) {
+    console.log(mainController);
+    if (!mainController.toolBox.checkToolBoxItemStatus("polylineItemButton")) {
+        return;
+    }
+    var polylineController = mainController.attributeControllerMapping.polylineController;
+    var offsetX, offsetY, touchIsPen, ratio;
+    var originalWidth = mainController.pageCurrentStatus.fullPageSize[0];
+    var testInfo = document.querySelector(".testInfo");
     if (e.type == "touchstart") {
         var rect = e.target.getBoundingClientRect();
-        offsetX = e.targetTouches[0].pageX - rect.left;
-        offsetY = e.targetTouches[0].pageY - rect.top;
+        ratio = rect.width / originalWidth;
+        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
+        console.log(e);
+        touchIsPen = e.targetTouches[0].radiusX > 10 ? false : true;
     }
     if (e.type == "mousedown") {
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
+        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
+        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
+        // testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`
     }
-    console.log(offsetX, offsetY);
-    //
-    polyline.soul.plot([[offsetX, offsetY]]);
-    polyline.appendTo(svgBoard);
-    polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
-    //
-    // define the mouse move event
-    var mouseMoveFunction = function (e) {
+    touchIsPen = true;
+    if (e.type == "mousedown" || touchIsPen) {
         e.preventDefault();
-        polylineMouseMoveFunction(e, polyline);
-    };
-    svgBoard.addEventListener(moveEventName, mouseMoveFunction);
-    //
-    // define the mouse move function
-    var mouseUpFunction = function (e) {
-        e.preventDefault();
-        polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunction, mouseUpFunction, moveEventName, upEventName);
-    };
-    svgBoard.addEventListener(upEventName, mouseUpFunction);
+        var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
+        var polyline_1 = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
+        polyline_1.style.pointerEvents = "none";
+        //
+        polyline_1.soul.plot([[offsetX, offsetY]]);
+        polyline_1.appendTo(svgBoard);
+        polyline_1.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
+        //
+        // define the mouse move event
+        var mouseMoveFunction_1 = function (e) {
+            e.preventDefault();
+            testInfo.innerHTML = "offsetX = " + offsetX * 1 / ratio + " <br>" + ("offsetY = " + offsetY * 1 / ratio + " <br> ratio = " + ratio);
+            polylineMouseMoveFunction(e, polyline_1, ratio);
+        };
+        svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
+        //
+        // define the mouse move function
+        var mouseUpFunction_1 = function (e) {
+            e.preventDefault();
+            polylineMouseUpFunction(e, svgBoard, polyline_1, mouseMoveFunction_1, mouseUpFunction_1, moveEventName, upEventName);
+        };
+        svgBoard.addEventListener(upEventName, mouseUpFunction_1);
+    }
 }
 exports.polylineMouseDownFunction = polylineMouseDownFunction;
-function polylineMouseMoveFunction(e, polyline) {
+function polylineMouseMoveFunction(e, polyline, ratio) {
     var offsetX;
     var offsetY;
     if (e.type == "touchmove") {
         var rect = e.target.getBoundingClientRect();
-        offsetX = e.targetTouches[0].pageX - rect.left;
-        offsetY = e.targetTouches[0].pageY - rect.top;
+        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
     }
     if (e.type == "mousemove") {
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
+        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
+        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
     }
     var newPoint = polyline.soul.array().value;
     newPoint.push([offsetX, offsetY]);
@@ -26645,9 +27077,524 @@ function polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRem
 }
 exports.polylineMouseUpFunction = polylineMouseUpFunction;
 
-},{"../GreatNoteSvgDataClass":48}],51:[function(require,module,exports){
-arguments[4][49][0].apply(exports,arguments)
-},{"./GreatNoteSVGDataClass":47,"./ToolboxFolder/ToolboxEventFunction":50,"./constructInitialCondition":60,"dup":49}],52:[function(require,module,exports){
+},{"../GreatNoteClass/GreatNoteSvgDataClass":57,"./toolBoxHelperFunction":65}],61:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.addCommentMouseDownFunction = void 0;
+var CommentController = __importStar(require("../commentFolder/commentController"));
+function addCommentMouseDownFunction(e, mainController, divLayer, moveEventName, upEventName) {
+    if (!mainController.toolBox.checkToolBoxItemStatus("addCommentItemButton")) {
+        return;
+    }
+    var divLayerAccessID = divLayer.getAccessPointer();
+    console.log(divLayer, mainController.getObjectById(divLayerAccessID));
+    var commentBox = CommentController.GNComment({ name: "commentDiv", arrayID: divLayerAccessID, saveToDatabase: true });
+    console.log(divLayer, mainController.getObjectById(divLayerAccessID));
+    //
+    //
+    divLayer.append(commentBox);
+}
+exports.addCommentMouseDownFunction = addCommentMouseDownFunction;
+
+},{"../commentFolder/commentController":74}],62:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.eraserMouseDownFunction = exports.detectCollision = void 0;
+var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSVGDataClass"));
+var ToolBoxHelperFunction = __importStar(require("./toolBoxHelperFunction"));
+function detectCollision(svgBoard, eraser) {
+    var objectsInTheLayer = svgBoard.querySelectorAll("polyline");
+    var newPoint = svgBoard.createSVGPoint();
+    objectsInTheLayer.forEach(function (object) {
+        var lineArray = object.soul.array().value;
+        Array.from(lineArray).forEach(function (p) {
+            newPoint.x = p[0];
+            newPoint.y = p[1];
+            if (eraser.isPointInFill(newPoint)) {
+                object.deleteFromDatabase();
+                return;
+            }
+        });
+        return;
+    });
+}
+exports.detectCollision = detectCollision;
+function eraserMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName) {
+    if (!mainController.toolBox.checkToolBoxItemStatus("eraserItemButton")) {
+        return;
+    }
+    var _a = ToolBoxHelperFunction.getOffSetXY(e), offsetX = _a[0], offsetY = _a[1], touchIsPen = _a[2];
+    console.log(44, 44, 44, touchIsPen);
+    if (!touchIsPen)
+        return;
+    e.preventDefault();
+    if (e.type == "mousedown" || touchIsPen) {
+        var cx = offsetX + "px";
+        var cy = offsetY + "px";
+        var r = "20px";
+        var eraser_1 = GreatNoteSvgDataClass.GNSvgCircle({ name: "123", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+        eraser_1.style["cx"] = cx;
+        eraser_1.style["cy"] = cy;
+        eraser_1.style["r"] = r;
+        // console.log(545454, e, eraser, moveEventName)
+        var mouseMoveFunction_1 = function (e) {
+            // t1 = t2
+            // t2 = e.timeStamp
+            var _a = ToolBoxHelperFunction.getOffSetXY(e), offsetX = _a[0], offsetY = _a[1], touchIsPen = _a[2];
+            eraser_1.style["cx"] = offsetX;
+            eraser_1.style["cy"] = offsetY;
+            detectCollision(svgBoard, eraser_1);
+        };
+        var mouseUpFunciton_1 = function (e) {
+            svgBoard.removeEventListener(moveEventName, mouseMoveFunction_1);
+            svgBoard.removeEventListener(upEventName, mouseUpFunciton_1);
+            eraser_1.remove();
+        };
+        svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
+        svgBoard.addEventListener(upEventName, mouseUpFunciton_1);
+        svgBoard.appendChild(eraser_1);
+    } // if (e.type=="mousedown" || touchIsPen)
+} // eraserMouseDownFunction
+exports.eraserMouseDownFunction = eraserMouseDownFunction;
+
+},{"../GreatNoteClass/GreatNoteSVGDataClass":56,"./toolBoxHelperFunction":65}],63:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.moveObejectInDivMouseDownFunction = void 0;
+var settings_1 = require("../settings");
+var ToolBoxHelperFunction = __importStar(require("./toolBoxHelperFunction"));
+var allowedSelectionObject = [settings_1.ClassNameCollection.commentContainer];
+function moveObejectInDivMouseDownFunction(e, mainController, divLayer, moveEventName, upEventName, divSelctionObjectStatus) {
+    var _a;
+    var originalObjectPosition, _;
+    var clickedPosition = { x: 0, y: 0 };
+    if (!mainController.toolBox.checkToolBoxItemStatus("moveObjectInDivButton")) {
+        return;
+    }
+    if (divSelctionObjectStatus.selectedObject) {
+        divSelctionObjectStatus.selectedObject.classList.remove("selectedObjectInDiv");
+    }
+    if (allowedSelectionObject.indexOf(e.target.className) == -1)
+        return;
+    // if the objeect is in the allowedSelectionObject list, then
+    divSelctionObjectStatus.selectedObject = e.target;
+    e.target.classList.add("selectedObjectInDiv");
+    // get the object's original position
+    _a = ToolBoxHelperFunction.getPageXY(e), clickedPosition.x = _a[0], clickedPosition.y = _a[1], _ = _a[2];
+    originalObjectPosition = { x: divSelctionObjectStatus.selectedObject.offsetLeft, y: divSelctionObjectStatus.selectedObject.offsetTop };
+    // mousemove event listener
+    var _moveEventFunction = function (e) {
+        console.log(34, "moveEventFUnction");
+        moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition);
+    };
+    // mouseup event listener
+    var _upEventFunction = function (e) {
+        console.log(349, "_upEventFunction");
+        divLayer.removeEventListener(moveEventName, _moveEventFunction);
+        divLayer.removeEventListener(upEventName, _upEventFunction);
+        divSelctionObjectStatus.selectedObject.saveHTMLObjectToDatabase();
+    };
+    divLayer.addEventListener(moveEventName, _moveEventFunction);
+    divLayer.addEventListener(upEventName, _upEventFunction);
+}
+exports.moveObejectInDivMouseDownFunction = moveObejectInDivMouseDownFunction;
+function moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, clickedPosition) {
+    var _a;
+    var newPosition;
+    var deltaX, deltaY;
+    var _b = ToolBoxHelperFunction.getPageXY(e), offsetX = _b[0], offsetY = _b[1], _ = _b[2];
+    _a = [offsetX - clickedPosition.x, offsetY - clickedPosition.y], deltaX = _a[0], deltaY = _a[1];
+    divSelctionObjectStatus.selectedObject.style.position = "absolute";
+    newPosition = {
+        x: originalObjectPosition.x + deltaX + "px",
+        y: originalObjectPosition.y + deltaY + "px"
+    };
+    divSelctionObjectStatus.selectedObject.style.left = newPosition.x;
+    divSelctionObjectStatus.selectedObject.style.top = newPosition.y;
+}
+// function upEventFunction(divLayer, divSelctionObjectStatus:any, _moveEventName:string, _moveEventFunction, _upEventName:string, _upEventFunction){
+//     console.log(divLayer, divSelctionObjectStatus, _moveEventName, _moveEventFunction, _upEventName, _upEventFunction)
+//     divLayer.removeEventListener(_moveEventName, _moveEventFunction)
+//     divLayer.removeEventListener(_upEventName, _upEventFunction)
+//     // divSelctionObjectStatus.selectedObject.saveHTMLObjectToDatabase()
+//
+// }
+function objectTranslateWithMouse(object, left, top) {
+}
+
+},{"../settings":86,"./toolBoxHelperFunction":65}],64:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.selectionToolMouseDownFunction = exports.selectionToolMouseUpFunction = exports.selectionToolMouseMoveFunction = exports.markObjectInsideSelectionArea = void 0;
+var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
+var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
+var Settings = __importStar(require("../settings"));
+function markObjectInsideSelectionArea(svgBoard, selectionStatusObject) {
+    var selectionObjectSet = new Set();
+    var polyline = selectionStatusObject.polyline;
+    var newPoint = svgBoard.createSVGPoint();
+    svgBoard.childNodes.forEach(function (object) {
+        // console.log(121210002, object!=polyline, object.id, svgBoard.childNodes, selectionStatusObject)
+        // the object cannot  be the polyline
+        if (object != polyline && object.soul) {
+            var lineArray = object.soul.array().value;
+            Array.from(lineArray).forEach(function (p) {
+                newPoint.x = p[0];
+                newPoint.y = p[1];
+                if (polyline.isPointInFill(newPoint)) {
+                    selectionObjectSet.add(object.getAccessPointer());
+                }
+                return;
+            }); // Array.from(lineArray)
+            return;
+        } // if object!=polyline)
+    }); // svgBoard.childNodes.forEach
+    selectionStatusObject.selectedObjectArray = Array.from(selectionObjectSet);
+    selectionStatusObject.selectedObjectArray = selectionStatusObject.selectedObjectArray.map(function (p) { return svgBoard.querySelector("polyline[accessPointer='" + p + "']"); });
+    // selectionStatusObject.selectedObjectArray.push(polyline)
+}
+exports.markObjectInsideSelectionArea = markObjectInsideSelectionArea;
+function selectionToolMouseMoveFunction(e, selectionStatusObject, ratio) {
+    var offsetX;
+    var offsetY;
+    if (e.type == "touchmove") {
+        var rect = e.target.getBoundingClientRect();
+        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
+    }
+    if (e.type == "mousemove") {
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+    }
+    var newPoint = selectionStatusObject.polyline.soul.array().value;
+    // console.log(newPoint)
+    newPoint.push([offsetX, offsetY]);
+    selectionStatusObject.polyline.soul.plot(newPoint);
+}
+exports.selectionToolMouseMoveFunction = selectionToolMouseMoveFunction;
+function selectionToolMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName) {
+    // connect the last point with the first point
+    var newPoint = polyline.soul.array().value;
+    newPoint.push(newPoint[0]);
+    polyline.soul.plot(newPoint);
+    // cleaan up
+    toolBoxHelperFunction_1.clearUpEvent(svgBoard, moveEventName, mouseMoveFunctionToBeRemoved);
+    toolBoxHelperFunction_1.clearUpEvent(svgBoard, upEventName, mouseUpFunctionToBeRemoved);
+}
+exports.selectionToolMouseUpFunction = selectionToolMouseUpFunction;
+function selectionToolMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
+    if (!mainController.toolBox.checkToolBoxItemStatus("selectionToolItemButton")) {
+        return;
+    }
+    var _a = toolBoxHelperFunction_1.getOffSetXY(e), originalPositionX = _a[0], originalPositionY = _a[1], touchIsPen = _a[2];
+    var _b = [originalPositionX, originalPositionY], offsetX = _b[0], offsetY = _b[1];
+    touchIsPen = true;
+    // if (!touchIsPen) return
+    e.preventDefault();
+    if (selectionStatusObject.mode == "selectionMode") {
+        mouseDownEventBeforeSelection(e, mainController, svgBoard, moveEventName, upEventName, originalPositionX, originalPositionY, offsetX, offsetY, touchIsPen, selectionStatusObject);
+        selectionStatusObject.mode = "selectedMode";
+    }
+    else if (selectionStatusObject.mode == "selectedMode") {
+        mouseDownEventAfterSelection(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject);
+    }
+} // selectionToolMouseDownFunction
+exports.selectionToolMouseDownFunction = selectionToolMouseDownFunction;
+function mouseDownEventBeforeSelection(e, mainController, svgBoard, moveEventName, upEventName, originalPositionX, originalPositionY, offsetX, offsetY, touchIsPen, selectionStatusObject) {
+    if (e.type == "mousedown" || touchIsPen) {
+        selectionStatusObject.selectedObjectArray = [];
+        var strokeColor = "blue";
+        var strokeWidth = "2px";
+        var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", saveToDatabase: false });
+        polyline.style.pointerEvents = "none";
+        polyline.soul.plot([[offsetX, offsetY]]);
+        polyline.appendTo(svgBoard);
+        polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
+        polyline.style["stroke-dasharray"] = "5";
+        selectionStatusObject.polyline = polyline;
+        var rect = e.target.getBoundingClientRect();
+        var ratio_1 = rect.width / Settings.pageSizeInfo.fullPageSize[0];
+        var mouseMoveFunction_1 = function (e) {
+            e.preventDefault();
+            var _a = toolBoxHelperFunction_1.getOffSetXY(e), newX = _a[0], newY = _a[1], _ = _a.slice(2);
+            var distance = toolBoxHelperFunction_1.calculateDistance(newX, newY, offsetX, offsetY);
+            // console.log(112112, selectionStatusObject.polyline.soul.array().value.length, newX, newY, distance)
+            console.log("----------------");
+            selectionToolMouseMoveFunction(e, selectionStatusObject, ratio_1);
+        };
+        var mouseUpFunction_1 = function (e) {
+            e.preventDefault();
+            // cleaan up
+            selectionToolMouseUpFunction(e, svgBoard, selectionStatusObject.polyline, mouseMoveFunction_1, mouseUpFunction_1, moveEventName, upEventName);
+            markObjectInsideSelectionArea(svgBoard, selectionStatusObject);
+        };
+        // define the mouse move event
+        svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
+        svgBoard.addEventListener(upEventName, mouseUpFunction_1);
+    }
+} // mouseDownEventBeforeSelection
+function mouseDownEventAfterSelection(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
+    var _a;
+    var clickedPoint = svgBoard.createSVGPoint();
+    var touchIsPen;
+    _a = toolBoxHelperFunction_1.getOffSetXY(e), clickedPoint.x = _a[0], clickedPoint.y = _a[1], touchIsPen = _a[2];
+    if (!touchIsPen) {
+        // return
+    }
+    e.preventDefault();
+    // let targetObjectOriginalDataArray = selectionStatusObject.selectedObjectArray.map(p=>p.soul.array().value);
+    // console.log(144, "lenght of targetObjectOriginalDataArray", targetObjectOriginalDataArray.length)
+    var selectionPolylineOriginalData = selectionStatusObject.polyline.soul.array().value;
+    // if the clicked point is outside the area, then just delete the selected circle and then go back to selection Mode
+    if (!selectionStatusObject.polyline.isPointInFill(clickedPoint)) {
+        selectionStatusObject.polyline.remove();
+        selectionStatusObject.polyline = null;
+        selectionStatusObject.mode = "selectionMode";
+        return;
+    }
+    selectionStatusObject.triggerFlag = true;
+    setTimeout(function () {
+        if (selectionStatusObject.triggerFlag) {
+            // if hold, then create popup box
+            addHoldTouchAction(e, svgBoard, selectionStatusObject);
+        }
+        else {
+            console.log("I will not trigger.");
+        }
+    }, 1000);
+    var blockEvent = false;
+    var mouseMoveFunction = function (e) {
+        e.preventDefault();
+        if (!selectionStatusObject.polyline)
+            return;
+        // console.log(selectionStatusObject.polyline)
+        // return
+        // if (blockEvent) return
+        // blockEvent = true
+        // setTimeout(()=>{blockEvent = false}, 100)
+        var _a = toolBoxHelperFunction_1.getOffSetXY(e), newX = _a[0], newY = _a[1], _ = _a.slice(2);
+        var _b = [newX - clickedPoint.x, newY - clickedPoint.y], deltaX = _b[0], deltaY = _b[1];
+        console.log(179, "newX, newY", newX, newY, "deltaX, Y; ", deltaX, deltaY);
+        // selectionStatusObject.polyline.soul.plot(selectionStatusObject.polyline.soul.array().value.map(p=> [p[0] + deltaX, p[1] + deltaY]))
+        toolBoxHelperFunction_1.changeItemPosition(selectionStatusObject.polyline, selectionPolylineOriginalData, deltaX, deltaY);
+        // selectionStatusObject.selectedObjectArray.forEach((p, i)=>{
+        //   if (p.soul){
+        //       changeItemPosition(p, targetObjectOriginalDataArray[i], deltaX, deltaY)
+        //   }
+        //
+        //   // try {
+        //   //     // p is the pint arrays
+        //   //     // targetObjectOriginalDataArray is the original positionss of the points of the polylines
+        //   //
+        //   // } catch {
+        //   //     // console.log("some error", targetf12ObjectOriginalDataArray)
+        //   //     return
+        //   // }
+        //
+        //
+        //
+        // })
+        var distance = toolBoxHelperFunction_1.calculateDistance(newX, newY, clickedPoint.x, clickedPoint.y);
+        if (distance > 0.5)
+            selectionStatusObject.triggerFlag = false;
+    };
+    var mouseUpFunction = function (e) {
+        e.preventDefault();
+        selectionStatusObject.triggerFlag = false;
+        selectionToolMouseUpFunction(e, svgBoard, selectionStatusObject.polyline, mouseMoveFunction, mouseUpFunction, moveEventName, upEventName);
+        svgBoard.removeEventListener(mouseMoveFunction, mouseMoveFunction);
+    };
+    // define the mouse move event
+    svgBoard.addEventListener(moveEventName, mouseMoveFunction);
+    // svgBoard.addEventListener(upEventName, mouseUpFunction)
+}
+// a popup box comes out
+function addHoldTouchAction(e, svgBoard, selectionStatusObject) {
+    // let popUpBox = PopUpBoxManager.createPopUpBox()
+    // let [pageX, pageY, ..._] = getPageXY(e)
+    // svgBoard.parentNode.appendChild(popUpBox)
+    // popUpBox.style.left = (pageX + 10) + "px"
+    // popUpBox.style.top = (pageY + 10) + "px"
+    //
+    // PopUpBoxManager.addItemToCreatePopUpBox(popUpBox, "deleteAll", function(){
+    //     selectionStatusObject.selectedObjectArray.forEach(p=>{
+    //         p.remove()
+    //     })
+    //     popUpBox.remove()
+    // })
+}
+
+},{"../GreatNoteClass/GreatNoteSvgDataClass":57,"../settings":86,"./toolBoxHelperFunction":65}],65:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.getTouchOffset = exports.getScale = exports.getPageXY = exports.getOffSetXY = exports.changeItemPosition = exports.mousePositionRatioAdjustment = exports.calculateDistance = exports.clearUpEvent = void 0;
+var Settings = __importStar(require("../settings"));
+function clearUpEvent(svgBoard, eventName, eventFunction) {
+    svgBoard.removeEventListener(eventName, eventFunction);
+}
+exports.clearUpEvent = clearUpEvent;
+function calculateDistance(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+}
+exports.calculateDistance = calculateDistance;
+function mousePositionRatioAdjustment(length, ratio) {
+    return length * 1 / ratio;
+}
+exports.mousePositionRatioAdjustment = mousePositionRatioAdjustment;
+function changeItemPosition(p, originalPointArray, deltaX, deltaY) {
+    var newPointArray = originalPointArray.map(function (_a, i) {
+        var x = _a[0], y = _a[1];
+        return [x + deltaX, y + deltaY];
+    });
+    p.soul.plot(newPointArray);
+}
+exports.changeItemPosition = changeItemPosition;
+function getOffSetXY(e) {
+    var offsetX, offsetY, touchIsPen;
+    var rect = e.target.getBoundingClientRect();
+    var ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0];
+    if (e.type == "touchstart" || e.type == "touchmove") {
+        offsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+        offsetY = mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
+        touchIsPen = e.targetTouches[0].radiusX < 10 ? true : false;
+    }
+    if (e.type == "mousedown" || e.type == "mousemove") {
+        offsetX = mousePositionRatioAdjustment(e.offsetX, ratio);
+        offsetY = mousePositionRatioAdjustment(e.offsetY, ratio);
+    }
+    return [offsetX, offsetY, touchIsPen];
+}
+exports.getOffSetXY = getOffSetXY;
+function getPageXY(e) {
+    var offsetX, offsetY, touchIsPen;
+    var rect = e.target.getBoundingClientRect();
+    var ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0];
+    if (e.type == "touchstart" || e.type == "touchmove") {
+        offsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX, ratio);
+        offsetY = mousePositionRatioAdjustment(e.targetTouches[0].pageY, ratio);
+        touchIsPen = e.targetTouches[0].radiusX > 10 ? false : true;
+    }
+    if (e.type == "mousedown" || e.type == "mousemove") {
+        offsetX = e.pageX;
+        offsetY = e.pageY;
+    }
+    return [offsetX, offsetY, touchIsPen];
+}
+exports.getPageXY = getPageXY;
+function getScale(pageContentContainer) {
+    var matrix = window.getComputedStyle(pageContentContainer).transform;
+    var matrixArray = matrix.replace("matrix(", "").split(",");
+    var scaleX = parseFloat(matrixArray[0]); // convert from string to number
+    return scaleX;
+}
+exports.getScale = getScale;
+function getTouchOffset(e, touchPointIndex) {
+    var rect = e.target.getBoundingClientRect();
+    var ratio = rect.width / Settings.pageSizeInfo.fullPageSize[0];
+    var x = mousePositionRatioAdjustment(e.targetTouches[touchPointIndex].pageX - rect.left, ratio);
+    var y = mousePositionRatioAdjustment(e.targetTouches[touchPointIndex].pageY - rect.top, ratio);
+    return [x, y];
+}
+exports.getTouchOffset = getTouchOffset;
+
+},{"../settings":86}],66:[function(require,module,exports){
+arguments[4][59][0].apply(exports,arguments)
+},{"dup":59}],67:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.universalControllerCreater = exports.superController = exports.initializeContainerAndControllerEvent = void 0;
@@ -26707,11 +27654,9 @@ function universalControllerCreater(name, controllerOptions) {
 }
 exports.universalControllerCreater = universalControllerCreater;
 
-},{"./basicControllerType":54}],53:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-
-},{}],54:[function(require,module,exports){
+},{"./basicControllerType":69}],68:[function(require,module,exports){
+arguments[4][55][0].apply(exports,arguments)
+},{"dup":55}],69:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = void 0;
@@ -26789,12 +27734,7 @@ exports.dropdownListController = dropdownListController;
 // @auto-fold here
 function choiceController(attribute, choiceList, prototype) {
     var controllerContainer = document.createElement("div");
-    controllerContainer.style.display = "flex";
-    controllerContainer.style["align-items"] = "center";
-    controllerContainer.style["justify-content"] = "left";
-    controllerContainer.style["flex-wrap"] = "wrap";
-    controllerContainer.style.width = "300px";
-    controllerContainer.style.minHeight = "150px";
+    controllerContainer.classList.add("choiceController");
     controllerContainer.classList.add(attribute + "Controller");
     choiceList.forEach(function (choiceValue) {
         var item = prototype.cloneNode(true);
@@ -26837,7 +27777,7 @@ function choiceController(attribute, choiceList, prototype) {
 } // choiceController
 exports.choiceController = choiceController;
 
-},{}],55:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.createSvgCircleControllerContainer = exports.createDivControllerContainer = exports.createPolylineController = void 0;
@@ -26934,70 +27874,7 @@ function createSvgCircleControllerContainer() {
 } // createSvgCircleControllerContainer
 exports.createSvgCircleControllerContainer = createSvgCircleControllerContainer;
 
-},{"./attributeControllerHelperFunction":52,"./basicControllerType":54}],56:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-exports.initializeMainControllerAttributeControllerMapping = void 0;
-var highLevelController_1 = require("./highLevelController");
-//** to initialize the main controller attribute controller mapping so that other objects can access tthe attribute controllers through the mainController
-function initializeMainControllerAttributeControllerMapping(mainController) {
-    var polylineController = highLevelController_1.createPolylineController();
-    mainController.attributeControllerMapping = {
-        polylineController: polylineController
-    };
-}
-exports.initializeMainControllerAttributeControllerMapping = initializeMainControllerAttributeControllerMapping;
-
-},{"./highLevelController":55}],57:[function(require,module,exports){
-//
-//
-// function renderLatex(latexMotherCell, latexChildCell){
-//
-//      function findPattern(pattern){
-//         let motherText = latexMotherCell.innerHTML.match(pattern)
-//         let newMotherHTML = latexMotherCell.innerHTML
-//         if (motherText){
-//
-//             motherText.forEach(p=>{
-//                 let beforePattern = p
-//                 p = p.slice(2, p.length-2);
-//                 p = p.split("@").join("\\").split("##").join("$$")
-//                 // console.log(beforePattern);
-//                  MathJax.tex2svgPromise(p, {em: 12, ex: 6, display: false})
-//                   .then((html) => {
-//
-//                       // console.log(html.outerHTML);
-//                       newMotherHTML=  newMotherHTML.replace(beforePattern, html.outerHTML)
-//                       // console.log(newMotherHTML);
-//                       latexChildCell.innerHTML = newMotherHTML
-//                   });
-//             })
-//         } else{
-//             latexChildCell.innerHTML = newMotherHTML
-//         }
-//     }//findPattern
-//
-//
-//     let pattern1 = /@[(](.*?)@[)]/g
-//     let pattern2 = /##(.*?)##/g
-//
-//
-//     findPattern(pattern1)
-//     findPattern(pattern2)
-//
-// }// renderLatex
-//
-//
-//
-//
-//
-// let latexOutput = document.querySelector(".latexOutput")
-// let latexInput = document.querySelector(".latexInput")
-// latexInput.addEventListener("input", (e)=>{
-//     renderLatex(latexInput, latexOutput)
-// })
-
-},{}],58:[function(require,module,exports){
+},{"./attributeControllerHelperFunction":67,"./basicControllerType":69}],71:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27019,48 +27896,53 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.buildInitialHTMLSkeleton = exports.buildInitialPage = void 0;
-var GreatNoteSvgDataClass = __importStar(require("./GreatNoteSvgDataClass"));
-var ToolBoxModel = __importStar(require("./ToolBoxModel"));
-// import {mainController} from "./constructInitialCondition"
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
-var socketFunction_1 = require("./socketFunction");
-var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
-var pageController = __importStar(require("./pageControllerFolder/pageController"));
-var LayerConroller = __importStar(require("./layerControllerFolder/layerController"));
-var GNCommentController = __importStar(require("./commentFolder/commentController"));
-function buildInitialPage(mainController, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = false; }
-    mainController.GNDataStructureMapping = {
-        GNInputField: GreatNoteDataClass.GNInputField,
-        GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-        GNEditableDiv: GreatNoteDataClass.GNEditableDiv,
-        GNImage: GreatNoteDataClass.GNImage,
-        // svg
-        GNSvg: GreatNoteSvgDataClass.GNSvg,
-        GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
-        GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
-        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
-        GNComment: GNCommentController.GNComment
+exports.initializeMainControllerAttributeControllerMapping = void 0;
+var HighLevelController = __importStar(require("./highLevelController"));
+//** to initialize the main controller attribute controller mapping so that other objects can access tthe attribute controllers through the mainController
+function initializeMainControllerAttributeControllerMapping(mainController) {
+    var polylineController = HighLevelController.createPolylineController();
+    mainController.attributeControllerMapping = {
+        polylineController: polylineController
     };
-    var pageController = mainController.pageController;
-    var pageFullArray = mainController.mainDoc["array"][0]["array"];
-    var pageOverviewArray = mainController.mainDoc["array"][1]["array"];
-    console.log("pageFullArray", pageFullArray);
-    var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
-    var overviewModeDiv = document.querySelector(".overviewModeDiv");
-    for (var i = 0; i < pageFullArray.length; i++) {
-        var _a = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
-        mainController.renderDataToHTML(pageFullArray[i], newPage);
-        // let commentContainer = CommentController.GNComment({name:"name", arrayID: newPage.getAccessPointer(), saveToDatabase:true})
-        // commentContainer.appendTo(newPage)
-        // console.log(pageFullArray[i])
-        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv);
-    }
-} // buildInitialPage
-exports.buildInitialPage = buildInitialPage;
-function buildInitialHTMLSkeleton(mainController) {
-    var toolBoxController = new ToolBoxModel.ToolBoxClass();
+}
+exports.initializeMainControllerAttributeControllerMapping = initializeMainControllerAttributeControllerMapping;
+
+},{"./highLevelController":70}],72:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.attachEvents = exports.buildInitialPage = exports.buildInitialHTMLSkeleton = exports.buildPageController = exports.buildToolBoxHtmlObject = exports.buildPageControllerButtonArray = exports.getDivFromHTML = void 0;
+var ClipboardEvent = __importStar(require("./clipboardEvents"));
+var GreatNoteSvgDataClass = __importStar(require("./GreatNoteClass/GreatNoteSvgDataClass"));
+var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
+var socketFunction_1 = require("./socketFunction");
+var GNCommentController = __importStar(require("./commentFolder/commentController"));
+var LayerConroller = __importStar(require("./layerControllerFolder/layerController"));
+var pageController = __importStar(require("./pageControllerFolder/pageController"));
+var pageViewHelperFunction = __importStar(require("./pageViewHelperFunction"));
+var InitializeAttributeControllerFunction = __importStar(require("./attributeControllerFolder/initializeAttributeControllers"));
+var SwipeEventController = __importStar(require("./EventFolder/swipeEvent"));
+var TestHelper = __importStar(require("./testFolder/testHelperFunction"));
+var WindowController = __importStar(require("./EventFolder/specialWindowObject"));
+function getDivFromHTML(mainController) {
     var pageArrayID = mainController.mainDocArray["mainArray_page"];
     // global htmlObjects
     var panelContainer = document.querySelector(".panelContainer");
@@ -27070,18 +27952,28 @@ function buildInitialHTMLSkeleton(mainController) {
     fullPageModeDiv.setAttribute("accessPointer", mainController.mainDocArray["mainArray_pageFull"]);
     var overviewModeDiv = document.querySelector(".overviewModeDiv");
     overviewModeDiv.setAttribute("accessPointer", mainController.mainDocArray["mainArray_pageOverview"]);
+    overviewModeDiv.setAttribute("status", "off");
     var bookmarkSubPanel = pageViewHelperFunction.createSubPanel("bookmark", true);
     var bookmarkSubPanelContent = bookmarkSubPanel.querySelector(".subPanelContent");
-    var currentStatus = mainController.pageCurrentStatus;
-    // toolBoxObject
-    var toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
-    var polylineItemButton = mainController.toolBox.createNewPolyLineItemButton(toolBoxHtmlObject);
-    var eraserItemButton = mainController.toolBox.createEraserItemButton(toolBoxHtmlObject);
+    return { pageArrayID: pageArrayID, panelContainer: panelContainer, pageContentContainer: pageContentContainer, fullPageModeDiv: fullPageModeDiv, overviewModeDiv: overviewModeDiv, bookmarkSubPanel: bookmarkSubPanel, bookmarkSubPanelContent: bookmarkSubPanelContent };
+}
+exports.getDivFromHTML = getDivFromHTML;
+function buildPageControllerButtonArray(mainController) {
     // create subPanel
     var pageControllerSubPanel = pageViewHelperFunction.createSubPanel("pageController", true);
     var pageControllerSubPanelContent = pageControllerSubPanel.querySelector(".subPanelContent");
+    var testValuePanel = document.createElement("div");
+    testValuePanel.classList.add("testValuePanel");
+    pageControllerSubPanelContent.appendChild(testValuePanel);
     var editorControllerTemplate = document.querySelector("#editControllerTemplate");
     var editorController = editorControllerTemplate.content.cloneNode(true);
+    console.log(484848, editorController);
+    // attribute controller
+    var attributePanel = editorController.querySelector(".attributePanel");
+    InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(mainController);
+    Object.values(mainController.attributeControllerMapping).forEach(function (p) {
+        attributePanel.appendChild(p);
+    });
     var copyButton = editorController.querySelector(".copyButton");
     var linkButton = editorController.querySelector(".linkButton");
     var deleteButton = editorController.querySelector(".deleteButton");
@@ -27092,7 +27984,6 @@ function buildInitialHTMLSkeleton(mainController) {
         selectedObjectData["data"]["cx"] += 100;
         var copiedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: "", insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: false });
         copiedObject.loadFromData(selectedObjectData);
-        console.log(88, selectedObjectData, copiedObject);
         selectedObject.parentNode.appendChild(copiedObject);
     });
     linkButton.addEventListener("click", function () {
@@ -27104,37 +27995,23 @@ function buildInitialHTMLSkeleton(mainController) {
         var parentContainerObjectID = selectedObject.parentNode.getAccessPointer();
         var linkedObject = mainController.createGNObjectThroughName(nameOfGNtype, { name: "", arrayID: parentContainerObjectID, insertPosition: false, dataPointer: selectedObject.getAccessPointer(), saveToDatabase: true });
         linkedObject.loadFromData(selectedObjectData);
-        console.log(88, selectedObjectData, linkedObject);
         selectedObject.parentNode.appendChild(linkedObject);
     });
     deleteButton.addEventListener("click", function () {
-        var selectedObject = mainController.pageCurrentStatus.selectedObject;
-        selectedObject === null || selectedObject === void 0 ? void 0 : selectedObject.GNdelete();
-        selectedObject === null || selectedObject === void 0 ? void 0 : selectedObject.remove();
+        var selectedObject = document.querySelector(".selectedObject");
+        selectedObject.deleteFromDatabase();
+        // selectedObject?.remove()
     });
-    // javascript created buttons
-    var addInputFieldButton = document.createElement("button");
-    addInputFieldButton.innerText = "addInput";
-    addInputFieldButton.addEventListener("click", function () {
-        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
-        var newInputField = GreatNoteDataClass.GNInputField({ name: "", arrayID: currentPage.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true });
-        newInputField.appendTo(currentPage);
-    });
-    var addSvgDivButton = document.createElement("button");
-    addSvgDivButton.innerText = "addSvg";
-    addSvgDivButton.addEventListener("click", function () {
-        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
-        var svgBoard = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
-        svgBoard.addEventListener("click", function () {
-            mainController.toolBox.targetPage = svgBoard;
-        });
-        svgBoard.appendToContainer(currentPage);
-        // console.log(135, currentPage, currentPage.getAccessPointer())
-    });
-    var syncButton = document.createElement("button");
-    syncButton.innerText = "sync";
-    syncButton.addEventListener("click", function () {
-        socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
+    var testFieldButton = document.createElement("button");
+    testFieldButton.innerText = "testFieldButton";
+    testFieldButton.addEventListener("click", function () {
+        var testFieldDiv = document.querySelector(".testField");
+        if (testFieldDiv.classList.contains("open")) {
+            testFieldDiv.classList.remove("open");
+        }
+        else {
+            testFieldDiv.classList.add("open");
+        }
     });
     var showMainDocButton = document.createElement("button");
     showMainDocButton.innerText = "mainDoc";
@@ -27145,13 +28022,34 @@ function buildInitialHTMLSkeleton(mainController) {
     resetButton.innerText = "resetButton";
     resetButton.addEventListener("click", function () {
         mainController.initalizeMainDoc();
-        var saveData = mainController.saveMainDoc(true);
     });
-    editorController.append(addInputFieldButton, addSvgDivButton, syncButton, showMainDocButton, resetButton);
-    var layerControllerHTMLObject = LayerConroller.createLayerController(mainController);
-    pageControllerSubPanelContent.append(toolBoxHtmlObject, polylineItemButton, editorController, layerControllerHTMLObject);
-    //===================== bookmarkSubPanel ==================//
-    /** add new div, new svg*/
+    var objectIDGetter = document.createElement("input");
+    var objectIDGetterSubmit = document.createElement("input");
+    objectIDGetterSubmit.type = "submit";
+    objectIDGetter.style.border = "3px solid gold";
+    objectIDGetterSubmit.style.background = "gold";
+    objectIDGetterSubmit.addEventListener("click", function (e) {
+        console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector("*[accessPointer='" + objectIDGetter.value + "']"));
+    });
+    editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, resetButton);
+    // toolBoxObject
+    var toolBoxHtmlObject = buildToolBoxHtmlObject(mainController);
+    pageControllerSubPanelContent.append(toolBoxHtmlObject, editorController);
+    return { pageControllerSubPanel: pageControllerSubPanel, pageControllerSubPanelContent: pageControllerSubPanelContent, testFieldButton: testFieldButton, copyButton: copyButton, linkButton: linkButton, deleteButton: deleteButton, showMainDocButton: showMainDocButton, resetButton: resetButton };
+}
+exports.buildPageControllerButtonArray = buildPageControllerButtonArray;
+function buildToolBoxHtmlObject(mainController) {
+    var toolBoxHtmlObject = mainController.toolBox.createToolboxHtmlObject();
+    var eraserItemButton = mainController.toolBox.createEraserItemButton(toolBoxHtmlObject);
+    var polylineItemButton = mainController.toolBox.createNewPolyLineItemButton(toolBoxHtmlObject);
+    var selectionToolItemButton = mainController.toolBox.createSelectionToolItemButton(toolBoxHtmlObject);
+    var addCommentItemButton = mainController.toolBox.createAddCommentButton(toolBoxHtmlObject);
+    var moveObjectInDivButton = mainController.toolBox.createMoveObjectInDivButton(toolBoxHtmlObject);
+    toolBoxHtmlObject.append(eraserItemButton, polylineItemButton, selectionToolItemButton, addCommentItemButton, moveObjectInDivButton);
+    return toolBoxHtmlObject;
+}
+exports.buildToolBoxHtmlObject = buildToolBoxHtmlObject;
+function buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer) {
     // page controller
     // To create a page Controller to navigate previous and nex page
     pageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent);
@@ -27159,82 +28057,75 @@ function buildInitialHTMLSkeleton(mainController) {
     var deletePageButton = document.createElement("button");
     deletePageButton.innerHTML = "delete page";
     deletePageButton.addEventListener("click", function () {
-        mainController.pageController.currentPage.remove();
+        var currentPageNumber = mainController.pageController.currentPage.pageNumber;
+        mainController.pageController.deletePage(currentPageNumber);
+        mainController.pageController.currentPage.fullPageHTMLObject.deleteFromDatabase();
+        mainController.pageController.goToPage(currentPageNumber - 1);
+        mainController.pageController.updatePageNumber(mainController.pageController.currentPage);
     });
     var switchViewModeButton = pageViewHelperFunction.createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv);
     var saveButton = document.createElement("button");
     saveButton.innerHTML = "saveButton";
     saveButton.addEventListener("click", function () {
         var saveData = mainController.saveMainDoc(true);
+        socketFunction_1.socket.emit("saveNotebookUsingClientData", saveData);
     });
-    var createNewSvg = pageViewHelperFunction.functionButtonCreater("new svg", function (e) {
-    });
-    var objectIDGetter = document.createElement("input");
-    var objectIDGetterSubmit = document.createElement("input");
-    objectIDGetterSubmit.type = "submit";
-    objectIDGetterSubmit.addEventListener("click", function (e) {
-        console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector("*[accessPointer='" + objectIDGetter.value + "']"));
-    });
-    bookmarkSubPanelContent.append(createNewDivButton, deletePageButton, switchViewModeButton, saveButton, objectIDGetter, objectIDGetterSubmit);
+    var layerControllerHTMLObject = LayerConroller.createLayerController(mainController);
+    bookmarkSubPanelContent.append(createNewDivButton, deletePageButton, switchViewModeButton, layerControllerHTMLObject, saveButton);
+}
+exports.buildPageController = buildPageController;
+function buildInitialHTMLSkeleton(mainController) {
+    var currentStatus = mainController.pageCurrentStatus;
+    var _a = getDivFromHTML(mainController), pageArrayID = _a.pageArrayID, panelContainer = _a.panelContainer, pageContentContainer = _a.pageContentContainer, fullPageModeDiv = _a.fullPageModeDiv, overviewModeDiv = _a.overviewModeDiv, bookmarkSubPanel = _a.bookmarkSubPanel, bookmarkSubPanelContent = _a.bookmarkSubPanelContent;
+    var _b = buildPageControllerButtonArray(mainController), pageControllerSubPanel = _b.pageControllerSubPanel, pageControllerSubPanelContent = _b.pageControllerSubPanelContent, testFieldButton = _b.testFieldButton, copyButton = _b.copyButton, linkButton = _b.linkButton, deleteButton = _b.deleteButton, showMainDocButton = _b.showMainDocButton, resetButton = _b.resetButton;
+    //===================== bookmarkSubPanel ==================//
+    buildPageController(mainController, bookmarkSubPanelContent, fullPageModeDiv, overviewModeDiv, pageContentContainer);
     // commentSubPanel
     var commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false);
+    // add events: initalizeWindowObject, addPasteImageEvent, swipeDetection
+    attachEvents(mainController, pageContentContainer);
+    socketFunction_1.socket.emit("clientAskServerForSocketData");
     panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel);
-}
+} // buildInitialHTMLSkeleton
 exports.buildInitialHTMLSkeleton = buildInitialHTMLSkeleton;
-
-},{"./GreatNoteDataClass":46,"./GreatNoteSvgDataClass":48,"./ToolBoxModel":49,"./commentFolder/commentController":59,"./layerControllerFolder/layerController":62,"./pageControllerFolder/pageController":64,"./pageViewHelperFunction":65,"./socketFunction":66}],59:[function(require,module,exports){
-"use strict";
-exports.__esModule = true;
-exports.GNComment = void 0;
-var GreatNoteDataClass_1 = require("../GreatNoteDataClass");
-function GNComment(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage, injectedData = createData.injectedData;
-    var _commentContainer = GreatNoteDataClass_1.GNContainerDiv({ name: "commentDiv", saveToDatabase: false });
-    _commentContainer.GNType = GNComment.name;
-    _commentContainer.classList.add("_commentContainer");
-    _commentContainer.createCommentObject = function (createData) {
-        var _commentObject = GreatNoteDataClass_1.GNContainerDiv(createData);
-        _commentObject.specialGNType = "GNCommentObject";
-        _commentObject.appendTo(_commentContainer);
-        return _commentObject;
+function buildInitialPage(mainController, saveToDatabase) {
+    if (saveToDatabase === void 0) { saveToDatabase = false; }
+    mainController.GNDataStructureMapping = {
+        GNInputField: GreatNoteDataClass.GNInputField,
+        GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
+        GNImageContainer: GreatNoteDataClass.GNImageContainer,
+        // svg
+        GNSvg: GreatNoteSvgDataClass.GNSvg,
+        GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,
+        GNSvgPolyLine: GreatNoteSvgDataClass.GNSvgPolyLine,
+        GNSvgRect: GreatNoteSvgDataClass.GNSvgRect,
+        GNComment: GNCommentController.GNComment
     };
-    _commentContainer.createReplyObject = function (createData) {
-        var _replyObject = GreatNoteDataClass_1.GNContainerDiv(createData);
-        _replyObject.specialGNType = "GNReplyObject";
-        _replyObject.appendTo(_commentContainer);
-        return _replyObject;
-    };
-    if (injectedData) {
-        // if there are data, loop each object and create
-        injectedData["array"].forEach(function (p) {
-            var newObject;
-            if (p.specialGNType == "GNCommentObject") {
-                newObject = _commentContainer.createCommentObject({ name: "" });
-                newObject.initializeHTMLObjectFromData(p);
-            }
-            if (p.specialGNType == "GNCommentObject") {
-                newObject = _commentContainer.createReplyObject({ name: "", injectedData: p });
-                newObject.initializeHTMLObjectFromData(p);
-            }
-        });
+    var pageController = mainController.pageController;
+    var pageFullArray = mainController.mainDoc["array"][0]["array"];
+    var pageOverviewArray = mainController.mainDoc["array"][1]["array"];
+    var fullPageModeDiv = document.querySelector(".fullPageModeDiv");
+    var overviewModeDiv = document.querySelector(".overviewModeDiv");
+    for (var i = 0; i < pageFullArray.length; i++) {
+        var _a = pageViewHelperFunction.createNewPage(pageController, fullPageModeDiv, overviewModeDiv, pageFullArray[i], pageOverviewArray[i], saveToDatabase), newPage = _a[0], smallView = _a[1];
+        mainController.renderDataToHTML(pageFullArray[i], newPage);
+        // let commentContainer = CommentController.GNComment({name:"name", arrayID: newPage.getAccessPointer(), saveToDatabase:true})
+        pageViewHelperFunction.insertNewPage(pageController, newPage, smallView, fullPageModeDiv, overviewModeDiv);
     }
-    else {
-        var _commentObject = _commentContainer.createCommentObject({ name: "" });
-        _commentObject.innerHTML = "commentDiv commentDiv commentDiv commentDiv commentDiv";
-        var _replyObject = _commentContainer.createReplyObject({ name: "" });
-        _replyObject.innerHTML = "reply reply reply reply reply";
-        if (saveToDatabase) {
-            _commentContainer.addToDatabase(arrayID);
-            var _commentContainerID = _commentContainer._identity.accessPointer;
-            _commentObject.addToDatabase(_commentContainerID);
-            _replyObject.addToDatabase(_commentContainerID);
-        }
-    }
-    return _commentContainer;
+    mainController.layerController.renderCurrentPageLayer();
+    TestHelper.testFunction(mainController);
+} // buildInitialPage
+exports.buildInitialPage = buildInitialPage;
+function attachEvents(mainController, pageContentContainer) {
+    WindowController.initalizeWindowObject();
+    // clipboard event
+    ClipboardEvent.addPasteImageEvent(mainController);
+    // to add swipe, panning events to the pageContentContainer
+    SwipeEventController.swipeDetection(mainController, pageContentContainer);
 }
-exports.GNComment = GNComment;
+exports.attachEvents = attachEvents;
 
-},{"../GreatNoteDataClass":46}],60:[function(require,module,exports){
+},{"./EventFolder/specialWindowObject":46,"./EventFolder/swipeEvent":47,"./GreatNoteClass/GreatNoteDataClass":54,"./GreatNoteClass/GreatNoteSvgDataClass":57,"./attributeControllerFolder/initializeAttributeControllers":71,"./clipboardEvents":73,"./commentFolder/commentController":74,"./layerControllerFolder/layerController":79,"./pageControllerFolder/pageController":83,"./pageViewHelperFunction":85,"./socketFunction":87,"./testFolder/testHelperFunction":88}],73:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27256,38 +28147,430 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.mainController = exports.MainController = exports.MainDocArrayEnum = void 0;
+exports.mousePositionTrackFunction = exports.triggerTargetObjectMovingFunction = exports.getObjectOrigianlDataArray = exports.setTargetObject = exports.createMouseTrackingController = exports.mouseResizeFunction = exports.addPasteImageEvent = void 0;
+var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
+function addPasteImageEvent(mainController) {
+    document.onpaste = function (event) {
+        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        console.log(JSON.stringify(items)); // might give you mime types
+        for (var index in items) {
+            var item = items[index];
+            if (item.kind === 'file') {
+                var blob = item.getAsFile();
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'processImageBase64Format', true);
+                    xhr.onload = function () {
+                        console.log("finish processing image");
+                        console.log(this.responseText);
+                        var responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "");
+                        var newImg = GreatNoteDataClass.GNImageContainer({ "name": "", arrayID: mainController.toolBox.targetPage.getAccessPointer(), saveToDatabase: true, imgsrc: "/noteImage/" + responseImgSrc + ".png" });
+                        mainController.toolBox.targetPage.appendChild(newImg);
+                        newImg.setImageSize({ width: 500 });
+                        newImg.setMovable();
+                        newImg.saveHTMLObjectToDatabase();
+                        mainController.toolBox.targetPage.appendChild(newImg);
+                    };
+                    xhr.send(event.target.result);
+                };
+                reader.readAsDataURL(blob);
+            }
+        }
+    };
+}
+exports.addPasteImageEvent = addPasteImageEvent;
+console.log("clipboard event");
+function mouseResizeFunction(item) {
+    var eventName = "mousedown";
+    var moveEventName = "mousemove";
+    var attributeX = "left";
+    var attributeY = "top";
+    return function (e) {
+        var startX = e["screenX"];
+        var startY = e["screenY"];
+        var objectInitialX = 0;
+        var objectInitialY = 0;
+        var initialLeftValue = parseInt(item.style[attributeX].replace("px", "")) || 0;
+        var initialTopValue = parseInt(item.style[attributeY].replace("px", "")) || 0;
+        var currentX;
+        var currentY;
+        var deltaX = 0;
+        var deltaY = 0;
+        var mousemoveFunction = function (e) {
+            currentY = e.screenY;
+            currentX = e.screenX;
+            deltaX = currentX - startX;
+            deltaY = currentY - startY;
+            var newX = item.style[attributeX] = initialLeftValue + deltaX + "px";
+            item.style[attributeY] = initialTopValue + deltaY + "px";
+        };
+        item.addEventListener("mousemove", mousemoveFunction, false);
+        function endDragEvent(e) {
+            Array.from(item.parentNode["children"]).forEach(function (p) {
+                p["style"]["pointerEvents"] = "inherit";
+            });
+            var endX = e["screenX"];
+            var endY = e["screenY"];
+            item.removeEventListener("mousemove", mousemoveFunction);
+        }
+        item.addEventListener("mouseup", function (e) {
+            endDragEvent(e);
+        }, false);
+        item.addEventListener("mouseout", function (e) {
+            endDragEvent(e);
+        }, false);
+    };
+}
+exports.mouseResizeFunction = mouseResizeFunction;
+function createMouseTrackingController(mouseInfoDiv, testFieldDiv) {
+    console.log(mouseInfoDiv, testFieldDiv);
+    var clientXYDiv = document.createElement("div");
+    clientXYDiv.style.display = "grid";
+    clientXYDiv.style.gridTemplateColumns = "1fr 2fr";
+    var clientXYDivLabel = document.createElement("span");
+    var clientXYDivData = document.createElement("span");
+    clientXYDivLabel.innerText = "clientXY";
+    clientXYDiv.appendChild(clientXYDivLabel);
+    clientXYDiv.appendChild(clientXYDivData);
+    var screenXYDiv = document.createElement("div");
+    screenXYDiv.style.display = "grid";
+    screenXYDiv.style.gridTemplateColumns = "1fr 2fr";
+    var screenXYDivLabel = document.createElement("span");
+    var screenXYDivData = document.createElement("span");
+    screenXYDivLabel.innerText = "screenXY";
+    screenXYDiv.appendChild(screenXYDivLabel);
+    screenXYDiv.appendChild(screenXYDivData);
+    var offsetXYDiv = document.createElement("div");
+    offsetXYDiv.style.display = "grid";
+    offsetXYDiv.style.gridTemplateColumns = "1fr 2fr";
+    var offsetXYDivLabel = document.createElement("span");
+    var offsetXYDivData = document.createElement("span");
+    offsetXYDivLabel.innerText = "offsetXY";
+    offsetXYDiv.appendChild(offsetXYDivLabel);
+    offsetXYDiv.appendChild(offsetXYDivData);
+    var pageXYDiv = document.createElement("div");
+    pageXYDiv.style.display = "grid";
+    pageXYDiv.style.gridTemplateColumns = "1fr 2fr";
+    var pageXYDivLabel = document.createElement("span");
+    var pageXYDivData = document.createElement("span");
+    pageXYDivLabel.innerText = "pageXY";
+    pageXYDiv.appendChild(pageXYDivLabel);
+    pageXYDiv.appendChild(pageXYDivData);
+    var deltaXYDiv = document.createElement("div");
+    deltaXYDiv.style.display = "grid";
+    deltaXYDiv.style.gridTemplateColumns = "1fr 2fr";
+    var deltaXYDivLabel = document.createElement("span");
+    var deltaXYDivData = document.createElement("span");
+    deltaXYDivLabel.innerText = "deltaXY";
+    deltaXYDiv.appendChild(deltaXYDivLabel);
+    deltaXYDiv.appendChild(deltaXYDivData);
+    var targetObjectXYDiv = document.createElement("div");
+    targetObjectXYDiv.style.display = "grid";
+    targetObjectXYDiv.style.gridTemplateColumns = "1fr 2fr";
+    var targetObjectXYDivLabel = document.createElement("span");
+    var targetObjectXYDivData = document.createElement("span");
+    targetObjectXYDivLabel.innerText = "targetObjXY";
+    targetObjectXYDiv.appendChild(targetObjectXYDivLabel);
+    targetObjectXYDiv.appendChild(targetObjectXYDivData);
+    mouseInfoDiv.append(clientXYDiv, screenXYDiv, offsetXYDiv, pageXYDiv, deltaXYDiv, targetObjectXYDiv);
+    return [clientXYDivData, screenXYDivData, offsetXYDivData, pageXYDivData, deltaXYDivData, targetObjectXYDivData];
+}
+exports.createMouseTrackingController = createMouseTrackingController;
+function setTargetObject(parentDiv, targetObjectArray) {
+    parentDiv.targetObjectArray = targetObjectArray;
+}
+exports.setTargetObject = setTargetObject;
+function getObjectOrigianlDataArray(p) {
+    // to get data about the object's position and parent's dimension so that you can change the position and size of the object
+    return {
+        originalLeft: p.offsetLeft,
+        originalTop: p.offsetTop,
+        parentOriginalWidth: p.parentNode.offsetWidth,
+        parentOriginalHeight: p.parentNode.offsetHeight
+    };
+}
+exports.getObjectOrigianlDataArray = getObjectOrigianlDataArray;
+function triggerTargetObjectMovingFunction(p, i, deltaX, deltaY, targetObjectOriginalDataArray) {
+    // p = targetObject
+    // i = index
+    var newTargetObjectLeft = targetObjectOriginalDataArray[i]["originalLeft"] + deltaX + "px";
+    var newTargetObjectTop = targetObjectOriginalDataArray[i]["originalTop"] + deltaY + "px";
+    p.style.left = newTargetObjectLeft;
+    p.style.top = newTargetObjectTop;
+    if (p.specialMovingEvent) {
+        p.specialMovingEvent(deltaX, deltaY, targetObjectOriginalDataArray[i]["parentOriginalWidth"], targetObjectOriginalDataArray[i]["parentOriginalHeight"]);
+    }
+} // triggerTargetObjectMovingFunction
+exports.triggerTargetObjectMovingFunction = triggerTargetObjectMovingFunction;
+function mousePositionTrackFunction(mouseInfoDiv, parentDiv) {
+    var _a = createMouseTrackingController(mouseInfoDiv, parentDiv), clientXYDivData = _a[0], screenXYDivData = _a[1], offsetXYDivData = _a[2], pageXYDivData = _a[3], deltaXYDivData = _a[4], targetObjectXYDivData = _a[5];
+    var originalX, originalY;
+    var currentX, currentY;
+    var deltaX, deltaY;
+    var targetObjectOriginalDataArray = [];
+    parentDiv.addEventListener("mousedown", function (e) {
+        parentDiv.childNodes.forEach(function (p) {
+            // p.style.pointerEvents = "none"
+            if (p.classList.contains("selectedObject")) {
+                // p.style.pointerEvents = "all"
+            }
+        });
+        originalX = e.pageX;
+        originalY = e.pageY;
+        currentX = e.pageX;
+        currentY = e.pageY;
+        clientXYDivData.innerText = "(" + e.clientX + ", " + e.clientY + ")";
+        screenXYDivData.innerText = "(" + e.screenX + ", " + e.screenY + ")";
+        offsetXYDivData.innerText = "(" + e.offsetX + ", " + e.offsetY + ")";
+        pageXYDivData.innerText = "(" + e.pageX + ", " + e.pageY + ")";
+        deltaX = currentX - originalX;
+        deltaY = currentY - originalY;
+        deltaXYDivData.innerText = "(" + deltaX + ", " + deltaY + ")";
+        // original position
+        targetObjectOriginalDataArray = Array.from(parentDiv.childNodes).map(function (p) { return getObjectOrigianlDataArray(p); });
+        var mousemoveFunction = function (e) {
+            currentX = e.pageX;
+            currentY = e.pageY;
+            clientXYDivData.innerText = "(" + e.clientX + ", " + e.clientY + ")";
+            screenXYDivData.innerText = "(" + e.screenX + ", " + e.screenY + ")";
+            offsetXYDivData.innerText = "(" + e.offsetX + ", " + e.offsetY + ")";
+            pageXYDivData.innerText = "(" + e.pageX + ", " + e.pageY + ")";
+            deltaX = currentX - originalX;
+            deltaY = currentY - originalY;
+            parentDiv.childNodes.forEach(function (p, i) {
+                if (p.classList.contains("selectedObject")) {
+                    triggerTargetObjectMovingFunction(p, i, deltaX, deltaY, targetObjectOriginalDataArray);
+                }
+            });
+            deltaXYDivData.innerText = "(" + deltaX + ", " + deltaY + ")";
+        }; // mousemoveFunction
+        parentDiv.addEventListener("mousemove", mousemoveFunction);
+        var mouseupFunction = function (e) {
+            parentDiv.removeEventListener("mousemove", mousemoveFunction);
+            parentDiv.removeEventListener("mouseup", mouseupFunction);
+            parentDiv.childNodes.forEach(function (p) { return p.style.pointerEvents = "all"; });
+        };
+        parentDiv.addEventListener("mouseup", mouseupFunction);
+        parentDiv.addEventListener("mouseup2", mouseupFunction);
+    });
+}
+exports.mousePositionTrackFunction = mousePositionTrackFunction;
+
+},{"./GreatNoteClass/GreatNoteDataClass":54}],74:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.GNComment = void 0;
+var GreatNoteDataClass_1 = require("../GreatNoteClass/GreatNoteDataClass");
+var CommentControlerHelperFunction = __importStar(require("./commentControllerHelperFunction"));
+//@auto-fold here
+function GNComment(createData) {
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage, injectedData = createData.injectedData;
+    var _commentContainer = GreatNoteDataClass_1.GNContainerDiv({ name: "commentDiv", saveToDatabase: false });
+    _commentContainer.GNType = GNComment.name;
+    _commentContainer.classList.add("_commentContainer");
+    if (arrayID && saveToDatabase) {
+        _commentContainer.addToDatabase(arrayID);
+        _commentContainer.saveHTMLObjectToDatabase();
+    }
+    //@auto-fold here
+    _commentContainer.createCommentObject = function (createData) {
+        return CommentControlerHelperFunction.createCommentObject(_commentContainer, createData);
+    };
+    _commentContainer.loadFromData = function (injectedData) {
+        CommentControlerHelperFunction.loadFromData(_commentContainer, injectedData);
+    }; // _commentContainer.loadFromData
+    //@auto-fold here
+    if (injectedData) {
+        // if there are data, loop each object and create
+        console.log(323232, "inject data");
+        _commentContainer.loadFromData(injectedData);
+        // ****************************
+        // render the comments inside
+        // ****************************
+        injectedData["array"].forEach(function (p) {
+            var newObject = _commentContainer.createCommentObject({ name: "" });
+            newObject.initializeHTMLObjectFromData(p);
+            newObject.contentEditable = "true";
+            // _commentContainer.appendChild(newObject)
+        });
+    }
+    else {
+        var newCommentField = _commentContainer.createCommentObject({ "name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase: true });
+        newCommentField.saveHTMLObjectToDatabase();
+    } // if not injectedData
+    CommentControlerHelperFunction.addEventToCommentContainer(_commentContainer);
+    CommentControlerHelperFunction.addCommentController(_commentContainer);
+    return _commentContainer;
+}
+exports.GNComment = GNComment;
+
+},{"../GreatNoteClass/GreatNoteDataClass":54,"./commentControllerHelperFunction":75}],75:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.addCommentController = exports.addEventToCommentContainer = exports.createCommentObject = exports.loadFromData = void 0;
+var GreatNoteDataClass_1 = require("../GreatNoteClass/GreatNoteDataClass");
+function loadFromData(_commentContainer, injectedData) {
+    _commentContainer._identity = injectedData._identity;
+    _commentContainer.setAttribute("accessPointer", injectedData._identity.accessPointer);
+    if (injectedData.classList)
+        injectedData.classList.forEach(function (className) {
+            // add class name if the object does not have the class naame
+            if (!_commentContainer.classList.contains(className)) {
+                _commentContainer.classList.add(className);
+            }
+            else {
+                return;
+            }
+        }); // add classList
+    if (injectedData.stylesheet) {
+        _commentContainer.applyStyle(injectedData.stylesheet, false);
+    }
+}
+exports.loadFromData = loadFromData;
+function createCommentObject(_commentContainer, createData) {
+    var arrayID = createData.arrayID, saveToDatabase = createData.saveToDatabase, injectedData = createData.injectedData;
+    var _commentObject = GreatNoteDataClass_1.GNContainerDiv(createData);
+    console.log(323232, _commentObject, createData);
+    _commentObject.classList.add("commentField");
+    // _commentObject.classList.add("commentField")
+    // _commentObject.specialGNType = "GNCommentObject"
+    _commentObject.contentEditable = "true";
+    // when nit is not injectdData, then initialize the html
+    if (!injectedData) {
+        _commentObject.textContent = "create CommentDiv";
+    }
+    _commentObject.appendTo(_commentContainer);
+    return _commentObject;
+}
+exports.createCommentObject = createCommentObject;
+//@auto-fold here
+function addEventToCommentContainer(commentContainer) {
+    commentContainer.addEventListener("click", function (e) {
+        e.stopPropagation();
+    });
+}
+exports.addEventToCommentContainer = addEventToCommentContainer;
+//@auto-fold here
+function addCommentController(_commentContainer) {
+    var controller = document.createElement("div");
+    controller.classList.add("commentController");
+    // add comment button
+    var addCommentButton = document.createElement("button");
+    addCommentButton.classList.add("addCommentButton");
+    addCommentButton.innerText = "add Comment";
+    addCommentButton.addEventListener("click", function (e) {
+        var newCommentField = _commentContainer.createCommentObject({ "name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase: true });
+        newCommentField.saveHTMLObjectToDatabase();
+    });
+    // delete comment button
+    var deleteCommentButton = document.createElement("button");
+    deleteCommentButton.classList.add("deleteCommentButton");
+    deleteCommentButton.innerText = "delete Comment";
+    deleteCommentButton.addEventListener("click", function (e) {
+        _commentContainer.deleteFromDatabase();
+    });
+    // add objects to htmlObject
+    controller.append(addCommentButton, deleteCommentButton);
+    _commentContainer.insertBefore(controller, _commentContainer.firstChild);
+}
+exports.addCommentController = addCommentController;
+
+},{"../GreatNoteClass/GreatNoteDataClass":54}],76:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.createCommunicationPanel = void 0;
+function createCommunicationPanel(socketData) {
+    // socketData = {"yourSocketId", "socketArray"}
+    var socketIdSet = new Set();
+    var communicationPanel = document.createElement("div");
+    communicationPanel.classList.add("communicationPanel");
+    communicationPanel.selfSocketId = socketData.yourSocketId;
+    communicationPanel.createRow = function (userId) {
+        if (!socketIdSet.has(userId)) {
+            var row = document.createElement("div");
+            row.setAttribute("userId", userId);
+            row.innerText = userId;
+            row.style.background = "pink";
+            communicationPanel.appendChild(row);
+            socketIdSet.add(userId);
+        }
+    };
+    communicationPanel.deleteRow = function (userId) {
+        socketIdSet["delete"](userId);
+        var targetRow = communicationPanel.querySelector("div[userId='" + userId + "']");
+        targetRow.remove();
+    };
+    communicationPanel.update = function (message) {
+        // message = action, targetSocketId
+        if (message.action == "connect") {
+            communicationPanel.createRow(message.targetSocketIds);
+        }
+        if (message.action == "disconnect") {
+            communicationPanel.deleteRow(message.targetSocketIds);
+        }
+    };
+    // intialize data
+    if (socketData.socketArray) {
+        socketData.socketArray.forEach(function (p) {
+            communicationPanel.createRow(p);
+        });
+        var panelContainer = document.querySelector(".panelContainer");
+        panelContainer.insertBefore(communicationPanel, panelContainer.firstChild);
+    }
+}
+exports.createCommunicationPanel = createCommunicationPanel;
+
+},{}],77:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.mainController = exports.MainController = void 0;
 var Automerge = __importStar(require("automerge"));
 var buildInitialPageHelperFunctions = __importStar(require("./buildInitialPageHelperFunctions"));
 var socketFunction_1 = require("./socketFunction");
 var databaseHelperFunction_1 = require("./databaseHelperFunction");
-var InitializeAttributeControllerFunction = __importStar(require("./attributeControllerFolder/initializeAttributeControllers"));
 var PageController = __importStar(require("./pageControllerFolder/pageController"));
-var MainDocArrayEnum;
-(function (MainDocArrayEnum) {
-    MainDocArrayEnum["mainArray_pageFull"] = "mainArray_pageFull";
-    MainDocArrayEnum["mainArray_pageOverview"] = "mainArray_pageOverview";
-    MainDocArrayEnum["mainArray_bookmark"] = "mainArray_bookmark";
-    MainDocArrayEnum["mainArray_panel"] = "mainArray_panel";
-    MainDocArrayEnum["mainArray_pokemon"] = "mainArray_pokemon";
-})(MainDocArrayEnum = exports.MainDocArrayEnum || (exports.MainDocArrayEnum = {}));
-var mainArrayData = {
-    "mainArray_pageFull": {
-        arrayID: "", arrayHTMLObject: "fullPageModeDiv"
-    },
-    "mainArray_pageOverview": {
-        arrayID: "", arrayHTMLObject: "overviewModeDiv"
-    },
-    "mainArray_bookmark": {
-        arrayID: "", arrayHTMLObject: "pageContentContainer"
-    },
-    "mainArray_panel": {
-        arrayID: "", arrayHTMLObject: "contentContainer"
-    },
-    "mainArray_pokemon": {
-        arrayID: "", arrayHTMLObject: "contentContainer"
-    }
-};
+var Setting = __importStar(require("./settings"));
+var mainControllerInterface_1 = require("./mainControllerFolder/mainControllerInterface");
+var MainControllerHelperFunction = __importStar(require("./mainControllerFolder/mainControllerHelperFunction"));
 var MainController = /** @class */ (function () {
     // *****************************
     // *     A. Initialization     *
@@ -27297,20 +28580,21 @@ var MainController = /** @class */ (function () {
         this.initializeRootArray();
         this.initalizeMainDoc();
         this.applyMainDocTemplate = false;
+        this.selectedObjectArray = [];
         this.pageCurrentStatus = {
             "pendingObject": {
                 "newPage": new Set(),
                 "newPageArray": []
             },
-            "fullPageSize": [1187, 720],
-            "overviewPageSize": [237.4, 144]
+            "fullPageSize": Setting.pageSizeInfo.fullPageSize,
+            "overviewPageSize": Setting.pageSizeInfo.overviewPageSize
         };
-        this.pageController = PageController.initializePageController();
+        this.pageController = PageController.initializePageController(this);
     }
     //@auto-fold here
     MainController.prototype.initializeRootArray = function () {
         this.mainDocArray = {};
-        for (var arrayName in MainDocArrayEnum) {
+        for (var arrayName in mainControllerInterface_1.MainDocArrayEnum) {
             this.mainDocArray[arrayName] = "";
         }
         this.baseArrayID = "";
@@ -27343,7 +28627,7 @@ var MainController = /** @class */ (function () {
             this_1.addData(this_1.baseArrayID, htmlObject);
         };
         var this_1 = this;
-        for (var arrayName in MainDocArrayEnum) {
+        for (var arrayName in mainControllerInterface_1.MainDocArrayEnum) {
             _loop_1(arrayName);
         }
         //@auto-fold here
@@ -27362,9 +28646,9 @@ var MainController = /** @class */ (function () {
     */
     //@auto-fold here
     MainController.prototype.addData = function (arrayID, htmlObject, insertPosition, dataPointer, specialCreationMessage) {
+        var _this = this;
         // Step 1: register an accessPointer in the database
         //@auto-fold here
-        var _this = this;
         var initializeMessage = { "action": "null", "objectID": "" };
         this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(initializeMessage), function (doc) {
             var arrayToBeAttachedTo = Automerge.getObjectById(doc, arrayID)["array"];
@@ -27424,8 +28708,7 @@ var MainController = /** @class */ (function () {
                 dataPointerObject["data"][key] = value;
             });
             var accessPointerObject = Automerge.getObjectById(_this.mainDoc, dataPointer);
-            Object.entries(htmlObjectData["stylesheet"])
-                .forEach(function (_a, _) {
+            Object.entries(htmlObjectData["stylesheet"]).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
                 dataPointerObject["stylesheet"][key] = value;
             });
@@ -27436,17 +28719,7 @@ var MainController = /** @class */ (function () {
     // **** can be deleted later
     MainController.prototype.createDummyData = function (data) {
         if (data === void 0) { data = {}; }
-        var _dummyData = {
-            "data": data,
-            "array": [],
-            "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-            "stylesheet": {},
-            "GNType": ""
-        };
-        var htmlObject = document.createElement("div");
-        htmlObject.style.width = "300px";
-        htmlObject.style.height = "200px";
-        return _dummyData;
+        MainControllerHelperFunction.createDummyData(data);
     };
     //@auto-fold here
     /** when ever the htmlObject is updated, we fetch newData from thfe HTMLObjectt, and then go to the database and update the relevant data*/
@@ -27479,9 +28752,38 @@ var MainController = /** @class */ (function () {
                 });
             }
         });
-        // console.log(322, "ask server to InitiateSynchronizatioj", new Date(), message)
-        socketFunction_1.socket.emit("clientAskServerToInitiateSynchronization");
+        // console.log(Automerge.getChanges(this.previousDoc, this.mainDoc))
+        this.sendChangeToServer();
     }; // saveHTMLObjectToDatabase
+    MainController.prototype.deleteFromDataBase = function (htmlObject) {
+        var _this = this;
+        if (htmlObject["parentNode"]) {
+            var accessPointer_1 = htmlObject.getAccessPointer();
+            var parentAccessPointer_1 = htmlObject["parentNode"].getAttribute("accessPointer");
+            // let parentAccessPointer = htmlObject.parentNode.getAccessPointer()
+            var deleteMessage = {
+                "action": "delete",
+                "objectID": accessPointer_1,
+                "parentHTMLObjectId": parentAccessPointer_1
+            };
+            this.mainDoc = Automerge.change(this.mainDoc, JSON.stringify(deleteMessage), function (doc) {
+                var parentObject = _this.getObjectById(parentAccessPointer_1, doc);
+                var targetObject = _this.getObjectById(accessPointer_1, doc);
+                var index = parentObject["array"].indexOf(targetObject);
+                if (index != -1)
+                    parentObject["array"].deleteAt(index);
+                // delete databaseObject
+            });
+            htmlObject.remove();
+            this.sendChangeToServer();
+        }
+    }; // deleteFromDataBase
+    MainController.prototype.sendChangeToServer = function () {
+        var changes = Automerge.getChanges(exports.mainController.previousDoc, exports.mainController.mainDoc);
+        exports.mainController.previousDoc = exports.mainController.mainDoc;
+        console.log("56: the changes are: ", changes);
+        socketFunction_1.socket.emit("clientSendChangesToServer", { "changeData": changes });
+    };
     // ******************************************
     // *     C. Access data in the database     *
     // ******************************************
@@ -27509,7 +28811,7 @@ var MainController = /** @class */ (function () {
         buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(this);
     }; // buildInitialHTMLSkeleton
     MainController.prototype.buildPageFromMainDoc = function () {
-        buildInitialPageHelperFunctions.buildInitialPage(this);
+        buildInitialPageHelperFunctions.buildInitialPage(this, false);
     }; // 2. buildPageFromMainDoc
     /** To accept data from the mainDoc file and then recreate the whole page according to the data stored in the database, not array, but the object includes array property */
     MainController.prototype.renderDataToHTML = function (data, arrayHTMLObject) {
@@ -27518,7 +28820,7 @@ var MainController = /** @class */ (function () {
         // cannot save any obeject to the data base here
         data["array"].forEach(function (p) {
             if (p.GNType == "GNComment") {
-                console.log("123, see a _commentContainer");
+                console.log(404, p.GNType);
                 newHTMLObject = _this.createGNObjectThroughName("GNComment", { name: "", injectedData: p });
                 arrayHTMLObject.appendChild(newHTMLObject);
                 return;
@@ -27534,10 +28836,9 @@ var MainController = /** @class */ (function () {
                 });
             }
             if (p.GNType == "GNContainerDiv") {
-                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
+                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, injectedData: p });
                 newHTMLObject._identity = p._identity;
                 var objectData = newHTMLObject.getDataFromDataBase();
-                newHTMLObject.applyStyle(objectData.stylesheet);
             }
             if (p.GNType == "GNSvgPolyLine") {
                 newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false });
@@ -27548,6 +28849,12 @@ var MainController = /** @class */ (function () {
                 var stylesheet = newPolylineData["stylesheet"];
                 newHTMLObject.applyStyle({ "stroke": stylesheet["stroke"], "stroke-width": stylesheet["stroke-width"], "fill": stylesheet["fill"] });
             }
+            if (p.GNType == "GNImageContainer") {
+                newHTMLObject = _this.GNDataStructureMapping["GNImageContainer"]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, imgsrc: p["data"]["src"] });
+                newHTMLObject._identity = p._identity;
+                newHTMLObject.setImageSize({ width: 500 });
+                newHTMLObject.setMovable();
+            }
             if (newHTMLObject) {
                 arrayHTMLObject.appendChild(newHTMLObject);
                 newHTMLObject.setAttribute("accessPointer", p._identity.accessPointer);
@@ -27556,8 +28863,8 @@ var MainController = /** @class */ (function () {
         });
     }; // 3. renderDataToHTML
     MainController.prototype.createGNObjectThroughName = function (objectName, createData) {
-        var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
-        return this.GNDataStructureMapping[objectName](name, arrayID, insertPosition, dataPointer, saveToDatabase);
+        var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, injectedData = createData.injectedData;
+        return this.GNDataStructureMapping[objectName](createData);
     }; // 4. createGNObjectThroughName
     //@auto-fold here
     MainController.prototype.saveMainDoc = function (sendRequest) {
@@ -27571,19 +28878,6 @@ var MainController = /** @class */ (function () {
             return saveData;
         }
     };
-    MainController.prototype.getLoadDataFromSocket = function () {
-        var loadData = false;
-        loadData = true;
-        // this.buildInitialHTMLSkeleton()
-        //
-        // if (loadData){
-        //     socket.emit("loadMainDoc", (response)=>{
-        //         console.log(375, this.mainDoc )
-        //         buildInitialPageHelperFunctions.buildInitialPage(this)
-        //       })
-        // }
-    };
-    //@auto-fold here
     //@auto-fold here
     MainController.prototype.loadMainDoc = function (data) {
         var _this = this;
@@ -27591,6 +28885,7 @@ var MainController = /** @class */ (function () {
         this.previousDoc = this.mainDoc;
         // to render the data ato HTML
         var rootArray = this.mainDoc["array"];
+        console.log(rootArray, this.mainDoc);
         rootArray.forEach(function (mainArray) {
             // update the ID of the mainArray
             var arrayName = mainArray["data"]["name"];
@@ -27599,29 +28894,29 @@ var MainController = /** @class */ (function () {
         });
     }; // loadMain
     MainController.prototype.processChangeData = function (changeDataArray) {
+        // processChangeData(changeDataArray:Set<string>){
         var _this = this;
-        var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p); });
-        console.log("476----", jsonfiedChangeDataArray);
-        if (jsonfiedChangeDataArray.length == 1) {
-            document.querySelector(".logField").style.background = "red";
-            console.log(1234, "========= fuck fuck fuck fuck fuck , ther is only one lenght");
-        }
+        // console.log(507, changeDataArray)//
+        var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p["message"]); });
+        // console.log(509, jsonfiedChangeDataArray)
+        // if (changeDataArray.length == 1){
         jsonfiedChangeDataArray.forEach(function (p) {
             var changeData = p;
             if (changeData.action == "create") {
                 databaseHelperFunction_1.processCreationDataHelper(_this, changeData);
-                console.log("4853, processing change", p);
-                console.log(_this.getHtmlObjectByID(p.objectID));
-                console.log(_this.getHtmlObjectByID(p.parentHTMLObjectId));
             } // create
             if (changeData.action == "update") {
                 var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
-                // console.log(457, _object, changeData.objectID)
                 if (_object) {
                     var objectData = exports.mainController.getObjectById(changeData.objectID);
+                    console.log(520520, _object);
                     _object.reloadDataFromDatabase();
                 }
             } // update
+            if (changeData.action == "delete") {
+                var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                _object.remove();
+            }
         }); // aaforEach
     };
     return MainController;
@@ -27633,22 +28928,10 @@ exports.mainController = new MainController();
 //
 var ToolBoxModel = __importStar(require("./ToolboxModel"));
 exports.mainController.toolBox = new ToolBoxModel.ToolBoxClass();
-//
 // to create the attributeControllers
-//
-var panelContainer = document.querySelector(".panelContainer");
-InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(exports.mainController);
-Object.values(exports.mainController.attributeControllerMapping).forEach(function (p) {
-    panelContainer.appendChild(p);
-});
-//
-// mainController.getLoadDataFromSocket()
-//
-socketFunction_1.socket.emit("initialDataRequest");
-// buildInitialPageHelperFunctions.buildInitialHTMLSkeleton(mainController)
-// buildInitialPageHelperFunctions.buildInitialPage()
+socketFunction_1.socket.emit("initialDataRequest"); // processInitialData
 
-},{"./ToolboxModel":51,"./attributeControllerFolder/initializeAttributeControllers":56,"./buildInitialPageHelperFunctions":58,"./databaseHelperFunction":61,"./pageControllerFolder/pageController":64,"./socketFunction":66,"automerge":1}],61:[function(require,module,exports){
+},{"./ToolboxModel":66,"./buildInitialPageHelperFunctions":72,"./databaseHelperFunction":78,"./mainControllerFolder/mainControllerHelperFunction":80,"./mainControllerFolder/mainControllerInterface":81,"./pageControllerFolder/pageController":83,"./settings":86,"./socketFunction":87,"automerge":1}],78:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27748,7 +29031,12 @@ function processCreationDataHelper(mainController, creationData) {
             } // if special Creation Message
             if (!creationData.specialCreationMessage) {
                 if (objectData && objectData.GNType) {
-                    newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+                    if (objectData.GNType == "GNImageContainer") {
+                        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false, imgsrc: objectData["data"].src });
+                    }
+                    else {
+                        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+                    }
                     console.log(newHTMLObject);
                     newHTMLObject.initializeHTMLObjectFromData(objectData);
                     parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId);
@@ -27774,42 +29062,17 @@ function changeEventGenerator(array) {
     });
 }
 exports.changeEventGenerator = changeEventGenerator;
-var logContent = document.querySelector(".logContent");
-logContent.style.overflowY = "scroll";
-var color = ["pink", "orange", "red", "lightgreen", "Aliceblue"];
-var index = 0;
 function processNewChangeData(mainController, generator, awaitmessage) {
     if (awaitmessage === void 0) { awaitmessage = false; }
     return __awaiter(this, void 0, void 0, function () {
-        var generatorStatus, changeData, logDate, logDiv, logAction, logObjectID, logParentObject, logHR, updateFinished, _object, objectData;
+        var generatorStatus, changeData, updateFinished, _object, objectData;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     generatorStatus = generator.next();
                     if (!!generatorStatus.done) return [3 /*break*/, 4];
                     changeData = generatorStatus.value;
-                    logDate = document.createElement("div");
-                    logDiv = document.createElement("div");
-                    logAction = document.createElement("div");
-                    logObjectID = document.createElement("div");
-                    logParentObject = document.createElement("div");
-                    logHR = document.createElement("hr");
-                    logDiv.append(logDate, logAction, logObjectID, logParentObject, logHR);
-                    if (changeData.action == "null") {
-                        logDiv.style.background = "grey";
-                    }
-                    else if (changeData.action == "create") {
-                        logDiv.style.background = "pink";
-                    }
-                    else if (changeData.action == "update") {
-                        logDiv.style.background = "orange";
-                    }
-                    logContent.insertBefore(logDiv, logContent.firstChild);
                     updateFinished = void 0;
-                    logDate.innerText = "date: " + new Date();
-                    logAction.innerText = "action: " + changeData.action;
-                    logObjectID.innerText = "objectID: " + changeData.objectID;
-                    logParentObject.innerText = "parentId: " + changeData.parentHTMLObjectId;
                     if (changeData.action == "null") {
                         processNewChangeData(mainController, generator, updateFinished);
                     }
@@ -27828,8 +29091,11 @@ function processNewChangeData(mainController, generator, awaitmessage) {
                 case 2:
                     if (!(changeData.action == "update")) return [3 /*break*/, 4];
                     _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                    console.log("83 The html object is  ", _object);
+                    console.log(457, _object, changeData.objectID);
                     objectData = mainController.getObjectById(changeData.objectID);
                     if (!_object) return [3 /*break*/, 4];
+                    console.log(939393, _object);
                     _object.reloadDataFromDatabase();
                     return [4 /*yield*/, objectData
                         // console.log("71717171========THis is await finished message", updateFinished)
@@ -27846,7 +29112,7 @@ function processNewChangeData(mainController, generator, awaitmessage) {
 }
 exports.processNewChangeData = processNewChangeData;
 
-},{"./pageViewHelperFunction":65}],62:[function(require,module,exports){
+},{"./pageViewHelperFunction":85}],79:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27868,93 +29134,220 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.buildLayerContentFunction = exports.showCurrentPageButtonFunction = exports.createLayerController = void 0;
-var GreatNoteDataClass = __importStar(require("../GreatNoteDataClass"));
-var GreatNoteSvgDataClass = __importStar(require("../GreatNoteSvgDataClass"));
+exports.buildLayerContentFunction = exports.showCurrentPageButtonFunction = exports.createLayerController = exports.switchStatus = void 0;
+var GreatNoteDataClass = __importStar(require("../GreatNoteClass/GreatNoteDataClass"));
+var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
+var layerRowTemplate = document.querySelector("#layerRowTemplate");
+function switchStatus(item) {
+    var currentStatus = item.getAttribute("status");
+    var newStatus = currentStatus == "on" ? "off" : "on";
+    item.setAttribute("status", newStatus);
+    return newStatus;
+}
+exports.switchStatus = switchStatus;
 // ** make the layer controller panel so that you can add new div / new svg layer
 function createLayerController(mainController) {
-    // layerController
+    // layerController HTML part
     var layerControllerTemplate = document.querySelector("#layerControllerTemplate");
     var layerControllerHTMLObject = layerControllerTemplate["content"].cloneNode(true);
     var layerView = layerControllerHTMLObject.querySelector(".layerView");
     var addDivLayerButton = layerControllerHTMLObject.querySelector(".addDivLayerButton");
     addDivLayerButton.addEventListener("click", function (e) {
-        console.log("15, The event detail is ", e.detail);
-        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
-        var divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
-        divLayer.applyStyle({ width: "100%", height: "100%", background: "blue", "position": "absolute", "left": "0px", "right": "0px" });
-        divLayer.classList.add("divLayer");
-        divLayer.appendTo(currentPage);
+        layerControllerHTMLObject.addDivLayer(e);
     }, { detail: { "run": 12345 } });
     var addSvgLayerButton = layerControllerHTMLObject.querySelector(".addSvgLayerButton");
-    addSvgLayerButton.addEventListener("click", function () {
-        console.log("add a new svg layer");
-        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
-        var svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
-        console.log(mainController.toolBox.registerSvg);
-        mainController.toolBox.registerSvg(svgLayer);
-        svgLayer.applyStyle({ width: "100%", height: "100%", background: "gold", position: "absolute", left: "0px", top: "0px" });
-        mainController.saveHTMLObjectToDatabase(svgLayer);
-        console.log(svgLayer);
-        svgLayer.classList.add("svgLayer");
-        svgLayer.appendTo(currentPage);
+    addSvgLayerButton.addEventListener("click", function (e) {
+        layerControllerHTMLObject.addSvgLayer(e);
     }); // addSvgLayerButton.addEventListener
     var showCurrentPageButton = layerControllerHTMLObject.querySelector(".showCurrentPageButton");
     showCurrentPageButton.addEventListener("click", function () {
         showCurrentPageButtonFunction(mainController, layerView);
     });
+    //
+    // layerControllerHTMLObject functions
+    //
+    layerControllerHTMLObject.renderCurrentPageLayer = function () {
+        showCurrentPageButtonFunction(mainController, layerView);
+    };
+    layerControllerHTMLObject.addDivLayer = function (e) {
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
+        var divLayer = GreatNoteDataClass.GNContainerDiv({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true, specialCreationMessage: "divLayer" });
+        divLayer.applyStyle({ width: "100%", height: "100%", background: "lightblue", "position": "absolute", "left": "0px", "top": "0px" });
+        mainController.saveHTMLObjectToDatabase(divLayer);
+        divLayer.classList.add("divLayer");
+        divLayer.appendTo(currentPage);
+        layerControllerHTMLObject.renderCurrentPageLayer();
+    };
+    layerControllerHTMLObject.addSvgLayer = function (e) {
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
+        var svgLayer = GreatNoteSvgDataClass.GNSvg({ name: "", arrayID: currentPage.getAccessPointer(), saveToDatabase: true });
+        mainController.toolBox.registerSvg(svgLayer);
+        svgLayer.applyStyle({ width: "100%", height: "100%", background: "gold", position: "absolute", left: "0px", top: "0px" });
+        mainController.saveHTMLObjectToDatabase(svgLayer);
+        svgLayer.classList.add("svgLayer");
+        svgLayer.appendTo(currentPage);
+        layerControllerHTMLObject.renderCurrentPageLayer();
+    };
+    mainController.layerController = layerControllerHTMLObject;
     return layerControllerHTMLObject;
 }
 exports.createLayerController = createLayerController;
 function showCurrentPageButtonFunction(mainController, layerView) {
     layerView.innerHTML = "";
-    var currentPageData = mainController.pageController.currentPage.getDataFromDataBase();
-    var layerObject = buildLayerContentFunction(currentPageData);
-    console.log(layerObject);
+    var currentPageData = mainController.pageController.currentPage.fullPageHTMLObject.getDataFromDataBase();
+    var layerObject = buildLayerContentFunction(mainController, currentPageData, layerView);
     layerView.appendChild(layerObject);
+    // layerObject.querySelector("span").style.background = "white"
 }
 exports.showCurrentPageButtonFunction = showCurrentPageButtonFunction;
 //** aa funciton to build a list of items in a page so that tthey can be shown in the layer panel for switch on and off and lock the layer
-function buildLayerContentFunction(currentPageData, layerLevel) {
+function buildLayerContentFunction(mainController, currentPageData, layerView, layerLevel) {
     if (layerLevel === void 0) { layerLevel = 0; }
     // first create an item object that conatin the information of the layerLeevel and pageAccessPointer
     // pageAccessPointer is used for finding the related HTML obejct show that you can manipulate them
     var item = document.createElement("div");
-    item.style.marginLeft = layerLevel * 10 + "px";
-    item.innerText = currentPageData.GNType;
+    item.classList.add("layerLevel");
+    var itemRow = layerRowTemplate.content.cloneNode(true)
+        .querySelector(".layerRow");
+    itemRow.setAttribute("layerLevel", layerLevel.toString());
+    var itemViewSwitch = itemRow.querySelector(".viewSwitch");
+    var itemRowName = itemRow.querySelector(".viewName");
+    var itemExpandSwitch = itemRow.querySelector(".expandSwitch");
+    item.appendChild(itemRow);
     item.setAttribute("layerLevel", layerLevel.toString());
-    layerLevel += 1;
+    if (layerLevel == 0)
+        itemRow.style.display = "none";
+    if (layerLevel > 1)
+        item.setAttribute("status", "off");
+    for (var i = 0; i < layerLevel; i++) {
+        itemRowName.innerText += "-";
+    }
+    itemRowName.innerText += currentPageData.GNType;
+    addItemRowFunction(layerView, itemRow);
     // add click event to the item object to change the style of the related html objec tin that page
     item.setAttribute("pageAccessPointer", currentPageData._identity.accessPointer);
-    item.addEventListener("click", function (e) {
+    // the event on the three buttons
+    itemViewSwitch.addEventListener("click", function (e) {
         e.stopPropagation();
         var relatedHTMLObject = document.querySelector("*[accessPointer='" + currentPageData._identity.accessPointer + "']");
+        mainController.toolBox.targetPage = relatedHTMLObject;
         // to test if the style is visible or not
         relatedHTMLObject.style.visibility = (relatedHTMLObject.style.visibility == "hidden") ? "inherit" : "hidden";
+        switchStatus(itemViewSwitch);
+    });
+    itemExpandSwitch.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var newStatus = switchStatus(itemExpandSwitch);
+        var targetItem = Array.from(item.querySelectorAll(".layerLevel[layerlevel='" + layerLevel + "']"));
+        targetItem.forEach(function (p) { return p.setAttribute("status", newStatus); });
+    });
+    itemRowName.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var selectedRow = layerView.querySelector(".selectedRow");
+        if (selectedRow)
+            selectedRow.classList.remove("selectedRow");
+        itemRow.classList.add("selectedRow");
     });
     // to
+    layerLevel += 1;
     if (currentPageData.array.length > 0) {
         currentPageData.array.forEach(function (p) {
-            item.appendChild(buildLayerContentFunction(p, layerLevel));
+            item.appendChild(buildLayerContentFunction(mainController, p, layerView, layerLevel));
         });
     }
     return item;
 }
 exports.buildLayerContentFunction = buildLayerContentFunction;
+function addItemRowFunction(layerView, itemRow) {
+    itemRow.addEventListener("click", function () {
+        var selectedRow = layerView.querySelector(".selectedRow");
+        if (selectedRow)
+            selectedRow.classList.remove("selectedRow");
+        itemRow.classList.add("selectedRow");
+    });
+}
 
-},{"../GreatNoteDataClass":46,"../GreatNoteSvgDataClass":48}],63:[function(require,module,exports){
-// import * as Automerge from 'automerge'
-// import {mainController} from "./constructInitialCondition"
-// import * as GreatNoteDataClass from "./GreatNoteDataClass"
-// let pkmDatabase = [{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cf47f9fac4ed3037ff2a8ea83204e32aff8fb5f3.png","number":"001","name":"妙蛙種子","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3245e4f8c04aa0619cb31884dbf123c6918b3700.png","number":"002","name":"妙蛙草","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0186d64c5773c8d3d03cd05dc79574b2d2798d4f.png","number":"003","name":"妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3bfcc4360c44f37815dc1e59f75818935cbfc41b.png","number":"003","name":"超級妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6b55babb3825ef9fa9e5d9ff44a14bdb8406ce97.png","number":"003","name":"妙蛙花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d0ee81f16175c97770192fb691fdda8da1f4f349.png","number":"004","name":"小火龍","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/285395ca77d82861fd30cea64567021a50c1169c.png","number":"005","name":"火恐龍","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2050f1fd1283f473d7d048f8631712e7e003f802.png","number":"006","name":"噴火龍","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ca3db4aad5c85a525d9be86852b26db1db7a22c0.png","number":"006","name":"超級噴火龍Ｘ","type":"火, 龍"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0aa78a0061bda9d88cbb0bbf739cd9cc56522fe9.png","number":"006","name":"超級噴火龍Ｙ","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fd12098f15628cce80d411e090189aeb7d758ff.png","number":"006","name":"噴火龍","type":"火, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5794f0251b1180998d72d1f8568239620ff5279c.png","number":"007","name":"傑尼龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a3bc17e6215031332462cc64e59b7922ddd14b91.png","number":"008","name":"卡咪龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2fe157db59153af8abd636ab03c7df6f28b08242.png","number":"009","name":"水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00186af714a048895ba8116e71b08671c3cfb8f5.png","number":"009","name":"超級水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/50eba0f85c4e9a039be078e7de0b10acc7323264.png","number":"009","name":"水箭龜","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/68f0cec6bcba20a0c53db3d8cfce81bd319d2c82.png","number":"010","name":"綠毛蟲","type":"蟲"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/05fd4676fa4a4b58288510a97a5211e066e02464.png","number":"011","name":"鐵甲蛹","type":"蟲"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eacd20285cb634ba9fea41fc0fa13871c2fcbc66.png","number":"012","name":"巴大蝶","type":"蟲, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b76026363e301dbd8ac3f084e7d242232c46c95f.png","number":"012","name":"巴大蝶","type":"蟲, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5ae74d403ec682eaf13e066850afd4b0c20d85f7.png","number":"013","name":"獨角蟲","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd41f31a3c97f1f9d998361b125362584873157b.png","number":"014","name":"鐵殼蛹","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/70f4206271b72492c9ba71d708d6183a80ba0e96.png","number":"015","name":"大針蜂","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e12ce48ab99b2df6fbbc1e97038c4f6e192d09d7.png","number":"015","name":"超級大針蜂","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0e7c6e616404c683f00701b591eeab56e465641a.png","number":"016","name":"波波","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a2935587b7c61e6e6da88da3578d700c133246e5.png","number":"017","name":"比比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/01e13954dff668c1420407c98b308c81b83f6dda.png","number":"018","name":"大比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dd6ab4ce8e7d05fb74e50cf66764e3ed8e11a097.png","number":"018","name":"超級大比鳥","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e4b38ab7545ebd938154d9aed9502cb068569d6.png","number":"019","name":"小拉達","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3567693e3479fb0cf15b9ec84ee8a033aa7b4310.png","number":"019","name":"小拉達","type":"惡, 一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e97c62e4e4b46017be60806d00f4d389d003f115.png","number":"020","name":"拉達","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a30454b7040a4a517bfe0914777e2e7c045f6c65.png","number":"020","name":"拉達","type":"惡, 一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e815cb4b8ba9c2d0841dfa364c87164880944e3a.png","number":"021","name":"烈雀","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b326a6f77b73b3c250ba95f3a97fc21b28c8f4b.png","number":"022","name":"大嘴雀","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ad90ec632849d032615d707ebe8ad741651eee06.png","number":"023","name":"阿柏蛇","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/eb3c14ed44c1e4a2ba4c2d7970cddf07cd8ef67f.png","number":"024","name":"阿柏怪","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b3f6ff00db7a1efae21d85cfb8995eaff2da8d8.png","number":"025","name":"皮卡丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a90881f103830615ee7f85e16fe9f586d41f2332.png","number":"025","name":"皮卡丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9c28defa939e230800ec0d0c421d9f82c60df77a.png","number":"026","name":"雷丘","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8be55a3ff2b24890fac0b9e2415dda9d0f893c1f.png","number":"026","name":"雷丘","type":"電, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f5fcf7a292a180320138ace7235f8a2c16f6594a.png","number":"027","name":"穿山鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d9ea1612a6ec53ba12e2d9abe28f99e66021bde1.png","number":"027","name":"穿山鼠","type":"冰, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d00d72f082b7dae546fa8bd5cf09fcfe53ffcae8.png","number":"028","name":"穿山王","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc154af4dcd20d14aba494a6a679f528bb9f3d6d.png","number":"028","name":"穿山王","type":"冰, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/14179c8ab9c2003fc5b27a29e91e4cd195283d52.png","number":"029","name":"尼多蘭","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fed980fd2341745923812e9dcd88a039aaaf36ea.png","number":"030","name":"尼多娜","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5174a41a9db00baf5dd664c92a12254b0baa5fde.png","number":"031","name":"尼多后","type":"毒, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/237579eaf2141edad61d647c62f074d53653337b.png","number":"032","name":"尼多朗","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3d8e45646fb05516dff845922c3d62d9aa33cbe.png","number":"033","name":"尼多力諾","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ce24d9eb27f4e554ea5bd29840a35957f7bd9d30.png","number":"034","name":"尼多王","type":"毒, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/18e9dc86ced1320d6846f2c192c4eb04e517963a.png","number":"035","name":"皮皮","type":"妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1865f85f9e417522f8de1a239fbff27f2106783b.png","number":"036","name":"皮可西","type":"妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f285c634efd141918f6ad066a6f59c20746d9050.png","number":"037","name":"六尾","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/89719dbcbddd11a1e6bc5f4366e00910a04eaf9f.png","number":"037","name":"六尾","type":"冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cc96e6a4eee980724ebd725bb8785334d3290074.png","number":"038","name":"九尾","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/397b20ea73c8358185d6f1d2971b5825b0cb0baf.png","number":"038","name":"九尾","type":"冰, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7a2bec0dd522d66353f0cf3df9148070456a3349.png","number":"039","name":"胖丁","type":"一般, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b3724395d41de1d0def948966c69148bd9f0f9c1.png","number":"040","name":"胖可丁","type":"一般, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d54b9d9cefa287ea258517537ba26f4103dda36.png","number":"041","name":"超音蝠","type":"毒, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cedbf9afd3155d3df1e2ffebf049902598ebd74b.png","number":"042","name":"大嘴蝠","type":"毒, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6bad448cb0997a928b94e72b67eacb861271f796.png","number":"043","name":"走路草","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/62973d0fc5f9bd5d8c819b8c885bd1f216983ff1.png","number":"044","name":"臭臭花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a95af5f577260373074117cb756e5ea38cd674ef.png","number":"045","name":"霸王花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/837bcac8efc9329d9e3b9e46e95670a5d493b60a.png","number":"046","name":"派拉斯","type":"蟲, 草"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e5838e76eb33d88601ba9d6e045e1bdf7e20f46a.png","number":"047","name":"派拉斯特","type":"蟲, 草"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8b550ab54d22a87dc784ee1af6cff4ad33aa10a2.png","number":"048","name":"毛球","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c57d464a64424f031a9872f2ec3f7c0b8052d3c1.png","number":"049","name":"摩魯蛾","type":"蟲, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/583fa625d6fda586a5734f5f9e455952aa6af15f.png","number":"050","name":"地鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/19bd3a09933b3e9a0a7156ef294091922dbf771e.png","number":"050","name":"地鼠","type":"地面, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de7c2ea1a9f39427b4732a6122284f257f9e87aa.png","number":"051","name":"三地鼠","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ba9403c475a889eadffb71b6cceae6e13c91a8e.png","number":"051","name":"三地鼠","type":"地面, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ea01871238908780334293e6407033650d803a9.png","number":"052","name":"喵喵","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57a0c88227aa0fe2327d79af31eb9516d4728752.png","number":"052","name":"喵喵","type":"惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/704fc0cde74c862f2063faefcf40eb67752a8637.png","number":"052","name":"喵喵","type":"鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/bff57f3b31012cef1da149224a84180492f90ed4.png","number":"052","name":"喵喵","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8da0bb6b5587f2150f41b08e0d61a80827d7229f.png","number":"053","name":"貓老大","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4341e35269528c91e75b6516b820804a37d9eebf.png","number":"053","name":"貓老大","type":"惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0783062d0d860b8ae7d8e859241a700359c4d981.png","number":"054","name":"可達鴨","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0dd5b6e921f55c5d49978b84ee66e458336518ae.png","number":"055","name":"哥達鴨","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/00fb5703d7c2b7a89933bbed89f4c84e48c59ea2.png","number":"056","name":"猴怪","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/37a3edfcf9c5cbdb68bcf8945ff89fe2999e5a30.png","number":"057","name":"火爆猴","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/333e2aef290059dc46274b77ea4095094784316a.png","number":"058","name":"卡蒂狗","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7ef9e71e9dc624e5558d7b4619f75ea8659eff55.png","number":"059","name":"風速狗","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8e8d47c5af6084904793496ddddb3e5f516e79f7.png","number":"060","name":"蚊香蝌蚪","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/7e16ace7443d45cc1def215c8cf82beefc69041c.png","number":"061","name":"蚊香君","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/da2fce266d1c13743742451617b2976d6bfd483d.png","number":"062","name":"蚊香泳士","type":"水, 格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5d05e6f2393a6a72fb36da26a79fd3db95ae7412.png","number":"063","name":"凱西","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/96613b8fe63edfdf800cde823078fadc6ea9aae9.png","number":"064","name":"勇基拉","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/265d42cf68deea0a54dacf3a4f1953198f55ad53.png","number":"065","name":"胡地","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6ef57b70dc74663cc1c203d7006e69cbad6bb15f.png","number":"065","name":"超級胡地","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/0074c7d90ce7d2a6926d28fe777d2bcb0b4ccb0b.png","number":"066","name":"腕力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/634e1c205ab72071fe941043f816a9e2f31db3ae.png","number":"067","name":"豪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8f2f69ae05bd6c76f0d6fe6d03f1e22ec1a8010a.png","number":"068","name":"怪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/aae2243d7c93e2cba33b000fbd92fcb050157d4e.png","number":"068","name":"怪力","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47ae88a63c66e32e957da303ad50b72268e097e4.png","number":"069","name":"喇叭芽","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b19541cee78bc2a00eb3f59f7a2fcca67469eb78.png","number":"070","name":"口呆花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f010b09344a212ecb98c6f209233c0661db0e7a8.png","number":"071","name":"大食花","type":"草, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3da5f9c26f39884f5f44a861e6965fdc1722241b.png","number":"072","name":"瑪瑙水母","type":"水, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e8720bf3fe40182141dc5f442f5fb83eff544a6e.png","number":"073","name":"毒刺水母","type":"水, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4b483c95c2124018519380eaa06cc657c5b76a64.png","number":"074","name":"小拳石","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c8870cfb5aae00c6b70d6550721b5bf51c73bf52.png","number":"074","name":"小拳石","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/f3ae64c5acf41a159e07b63da847cccc773bb184.png","number":"075","name":"隆隆石","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c91fbd40a228a6caa5f9b128715790fd536be2d6.png","number":"075","name":"隆隆石","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/02fb8976b07089e975a9911ae2ff1327b5e3340d.png","number":"076","name":"隆隆岩","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b7df1424a881e4d3232e6dd0ebc9d1908309e588.png","number":"076","name":"隆隆岩","type":"岩石, 電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/dacab2be1777c14ed7da12824dd85c2cdbd2ebf9.png","number":"077","name":"小火馬","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5dc1659954564f3015fc72060bbd87b98808aed4.png","number":"077","name":"小火馬","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cb874883fcffc227e8d065e275221e1e05ece46c.png","number":"078","name":"烈焰馬","type":"火"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ef678c969aef014b48cf390e0e04e3f0096020c9.png","number":"078","name":"烈焰馬","type":"超能力, 妖精"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/441132f5cdf87b0e46f96952f16c2dfc75911054.png","number":"079","name":"呆呆獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/e1c9ec78e7a009185df15c4defd0db6b0c1a5727.png","number":"079","name":"呆呆獸","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4d93d1171a1b9551989b17b4ae6838e4e9e98378.png","number":"080","name":"呆殼獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b4ff1375aa8d23aff0cc09a2f96773fbdd8e3843.png","number":"080","name":"超級呆殼獸","type":"水, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3862fc122debc9675749142a7c76f1a64dbbc60d.png","number":"080","name":"呆殼獸","type":"毒, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/8dfff91e7e39b06d0a9fcfb414565b25de55bdf1.png","number":"081","name":"小磁怪","type":"電, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5f8732c548e90780b660f65926e5567755aa2a6c.png","number":"082","name":"三合一磁怪","type":"電, 鋼"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/810c4dc60ff4f315216717a2ecaa3c7dfe3fcf09.png","number":"083","name":"大蔥鴨","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47201403d2e427655cb49df00895018ef8d750fd.png","number":"083","name":"大蔥鴨","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/63ff86cee884446925e664d99b82e3e8de988412.png","number":"084","name":"嘟嘟","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/de41d6a29c38d65f1f39bc5ecb3afe30c5e057eb.png","number":"085","name":"嘟嘟利","type":"一般, 飛行"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fc1342f9b5bc761333a44d74dc47ba0ff30ad6c8.png","number":"086","name":"小海獅","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2a2e293a8524ac94136bada7346ddfe57e12e47e.png","number":"087","name":"白海獅","type":"水, 冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/57f22ceb2f8765f927ff3fd1f4b4bf52a7033097.png","number":"088","name":"臭泥","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/61096756c8bfed61fbcc938bd3d964012f00cc89.png","number":"088","name":"臭泥","type":"毒, 惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/db91b8849e602828aaff3939f9e0816dd9ce92ab.png","number":"089","name":"臭臭泥","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d83b601f999b3df4c958c5e5bc8f1e5b21b2594b.png","number":"089","name":"臭臭泥","type":"毒, 惡"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/36918010e6d91103c9017f4ce4d1764c9f145db8.png","number":"090","name":"大舌貝","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/d5ebac9e1afe16f2a1d16a7593e022fc576aed9e.png","number":"091","name":"刺甲貝","type":"水, 冰"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/5c619391fb78cbe0d3646a9b76da07372a18580e.png","number":"092","name":"鬼斯","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/b8bcfb490b9a54a7cfc607ac82f413f4e582cb56.png","number":"093","name":"鬼斯通","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/47549471dc54feb8acd4b3de3a27ea8e9e9fd25c.png","number":"094","name":"耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/933fa0ef096191382ab20f5d6597ac7f8fbe336a.png","number":"094","name":"超級耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd3052b825dd7dc2d4f78043ecd94b57f9cad36a.png","number":"094","name":"耿鬼","type":"幽靈, 毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/134d26303c22ac0e0173bdf5121a3a3aae10e36c.png","number":"095","name":"大岩蛇","type":"岩石, 地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1d82671099cdd52c4a0b84724d72033d305538bd.png","number":"096","name":"催眠貘","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/9d0915f92dac45eca21a50d63799abe53404f7d4.png","number":"097","name":"引夢貘人","type":"超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/15ec38c5c458545368bf8e85da77d49f4b09104d.png","number":"098","name":"大鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/04f0bfa98547db408430513e07a15e3655095dca.png","number":"099","name":"巨鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/416c9cf7dbb527e3eac9d3b1eff2a98e03016087.png","number":"099","name":"巨鉗蟹","type":"水"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cfa3cfb38563c9afdb4d6fac40607fa78db97721.png","number":"100","name":"霹靂電球","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/823f1e2536f6036d7423f17fa4969ecd7cf08e00.png","number":"101","name":"頑皮雷彈","type":"電"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/2b23bf26e6063e8fe37a5122a112abb1a475b052.png","number":"102","name":"蛋蛋","type":"草, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/a17a1d3fbeeba958495697c23b287b1966fd11dc.png","number":"103","name":"椰蛋樹","type":"草, 超能力"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/12017db6ac167715bbdc052ec40ae093e8cb7b7c.png","number":"103","name":"椰蛋樹","type":"草, 龍"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c44a0ccb922bbb4345214f3fa0b9436a03c11f2.png","number":"104","name":"卡拉卡拉","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/1a2a79bce9b5c63de4d6db9b895a34ce6bf6733d.png","number":"105","name":"嘎啦嘎啦","type":"地面"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/cce0a0732b1db5e9efba7effa7c51020ed94de60.png","number":"105","name":"嘎啦嘎啦","type":"火, 幽靈"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/3e864b76679d4c2d1e46878dc241e06bdb8f8d1d.png","number":"106","name":"飛腿郎","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/6c57fef755afbd6ddda7f3c21f20bb38159494c6.png","number":"107","name":"快拳郎","type":"格鬥"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fe41bccc4b1fd3c2ab748d09a157e3c0c28c7700.png","number":"108","name":"大舌頭","type":"一般"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/fd10b57c1ac95c00638aed70b4a41d679e9af2b6.png","number":"109","name":"瓦斯彈","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/4c76d556bda94f8eb8b73a9e58ef051262e78b7d.png","number":"110","name":"雙彈瓦斯","type":"毒"},{"image":"https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/c89593cd44d8354c16c11f5fa10143a6a8b4ab1f.png","number":"110","name":"雙彈瓦斯","type":"毒, 妖精"}]
+},{"../GreatNoteClass/GreatNoteDataClass":54,"../GreatNoteClass/GreatNoteSvgDataClass":57}],80:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.createDummyData = void 0;
+function createDummyData(data) {
+    var _dummyData = {
+        "data": data,
+        "array": [],
+        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
+        "stylesheet": {},
+        "GNType": ""
+    };
+    var htmlObject = document.createElement("div");
+    htmlObject.style.width = "300px";
+    htmlObject.style.height = "200px";
+    return _dummyData;
+}
+exports.createDummyData = createDummyData;
 
-},{}],64:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.MainDocArrayEnum = exports.mainArrayData = void 0;
+exports.mainArrayData = {
+    "mainArray_pageFull": {
+        arrayID: "", arrayHTMLObject: "fullPageModeDiv"
+    },
+    "mainArray_pageOverview": {
+        arrayID: "", arrayHTMLObject: "overviewModeDiv"
+    },
+    "mainArray_bookmark": {
+        arrayID: "", arrayHTMLObject: "pageContentContainer"
+    },
+    "mainArray_panel": {
+        arrayID: "", arrayHTMLObject: "contentContainer"
+    },
+    "mainArray_pokemon": {
+        arrayID: "", arrayHTMLObject: "contentContainer"
+    }
+};
+var MainDocArrayEnum;
+(function (MainDocArrayEnum) {
+    MainDocArrayEnum["mainArray_pageFull"] = "mainArray_pageFull";
+    MainDocArrayEnum["mainArray_pageOverview"] = "mainArray_pageOverview";
+    MainDocArrayEnum["mainArray_bookmark"] = "mainArray_bookmark";
+    MainDocArrayEnum["mainArray_panel"] = "mainArray_panel";
+    MainDocArrayEnum["mainArray_pokemon"] = "mainArray_pokemon";
+})(MainDocArrayEnum = exports.MainDocArrayEnum || (exports.MainDocArrayEnum = {}));
+
+},{}],82:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.addItemToCreatePopUpBox = exports.createPopUpBox = void 0;
+function createPopUpBox() {
+    var popUpBox = document.createElement("div");
+    popUpBox.classList.add("popUpBox");
+    addItemToCreatePopUpBox(popUpBox, "delete", function () { return popUpBox.remove(); });
+    addItemToCreatePopUpBox(popUpBox, "delete", function () { return popUpBox.remove(); });
+    addItemToCreatePopUpBox(popUpBox, "delete", function () { return popUpBox.remove(); });
+    addItemToCreatePopUpBox(popUpBox, "delete", function () { return popUpBox.remove(); });
+    return popUpBox;
+}
+exports.createPopUpBox = createPopUpBox;
+function addItemToCreatePopUpBox(popUpBox, name, buttonFunction) {
+    var button = document.createElement("div");
+    button.classList.add("popUpBoxButton");
+    button.textContent = name;
+    button.addEventListener("click", function (e) {
+        buttonFunction();
+    });
+    popUpBox.appendChild(button);
+}
+exports.addItemToCreatePopUpBox = addItemToCreatePopUpBox;
+
+},{}],83:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.highlightCurrentPageInOverviewMode = exports.pageControllerHTMLObject = exports.initializePageController = void 0;
-function initializePageController() {
-    var startPage = { "previous": null, "next": null, pageNumber: 0 };
-    var endPage = { "previous": startPage, "next": null, pageNumber: 1 };
+function initializePageController(mainController) {
+    var startPage = { previous: null, next: null, pageNumber: 0, name: "startPage" };
+    var endPage = { previous: startPage, next: null, pageNumber: 1, name: "endPage" };
     startPage.next = endPage;
     var pageController = {
         "startPage": startPage,
@@ -27987,14 +29380,18 @@ function initializePageController() {
         pageController.currentPage = newPage;
         newPage.fullPageHTMLObject = fullPageHTMLObject;
         newPage.smallViewHTMLObject = smallViewHTMLObject;
-        newPage.fullPageHTMLObject.style.left = "0%";
+        newPage.fullPageHTMLObject.style.disply = "block";
         if (alpha.fullPageHTMLObject) {
-            alpha.fullPageHTMLObject.style.left = "-100%";
+            alpha.fullPageHTMLObject.style.disply = "none";
         }
         pageController.updatePageNumber(alpha);
         pageController.totalPageNumber += 1;
     };
     pageController.getPage = function (pageNumber) {
+        if (pageNumber == -999) {
+            var lastPage = pageController.endPage.previous;
+            return lastPage;
+        }
         var _currentPage = pageController.startPage;
         while (_currentPage) {
             if (_currentPage.pageNumber == pageNumber)
@@ -28003,14 +29400,24 @@ function initializePageController() {
         }
         return _currentPage;
     };
-    pageController.goToPage = function (pageNumber) {
-        var _targetPage = pageController.getPage(pageNumber);
-        console.log(_targetPage);
-        _targetPage.fullPageHTMLObject.style.left = "0%";
-        // set the position of the page according to the position relative to the targetPage
-        pageController.currentPage.fullPageHTMLObject.style.left = (_targetPage.pageNumber > pageController.currentPage.pageNumber) ? "-100%" : "+100%";
-        pageController.currentPage = _targetPage;
+    pageController.deletePage = function (targetPageNumber) {
+        var targetPage = pageController.getPage(targetPageNumber);
+        var alpha = targetPage.previous;
+        var beta = targetPage.next;
+        pageController.totalPageNumber -= 1;
+        alpha.next = beta;
+        beta.previous = alpha;
     };
+    pageController.goToPage = function (pageNumber, pageNumberInput) {
+        var _targetPage = pageController.getPage(pageNumber);
+        console.log(86868686, _targetPage);
+        _targetPage.fullPageHTMLObject.style.display = "block";
+        // set the position of the page according to the position relative to the targetPage
+        pageController.currentPage.fullPageHTMLObject.style.display = "none";
+        pageController.currentPage = _targetPage;
+        pageController.pagNumberInput.value = "" + pageNumber;
+        mainController.layerController.renderCurrentPageLayer();
+    }; // go To Page
     pageController.printAllPage = function () {
         var array = [];
         var _currentPage = pageController.startPage;
@@ -28018,18 +29425,16 @@ function initializePageController() {
             array.push(_currentPage);
             _currentPage = _currentPage.next;
         }
-        console.log(array);
-    };
+    }; // printAllPage
     pageController.transvereList = function (action) {
         var _currentPage = pageController.startPage;
         while (_currentPage) {
             action(_currentPage);
             _currentPage = _currentPage.next;
         }
-    };
+    }; // transvereList
     pageController.EventReceiver.addEventListener("goToPageEvent", function (e) {
         pageController.goToPage(e["detail"].pageNumber);
-        // console.log(pageController.currentPage.pageNumber)
     });
     return pageController;
 }
@@ -28040,6 +29445,7 @@ function pageControllerHTMLObject(pageController, subPanelContainer) {
     pageNavigator.classList.add("pageNavigator");
     var pageNumberInput = document.createElement("input");
     pageNumberInput.classList.add("pageNumberInput");
+    pageController.pagNumberInput = pageNumberInput;
     pageNumberInput.addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
             var goToPageEvent = new CustomEvent("goToPageEvent", { 'detail': { pageNumber: parseInt(pageNumberInput.value) } });
@@ -28057,11 +29463,7 @@ function pageControllerHTMLObject(pageController, subPanelContainer) {
     //@auto-fold here
     function leftButtonClickEvent() {
         if (pageController.currentPage.pageNumber > 1) {
-            pageController.currentPage.fullPageHTMLObject.style.left = "+100%";
-            // show the new page
-            pageController.currentPage = pageController.currentPage.previous;
-            pageController.currentPage.fullPageHTMLObject.style.left = "0%";
-            pageNumberInput.value = pageController.currentPage.pageNumber;
+            pageController.goToPage(+pageNumberInput.value - 1, pageNumberInput);
         }
     }
     leftButton.addEventListener("click", leftButtonClickEvent);
@@ -28070,11 +29472,7 @@ function pageControllerHTMLObject(pageController, subPanelContainer) {
     //@auto-fold here
     function rightButtonClickEvent() {
         if (pageController.currentPage.pageNumber < pageController.totalPageNumber) {
-            pageController.currentPage.fullPageHTMLObject.style.left = "-100%";
-            // show the new page
-            pageController.currentPage = pageController.currentPage.next;
-            pageController.currentPage.fullPageHTMLObject.style.left = "0%";
-            pageNumberInput.value = pageController.currentPage.pageNumber;
+            pageController.goToPage(+pageNumberInput.value + 1, pageNumberInput);
         }
     }
     rightButton.addEventListener("click", rightButtonClickEvent);
@@ -28090,7 +29488,15 @@ function highlightCurrentPageInOverviewMode(smallPageView, currentPageNumber, cu
 }
 exports.highlightCurrentPageInOverviewMode = highlightCurrentPageInOverviewMode;
 
-},{}],65:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.buildToolBoxDiv = void 0;
+function buildToolBoxDiv(mainController) {
+}
+exports.buildToolBoxDiv = buildToolBoxDiv;
+
+},{}],85:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -28114,7 +29520,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage = exports.fillInSmallViewDataContent = exports.fillInNewPageDataContent = exports.createNewPage = exports.createSwitchViewModeButton = exports.functionButtonCreater = exports.createSubPanelItem = exports.createSubPanel = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
 var pageController_1 = require("./pageControllerFolder/pageController");
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 //@auto-fold here
@@ -28122,7 +29528,7 @@ function createSubPanel(name, first) {
     var subPanelTemplate = document.querySelector("#subPanelTemplate");
     var subPanel = document.importNode(subPanelTemplate.content, true);
     var subPanelNavbarTitle = subPanel.querySelector(".subPanelTitle");
-    subPanelNavbarTitle.innerHTML = name + "SubPanel";
+    subPanelNavbarTitle.innerHTML = "" + name;
     var subPanelContent = subPanel.querySelector(".subPanelContent");
     subPanelContent.parentNode.classList.add(name + "SubPanel");
     if (first) {
@@ -28189,9 +29595,11 @@ exports.createSwitchViewModeButton = createSwitchViewModeButton;
 function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var newPage = GreatNoteDataClass.GNContainerDiv({ name: "fullPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject" });
-    newPage.classList.add("divPage");
+    newPage.classList.add("divPage", "fullPage");
     newPage._dataStructure = ["innerText"];
     newPage._styleStructure = ["background", "width", "height"];
+    // newPage.style.width = `${pageController.fullPageSize[0]}px`
+    // newPage.style.height = `${pageController.fullPageSize[1]}px`
     var newPageAccesssPointer = saveToDatabase ? newPage.getAccessPointer() : false; // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
     var smallView = GreatNoteDataClass.GNContainerDiv({ name: "overviewPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject" });
     smallView.classList.add("divPageSmall");
@@ -28225,7 +29633,6 @@ function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPag
 exports.createNewPage = createNewPage;
 function fillInNewPageDataContent(newPage, fullPageData) {
     newPage.initializeHTMLObjectFromData(fullPageData);
-    console.log(227, fullPageData);
     newPage.innerText = fullPageData.data.innerText;
 }
 exports.fillInNewPageDataContent = fillInNewPageDataContent;
@@ -28282,13 +29689,13 @@ function clickEventOfSmallPage(currentStatus, smallPage) {
         for (var i = 1; i < currentStatus.pageArrayFullPage.length; i++) {
             if (i < clickedPageNumber) {
                 // pages before the clicked page
-                currentStatus.pageArrayFullPage[i].style.left = "-100vw";
+                currentStatus.pageArrayFullPage[i].style.left = "-200%";
             }
             else if (i == clickedPageNumber) {
                 currentStatus.pageArrayFullPage[i].style.left = "0";
             }
             else {
-                currentStatus.pageArrayFullPage[i].style.left = "+100vw";
+                currentStatus.pageArrayFullPage[i].style.left = "+200vw";
             }
         }
         // updatePageController(currentStatus, clickedPageNumber)
@@ -28297,7 +29704,19 @@ function clickEventOfSmallPage(currentStatus, smallPage) {
 // extract and create data object do not directly save object to the database.
 // What is saved to the database is controlled by the saveHTMLOBjectTODatabase function in the mainController file
 
-},{"./GreatNoteDataClass":46,"./constructInitialCondition":60,"./pageControllerFolder/pageController":64}],66:[function(require,module,exports){
+},{"./GreatNoteClass/GreatNoteDataClass":54,"./constructInitialCondition":77,"./pageControllerFolder/pageController":83}],86:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.pageSizeInfo = exports.ClassNameCollection = void 0;
+exports.ClassNameCollection = {
+    commentContainer: "_commentContainer"
+};
+exports.pageSizeInfo = {
+    fullPageSize: [1150, 1678],
+    overviewPageSize: [237.4, 144]
+};
+
+},{}],87:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -28329,19 +29748,16 @@ exports.socket.on("connect", function () {
     exports.socket.emit("message", "user connected");
     // socket.emit("initialDataRequest")
 });
+exports.socket.on("serverSendSocketIdArray", function (data) {
+    // emit to everybody
+    // console.log(1616, data)
+    // socket.emit("initialDataRequest")
+});
 exports.socket.on("message", function (msg) {
     console.log(msg);
 });
-exports.socket.on("askRootUserForInitialData", function (data) {
-    // sender: server ask the root user to get the initial data
-    // action: root user will save the automerge document and then send back to the server the required initial data
-    // why are there two calls for the save funciton?
-    data.initialData = constructInitialCondition_1.mainController.saveMainDoc(false);
-    exports.socket.emit("sendInitialDataToServer", data);
-});
 exports.socket.on("saveDataToServer", function (data) {
     console.log("receive save message from server");
-    console.log(data);
     constructInitialCondition_1.mainController.saveMainDoc(true);
 });
 exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
@@ -28349,42 +29765,107 @@ exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
     constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
     constructInitialCondition_1.mainController.buildPageFromMainDoc();
 });
+function Decodeuint8arr(uint8array) {
+    return new TextDecoder("utf-8").decode(uint8array);
+}
 exports.socket.on("processInitialData", function (data) {
-    if (data.initialData) {
-        constructInitialCondition_1.mainController.loadMainDoc(data.initialData);
-        constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
-        constructInitialCondition_1.mainController.buildPageFromMainDoc();
-    }
-    else {
-        exports.socket.emit("loadMainDoc");
-    }
+    var convertedData = Decodeuint8arr(data);
+    constructInitialCondition_1.mainController.loadMainDoc(convertedData);
+    constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
+    constructInitialCondition_1.mainController.buildPageFromMainDoc();
+    // TestFunction.testFunction(mainController)
 });
-exports.socket.on("serverInitiatesSynchronization", function () {
-    // send back change data to the server
-    var changes = Automerge.getChanges(constructInitialCondition_1.mainController.previousDoc, constructInitialCondition_1.mainController.mainDoc);
-    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
-    console.log("56: the changes are: ", changes);
-    exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
+// socket.on("serverSendSocketIdArray", data=>{
+//     mainController.communitcationController = CommunicatorController.createCommunicationPanel(data)
+// })
+exports.socket.on("socketConnectionUpdate", function (data) {
+    // mainController.communitcationController.update(data)
 });
-exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {
-    var changeToBeProcessedArray = new Set();
-    changeDataArray.forEach(function (change) {
-        var senderID = change.id;
-        if (senderID != exports.socket.id) {
-            constructInitialCondition_1.mainController.mainDoc = Automerge.applyChanges(constructInitialCondition_1.mainController.mainDoc, change.changeData);
-            change.changeData.forEach(function (p) {
-                changeToBeProcessedArray.add(p.message);
-            });
-        }
-    });
-    constructInitialCondition_1.mainController.processChangeData(changeToBeProcessedArray);
-    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
-    // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
-    // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
-    // console.log(52, changes)
+exports.socket.on("serverSendChangeFileToClient", function (changeDataArray) {
+    if (changeDataArray.senderID != exports.socket.id) {
+        console.log(616161, "socket, serverSendChangeFileToClient");
+        constructInitialCondition_1.mainController.mainDoc = Automerge.applyChanges(constructInitialCondition_1.mainController.mainDoc, changeDataArray.changeData);
+        constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
+        constructInitialCondition_1.mainController.processChangeData(changeDataArray.changeData);
+    }
 });
 
-},{"./constructInitialCondition":60,"automerge":1,"socket.io-client":27}],67:[function(require,module,exports){
+},{"./constructInitialCondition":77,"automerge":1,"socket.io-client":27}],88:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.testFunction = void 0;
+function testFunction(mainController) {
+    // let lastPage = mainController.pageController.getPage(-999)
+    // let lastPageHTMLObject = lastPage.fullPageHTMLObject
+    //
+    // let svg = lastPageHTMLObject.querySelector("svg")
+    // console.log(55555, svg)
+    // let targetDiv = <GreatNoteDataClass.GNContainerDivInterface> document.querySelector(`div[accessPointer='7fd039f2-64b6-4aa3-aa08-6ec8e3f17763']`)
+    //  let testFieldDiv = document.querySelector(".testField")
+    //
+    //  let imageFrame = document.createElement("div")
+    //  imageFrame.classList.add("imageFrame")
+    //  testFieldDiv.appendChild(imageFrame)
+    //  // window.addSelectedObjectToWindow(imageFrame)
+    //  imageFrame.addEventListener("click", (e)=> {
+    //    console.log("imageFrame is clicked")
+    //    mainController.selectedObjectArray = []
+    //    imageFrame.classList.add("selectedObject")
+    //    mainController.selectedObjectArray.push(imageFrame)
+    //  }, true)
+    //  // imageFrame.addEventListener("mousedown", ClipboardEvent.mouseResizeFunction(imageFrame))
+    //
+    //
+    //  // resize
+    //  let imageFrameCorner = document.createElement("span")
+    //  imageFrameCorner.classList.add("imageFrameCorner", "topLeft")
+    //
+    //  let imageFrameCorner2 = document.createElement("span")
+    //  imageFrameCorner2.classList.add("imageFrameCorner", "bottomRight")
+    //
+    //  // rotate
+    //  let imageFrameCorner1 = document.createElement("span")
+    //  imageFrameCorner1.classList.add("imageFrameCorner", "topRight")
+    //
+    //  let imageFrameCorner3 = document.createElement("span")
+    //  imageFrameCorner3.classList.add("imageFrameCorner", "bottomLeft")
+    //
+    //  imageFrame.append(imageFrameCorner, imageFrameCorner1, imageFrameCorner2, imageFrameCorner3)
+    //
+    //  // targetDiv.appendChild(newImg)
+    //
+    //  let mouseInfoDiv = document.createElement("div")
+    //  testFieldDiv.appendChild(mouseInfoDiv)
+    //  mouseInfoDiv.style.width = "300px"
+    //  mouseInfoDiv.style.height = "500px"
+    //  mouseInfoDiv.style.position = "fixed"
+    //  mouseInfoDiv.style.right = "5%"
+    //  mouseInfoDiv.style.top = "10%"
+    //  mouseInfoDiv.style.background = "lightblue"
+    // ClipboardEvent.mousePositionTrackFunction(mouseInfoDiv, testFieldDiv)
+    // mouseInfoDiv.classList.add("selectedObject")
+    // testFieldDiv.targetObjectArray = [imageFrame, testObject, mouseInfoDiv]
+    var testFieldDiv = document.querySelector(".testField");
+    // testFieldDiv.style.disply = "block"
+    // <template id="layerRowTemplate">
+    //   <div class="layerRow">
+    //         <span class="viewSwitch"></span>
+    //         <span class="viewName"></span>
+    //         <span class="expand"></span>
+    //   </div>
+    // </template>
+    var layerRowTemplate = document.querySelector("#layerRowTemplate");
+    var layerRow = layerRowTemplate.content.cloneNode(true);
+    testFieldDiv.appendChild(layerRow);
+    var scalableDiv = document.createElement("div");
+    scalableDiv.classList.add("scalableDiv");
+    testFieldDiv.appendChild(scalableDiv);
+    function updateElementPosition(object, deltaX, deltaY) {
+    }
+}
+exports.testFunction = testFunction;
+
+},{}],89:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var divTest = false;
@@ -28720,7 +30201,7 @@ var fillController;
 // //
 // // }
 
-},{}],68:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -28872,7 +30353,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],69:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -30653,7 +32134,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":68,"buffer":69,"ieee754":70}],70:[function(require,module,exports){
+},{"base64-js":90,"buffer":91,"ieee754":92}],92:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -30740,7 +32221,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],71:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -30926,4 +32407,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[44,45,46,48,49,57,58,60,61,63,65,66,67,50,52,53,54,55,56,59,62,64]);
+},{}]},{},[48,59,72,73,77,78,85,86,87,89,44,45,46,47,49,50,51,52,53,54,55,57,58,60,61,62,63,64,65,67,68,69,70,71,74,75,76,79,80,81,82,83,84,88]);

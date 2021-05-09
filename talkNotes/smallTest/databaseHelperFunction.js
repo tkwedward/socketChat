@@ -97,7 +97,12 @@ function processCreationDataHelper(mainController, creationData) {
             } // if special Creation Message
             if (!creationData.specialCreationMessage) {
                 if (objectData && objectData.GNType) {
-                    newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+                    if (objectData.GNType == "GNImageContainer") {
+                        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false, imgsrc: objectData["data"].src });
+                    }
+                    else {
+                        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+                    }
                     console.log(newHTMLObject);
                     newHTMLObject.initializeHTMLObjectFromData(objectData);
                     parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId);
@@ -123,42 +128,17 @@ function changeEventGenerator(array) {
     });
 }
 exports.changeEventGenerator = changeEventGenerator;
-var logContent = document.querySelector(".logContent");
-logContent.style.overflowY = "scroll";
-var color = ["pink", "orange", "red", "lightgreen", "Aliceblue"];
-var index = 0;
 function processNewChangeData(mainController, generator, awaitmessage) {
     if (awaitmessage === void 0) { awaitmessage = false; }
     return __awaiter(this, void 0, void 0, function () {
-        var generatorStatus, changeData, logDate, logDiv, logAction, logObjectID, logParentObject, logHR, updateFinished, _object, objectData;
+        var generatorStatus, changeData, updateFinished, _object, objectData;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     generatorStatus = generator.next();
                     if (!!generatorStatus.done) return [3 /*break*/, 4];
                     changeData = generatorStatus.value;
-                    logDate = document.createElement("div");
-                    logDiv = document.createElement("div");
-                    logAction = document.createElement("div");
-                    logObjectID = document.createElement("div");
-                    logParentObject = document.createElement("div");
-                    logHR = document.createElement("hr");
-                    logDiv.append(logDate, logAction, logObjectID, logParentObject, logHR);
-                    if (changeData.action == "null") {
-                        logDiv.style.background = "grey";
-                    }
-                    else if (changeData.action == "create") {
-                        logDiv.style.background = "pink";
-                    }
-                    else if (changeData.action == "update") {
-                        logDiv.style.background = "orange";
-                    }
-                    logContent.insertBefore(logDiv, logContent.firstChild);
                     updateFinished = void 0;
-                    logDate.innerText = "date: " + new Date();
-                    logAction.innerText = "action: " + changeData.action;
-                    logObjectID.innerText = "objectID: " + changeData.objectID;
-                    logParentObject.innerText = "parentId: " + changeData.parentHTMLObjectId;
                     if (changeData.action == "null") {
                         processNewChangeData(mainController, generator, updateFinished);
                     }
@@ -177,8 +157,11 @@ function processNewChangeData(mainController, generator, awaitmessage) {
                 case 2:
                     if (!(changeData.action == "update")) return [3 /*break*/, 4];
                     _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                    console.log("83 The html object is  ", _object);
+                    console.log(457, _object, changeData.objectID);
                     objectData = mainController.getObjectById(changeData.objectID);
                     if (!_object) return [3 /*break*/, 4];
+                    console.log(939393, _object);
                     _object.reloadDataFromDatabase();
                     return [4 /*yield*/, objectData
                         // console.log("71717171========THis is await finished message", updateFinished)

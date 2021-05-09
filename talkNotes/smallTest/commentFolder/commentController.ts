@@ -1,10 +1,9 @@
-import {GNObjectInterface, GNContainerDivInterface, CreateGreatNoteObjectInterface, GNContainerDiv, GNEditableDiv} from "../GreatNoteDataClass"
-
-export interface CommentContainerInterface extends GNContainerDivInterface{
-    // to create the comment object and append to the container
-    createCommentObject(createData: CreateGreatNoteObjectInterface)
-    createReplyObject(createData: CreateGreatNoteObjectInterface)
-}
+import {GNObjectInterface, GNContainerDivInterface, CreateGreatNoteObjectInterface} from "../GreatNoteClass/GreatNoteObjectInterface"
+import {GNContainerDiv} from "../GreatNoteClass/GreatNoteDataClass"
+import {superGNObject} from "../GreatNoteClass/GreateNoteObjectHelperFunction"
+import * as CommentControlerHelperFunction from "./commentControllerHelperFunction"
+import {CommentContainerInterface} from "./commentControllerHelperFunction"
+//@auto-fold here
 
 export function GNComment(createData: CreateGreatNoteObjectInterface) : GNContainerDivInterface {
     let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData} = createData
@@ -13,55 +12,44 @@ export function GNComment(createData: CreateGreatNoteObjectInterface) : GNContai
     _commentContainer.GNType = GNComment.name
     _commentContainer.classList.add("_commentContainer")
 
-    _commentContainer.createCommentObject = function(createData: CreateGreatNoteObjectInterface): GNObjectInterface{
-        let _commentObject = GNContainerDiv(createData)
-        _commentObject.specialGNType = "GNCommentObject"
-        _commentObject.appendTo(_commentContainer)
-        return _commentObject
+    if (arrayID && saveToDatabase) {
+      _commentContainer.addToDatabase(arrayID)
+      _commentContainer.saveHTMLObjectToDatabase()
     }
 
-    _commentContainer.createReplyObject = function(createData: CreateGreatNoteObjectInterface):GNObjectInterface{
-        let _replyObject = GNContainerDiv(createData)
-        _replyObject.specialGNType = "GNReplyObject"
-        _replyObject.appendTo(_commentContainer)
-        return _replyObject
+    //@auto-fold here
+    _commentContainer.createCommentObject = function(createData: CreateGreatNoteObjectInterface){
+        return CommentControlerHelperFunction.createCommentObject(_commentContainer, createData)
     }
 
+    _commentContainer.loadFromData = function(injectedData){
+          CommentControlerHelperFunction.loadFromData(_commentContainer, injectedData)
+    } // _commentContainer.loadFromData
+
+    //@auto-fold here
     if (injectedData){
         // if there are data, loop each object and create
+        console.log(323232, "inject data")
+        _commentContainer.loadFromData(injectedData)
+
+        // ****************************
+        // render the comments inside
+        // ****************************
         injectedData["array"].forEach(p=>{
-            let newObject
-            if (p.specialGNType == "GNCommentObject"){
-                newObject = _commentContainer.createCommentObject({name: ""})
-                newObject.initializeHTMLObjectFromData(p)
-            }
+            let newObject = _commentContainer.createCommentObject({name: ""})
+            newObject.initializeHTMLObjectFromData(p)
+            newObject.contentEditable = "true"
 
-            if (p.specialGNType == "GNCommentObject"){
-                newObject = _commentContainer.createReplyObject({name: "", injectedData: p})
-                newObject.initializeHTMLObjectFromData(p)
-            }
+            // _commentContainer.appendChild(newObject)
         })
+
     } else {
-        let _commentObject = _commentContainer.createCommentObject({name: ""})
-        _commentObject.innerHTML = "commentDiv commentDiv commentDiv commentDiv commentDiv"
+        let newCommentField = _commentContainer.createCommentObject({"name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase:true})
+        newCommentField.saveHTMLObjectToDatabase()
+    }// if not injectedData
 
-        let _replyObject = _commentContainer.createReplyObject({name: ""})
-        _replyObject.innerHTML = "reply reply reply reply reply"
-
-        if (saveToDatabase){
-            _commentContainer.addToDatabase(arrayID)
-            let _commentContainerID = _commentContainer._identity.accessPointer
-
-            _commentObject.addToDatabase(_commentContainerID)
-            _replyObject.addToDatabase(_commentContainerID)
-        }
-
-    }
-
-
-
-
-
+    CommentControlerHelperFunction.addEventToCommentContainer(_commentContainer)
+    CommentControlerHelperFunction.addCommentController(_commentContainer)
 
     return _commentContainer
 }

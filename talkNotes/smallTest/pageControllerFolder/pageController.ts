@@ -7,6 +7,7 @@ export interface pageControllerInterface {
     fullPageSize:[number, number]
     overviewPageSize:[number, number]
     selectedObject:any
+    pagNumberInput: HTMLInputElement
     addPage(fullPageHTMLObject, smallViewHTMLObject)
     deletePage(targetPage)
     getPage(pageNumber:number)
@@ -17,9 +18,9 @@ export interface pageControllerInterface {
     transvereList(actionFunction)
 }
 
-export function initializePageController(){
-    let startPage = {"previous": null, "next": null, pageNumber: 0 }
-    let endPage = {"previous": startPage, "next": null, pageNumber: 1 }
+export function initializePageController(mainController){
+    let startPage = {previous: null, next: null, pageNumber: 0, name: "startPage" }
+    let endPage = {previous: startPage, next: null, pageNumber: 1, name: "endPage"}
     startPage.next = endPage
 
 
@@ -56,10 +57,9 @@ export function initializePageController(){
         newPage.fullPageHTMLObject = fullPageHTMLObject
         newPage.smallViewHTMLObject = smallViewHTMLObject
 
-
-        newPage.fullPageHTMLObject.style.left = "0%"
+        newPage.fullPageHTMLObject.style.disply = "block"
         if (alpha.fullPageHTMLObject){
-            alpha.fullPageHTMLObject.style.left = "-100%"
+            alpha.fullPageHTMLObject.style.disply = "none"
         }
 
 
@@ -68,22 +68,47 @@ export function initializePageController(){
     }
 
     pageController.getPage = function(pageNumber){
+        if (pageNumber == -999){
+          let lastPage = pageController.endPage.previous
+          return lastPage
+        }
+
         let _currentPage = pageController.startPage
         while (_currentPage){
             if (_currentPage.pageNumber == pageNumber) break
             _currentPage = _currentPage.next
         }
+
         return _currentPage
     }
 
-    pageController.goToPage = function(pageNumber){
-        let _targetPage = pageController.getPage(pageNumber)
-        console.log(_targetPage)
-        _targetPage.fullPageHTMLObject.style.left = "0%"
-        // set the position of the page according to the position relative to the targetPage
-        pageController.currentPage.fullPageHTMLObject.style.left = (_targetPage.pageNumber > pageController.currentPage.pageNumber)? "-100%":"+100%"
-        pageController.currentPage = _targetPage
+    pageController.deletePage = function(targetPageNumber){
+        let targetPage = pageController.getPage(targetPageNumber)
+        let alpha = targetPage.previous
+        let beta = targetPage.next
+
+        pageController.totalPageNumber -= 1
+
+        alpha.next = beta
+        beta.previous = alpha
     }
+
+    pageController.goToPage = function(pageNumber, pageNumberInput?){
+
+        let _targetPage = pageController.getPage(pageNumber)
+        console.log(86868686, _targetPage)
+        _targetPage.fullPageHTMLObject.style.display = "block"
+
+        // set the position of the page according to the position relative to the targetPage
+        pageController.currentPage.fullPageHTMLObject.style.display = "none"
+        pageController.currentPage = _targetPage
+
+
+
+        pageController.pagNumberInput.value = "" + pageNumber
+
+        mainController.layerController.renderCurrentPageLayer()
+    } // go To Page
 
     pageController.printAllPage = function(){
         let array = []
@@ -92,8 +117,7 @@ export function initializePageController(){
             array.push(_currentPage)
             _currentPage = _currentPage.next
         }
-        console.log(array)
-    }
+    }// printAllPage
 
     pageController.transvereList = function(action){
         let _currentPage = pageController.startPage
@@ -101,12 +125,10 @@ export function initializePageController(){
             action(_currentPage)
             _currentPage = _currentPage.next
         }
-    }
-
+    }// transvereList
 
     pageController.EventReceiver.addEventListener("goToPageEvent", e=>{
         pageController.goToPage(e["detail"].pageNumber)
-        // console.log(pageController.currentPage.pageNumber)
     })
 
 
@@ -120,6 +142,7 @@ export function pageControllerHTMLObject(pageController, subPanelContainer){
 
     let pageNumberInput = document.createElement("input")
     pageNumberInput.classList.add("pageNumberInput")
+    pageController.pagNumberInput = pageNumberInput
     pageNumberInput.addEventListener("keyup", function(event) {
       if (event.key === "Enter") {
             let goToPageEvent = new CustomEvent("goToPageEvent", { 'detail': {pageNumber: parseInt(pageNumberInput.value)}});
@@ -144,12 +167,7 @@ export function pageControllerHTMLObject(pageController, subPanelContainer){
 
     function leftButtonClickEvent(){
         if (pageController.currentPage.pageNumber > 1){
-            pageController.currentPage.fullPageHTMLObject.style.left = "+100%"
-
-            // show the new page
-            pageController.currentPage = pageController.currentPage.previous
-            pageController.currentPage.fullPageHTMLObject.style.left = "0%"
-            pageNumberInput.value = pageController.currentPage.pageNumber
+            pageController.goToPage(+pageNumberInput.value - 1, pageNumberInput)
         }
     }
 
@@ -160,12 +178,7 @@ export function pageControllerHTMLObject(pageController, subPanelContainer){
     //@auto-fold here
     function rightButtonClickEvent(){
         if (pageController.currentPage.pageNumber < pageController.totalPageNumber){
-            pageController.currentPage.fullPageHTMLObject.style.left = "-100%"
-
-            // show the new page
-            pageController.currentPage = pageController.currentPage.next
-            pageController.currentPage.fullPageHTMLObject.style.left = "0%"
-            pageNumberInput.value = pageController.currentPage.pageNumber
+            pageController.goToPage(+pageNumberInput.value + 1, pageNumberInput)
         }
     }
     rightButton.addEventListener("click", rightButtonClickEvent)

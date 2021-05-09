@@ -29,19 +29,16 @@ exports.socket.on("connect", function () {
     exports.socket.emit("message", "user connected");
     // socket.emit("initialDataRequest")
 });
+exports.socket.on("serverSendSocketIdArray", function (data) {
+    // emit to everybody
+    // console.log(1616, data)
+    // socket.emit("initialDataRequest")
+});
 exports.socket.on("message", function (msg) {
     console.log(msg);
 });
-exports.socket.on("askRootUserForInitialData", function (data) {
-    // sender: server ask the root user to get the initial data
-    // action: root user will save the automerge document and then send back to the server the required initial data
-    // why are there two calls for the save funciton?
-    data.initialData = constructInitialCondition_1.mainController.saveMainDoc(false);
-    exports.socket.emit("sendInitialDataToServer", data);
-});
 exports.socket.on("saveDataToServer", function (data) {
     console.log("receive save message from server");
-    console.log(data);
     constructInitialCondition_1.mainController.saveMainDoc(true);
 });
 exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
@@ -49,37 +46,27 @@ exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
     constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
     constructInitialCondition_1.mainController.buildPageFromMainDoc();
 });
+function Decodeuint8arr(uint8array) {
+    return new TextDecoder("utf-8").decode(uint8array);
+}
 exports.socket.on("processInitialData", function (data) {
-    if (data.initialData) {
-        constructInitialCondition_1.mainController.loadMainDoc(data.initialData);
-        constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
-        constructInitialCondition_1.mainController.buildPageFromMainDoc();
-    }
-    else {
-        exports.socket.emit("loadMainDoc");
-    }
+    var convertedData = Decodeuint8arr(data);
+    constructInitialCondition_1.mainController.loadMainDoc(convertedData);
+    constructInitialCondition_1.mainController.buildInitialHTMLSkeleton();
+    constructInitialCondition_1.mainController.buildPageFromMainDoc();
+    // TestFunction.testFunction(mainController)
 });
-exports.socket.on("serverInitiatesSynchronization", function () {
-    // send back change data to the server
-    var changes = Automerge.getChanges(constructInitialCondition_1.mainController.previousDoc, constructInitialCondition_1.mainController.mainDoc);
-    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
-    console.log("56: the changes are: ", changes);
-    exports.socket.emit("clientSendChangesToServer", { "changeData": changes });
+// socket.on("serverSendSocketIdArray", data=>{
+//     mainController.communitcationController = CommunicatorController.createCommunicationPanel(data)
+// })
+exports.socket.on("socketConnectionUpdate", function (data) {
+    // mainController.communitcationController.update(data)
 });
-exports.socket.on("deliverSynchronizeDataFromServer", function (changeDataArray) {
-    var changeToBeProcessedArray = new Set();
-    changeDataArray.forEach(function (change) {
-        var senderID = change.id;
-        if (senderID != exports.socket.id) {
-            constructInitialCondition_1.mainController.mainDoc = Automerge.applyChanges(constructInitialCondition_1.mainController.mainDoc, change.changeData);
-            change.changeData.forEach(function (p) {
-                changeToBeProcessedArray.add(p.message);
-            });
-        }
-    });
-    constructInitialCondition_1.mainController.processChangeData(changeToBeProcessedArray);
-    constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
-    // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
-    // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
-    // console.log(52, changes)
+exports.socket.on("serverSendChangeFileToClient", function (changeDataArray) {
+    if (changeDataArray.senderID != exports.socket.id) {
+        console.log(616161, "socket, serverSendChangeFileToClient");
+        constructInitialCondition_1.mainController.mainDoc = Automerge.applyChanges(constructInitialCondition_1.mainController.mainDoc, changeDataArray.changeData);
+        constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
+        constructInitialCondition_1.mainController.processChangeData(changeDataArray.changeData);
+    }
 });

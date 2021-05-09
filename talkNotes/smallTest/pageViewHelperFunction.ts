@@ -1,7 +1,8 @@
 import {mainController} from "./constructInitialCondition"
-import * as GreatNoteDataClass from "./GreatNoteDataClass"
+import * as GreatNoteDataClass from "./GreatNoteClass/GreatNoteDataClass"
+import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSVGDataClass"
 import {socket} from "./socketFunction"
-import {pageController, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
+import {highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 
 //@auto-fold here
@@ -9,7 +10,7 @@ export function createSubPanel(name:string, first:boolean){
     let subPanelTemplate = <HTMLTemplateElement>document.querySelector("#subPanelTemplate")
     let subPanel = document.importNode(subPanelTemplate.content, true)
     let subPanelNavbarTitle = subPanel.querySelector(`.subPanelTitle`)
-    subPanelNavbarTitle.innerHTML = `${name}SubPanel`
+    subPanelNavbarTitle.innerHTML = `${name}`
     let subPanelContent = subPanel.querySelector(".subPanelContent")
     subPanelContent.parentNode.classList.add(`${name}SubPanel`)
 
@@ -83,9 +84,11 @@ export function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv){
 export function createNewPage(pageController, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?, overviewPageData?, saveToDatabase=true){
     let newPage = GreatNoteDataClass.GNContainerDiv({name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject"})
 
-    newPage.classList.add("divPage")
+    newPage.classList.add("divPage", "fullPage")
     newPage._dataStructure = ["innerText"]
     newPage._styleStructure = ["background", "width", "height"]
+    // newPage.style.width = `${pageController.fullPageSize[0]}px`
+    // newPage.style.height = `${pageController.fullPageSize[1]}px`
 
     let newPageAccesssPointer = saveToDatabase? newPage.getAccessPointer(): false // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
     let smallView = GreatNoteDataClass.GNContainerDiv({name: "overviewPage", arrayID: mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject"})
@@ -122,12 +125,8 @@ export function createNewPage(pageController, fullPageModeDiv:HTMLDivElement, ov
     return [newPage, smallView]
 }
 
-
-import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
-
 export function fillInNewPageDataContent(newPage, fullPageData){
     newPage.initializeHTMLObjectFromData(fullPageData)
-    console.log(227, fullPageData)
     newPage.innerText = fullPageData.data.innerText
 }
 
@@ -192,11 +191,11 @@ function clickEventOfSmallPage(currentStatus, smallPage){
         for(let i = 1; i < currentStatus.pageArrayFullPage.length; i++){
             if (i < clickedPageNumber){
                 // pages before the clicked page
-                currentStatus.pageArrayFullPage[i].style.left = "-100vw"
+                currentStatus.pageArrayFullPage[i].style.left = "-200%"
             } else if (i == clickedPageNumber){
                 currentStatus.pageArrayFullPage[i].style.left = "0"
             } else {
-                currentStatus.pageArrayFullPage[i].style.left = "+100vw"
+                currentStatus.pageArrayFullPage[i].style.left = "+200vw"
             }
         }
 

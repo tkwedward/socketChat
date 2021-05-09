@@ -75,12 +75,7 @@ exports.dropdownListController = dropdownListController;
 // @auto-fold here
 function choiceController(attribute, choiceList, prototype) {
     var controllerContainer = document.createElement("div");
-    controllerContainer.style.display = "flex";
-    controllerContainer.style["align-items"] = "center";
-    controllerContainer.style["justify-content"] = "left";
-    controllerContainer.style["flex-wrap"] = "wrap";
-    controllerContainer.style.width = "300px";
-    controllerContainer.style.minHeight = "150px";
+    controllerContainer.classList.add("choiceController");
     controllerContainer.classList.add(attribute + "Controller");
     choiceList.forEach(function (choiceValue) {
         var item = prototype.cloneNode(true);

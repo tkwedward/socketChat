@@ -18,34 +18,96 @@ body {
 }
 .pageWrapper .panelContainer {
   background: gold;
+  height: 100vh;
+  overflow-y: scroll;
+}
+.pageWrapper .toolBoxHtml {
+  height: "80px";
+  background: silver;
+  width: 90%;
+  margin: 0 auto;
+  display: "grid";
+  grid-template-columns: "4fr 3fr";
+}
+.pageWrapper .toolBoxHtml .toolBoxItem {
+  display: inline-block;
+  background: gold;
+  margin: 10px 5px;
+  align-items: center;
+  justify-content: center;
+}
+.pageWrapper .toolBoxOption {
+  height: 80px;
+  background: lightblue;
 }
 .pageWrapper .pageContentContainer {
   background: silver;
   position: relative;
+  overflow: scroll;
+  z-index: 100;
 }
 .pageWrapper .pageContentContainer .divPage {
-  width: 100%;
-  height: 100vh;
+  transform-origin: top left;
+  transform: scale(1);
+  width: 1150px;
+  height: 1678px;
+  margin: 20px auto;
   background: pink;
   position: absolute;
   left: 0;
   right: 0;
 }
+.pageWrapper .pageContentContainer .divPage .popUpBox {
+  width: 150px;
+  min-height: 100px;
+  background: grey;
+  position: fixed;
+  display: grid;
+  grid-row-gap: 5px;
+}
+.pageWrapper .pageContentContainer .divPage .popUpBox .popUpBoxButton {
+  text-align: center;
+  padding: 5px;
+  font-size: 25px;
+}
+.pageWrapper .pageContentContainer .divPage .popUpBox .popUpBoxButton:not(:last-child) {
+  border-bottom: 1px solid white;
+}
 .pageWrapper .pageContentContainer .divPage .divLayer {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background: blue;
   position: absolute;
   left: 0;
   right: 0;
 }
+.pageWrapper .pageContentContainer .divPage .selectedObjectInDiv {
+  border: 1px solid blue;
+}
+.pageWrapper .pageContentContainer .divPage ._commentContainer {
+  width: 400px;
+  background: wheat;
+  margin: 10px;
+}
+.pageWrapper .pageContentContainer .divPage ._commentContainer .commentField {
+  margin: 10px;
+  width: 90%;
+}
+.pageWrapper .pageContentContainer .divPage ._commentContainer .replyField {
+  margin: 10px;
+  width: 90%;
+}
 .pageWrapper .pageContentContainer .overviewModeDiv {
+  position: absolute;
+  top: 0px;
+  left: 0px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-row-gap: 15px;
 }
 .pageWrapper .pageContentContainer .overviewModeDiv .divPageSmall {
   background: pink;
+  margin: 10px;
 }
 .pageWrapper .pageContentContainer .fullPageModeDiv[status=off] {
   display: none;
@@ -77,7 +139,7 @@ body {
 }
 
 .bookmarkSubPanel {
-  height: 230px;
+  min-height: 230px;
 }
 .bookmarkSubPanel .pageNavigator {
   text-align: center;
@@ -90,12 +152,139 @@ body {
 }
 .bookmarkSubPanel .subPanelContent[status=open] {
   display: block !important;
+  padding: 10px;
 }
 .bookmarkSubPanel .subPanelContent[status=open] .functionButton {
   width: 90%;
   height: 30px;
-  background: grey;
   margin: 10px auto;
+  background: grey;
+}
+
+.layerController {
+  margin: 10px 0px;
+}
+.layerController .layerControllerFunction {
+  background: lightblue;
+  height: 50px;
+}
+.layerController .layerView {
+  background: grey;
+  height: 150px;
+  overflow-y: scroll;
+}
+.layerController .layerView .layerLevel[status=off] {
+  display: none;
+}
+.layerController .layerView .layerRow {
+  width: 100%;
+  height: 30px;
+  background: ivory;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  border: 1px black solid;
+}
+.layerController .layerView .layerRow.selectedRow {
+  background: skyblue;
+}
+.layerController .layerView .layerRow div {
+  height: 100%;
+  width: 100%;
+}
+.layerController .layerView .layerRow div:not(:last-child) {
+  border-right: 1px black solid;
+}
+.layerController .layerView .layerRow .viewSwitch, .layerController .layerView .layerRow .expandSwitch, .layerController .layerView .layerRow .viewName {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.layerController .layerView .layerRow .viewName {
+  justify-content: left;
+  font-size: 12px;
+}
+.layerController .layerView .layerRow .viewSwitch[status=on] .visibility {
+  display: block;
+}
+.layerController .layerView .layerRow .viewSwitch[status=off] .visibility {
+  display: none;
+}
+.layerController .layerView .layerRow .expandSwitch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.layerController .layerView .layerRow .expandSwitch .expand_more, .layerController .layerView .layerRow .expandSwitch .expand_less {
+  font-size: 35px;
+}
+.layerController .layerView .layerRow .expandSwitch[status=off] .expand_more {
+  display: block;
+}
+.layerController .layerView .layerRow .expandSwitch[status=off] .expand_less {
+  display: none;
+}
+.layerController .layerView .layerRow .expandSwitch[status=on] .expand_more {
+  display: none;
+}
+.layerController .layerView .layerRow .expandSwitch[status=on] .expand_less {
+  display: block;
+}
+
+.testField.open {
+  width: 90vw;
+  height: 100vh;
+  background: lightblue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1000;
+}
+.testField.open .scalableDiv {
+  width: 800px;
+  height: 1200px;
+  background: ivory;
+  transform-origin: top left;
+  transform: scale(0.1, 0.1);
+}
+.testField.open .scalableDiv p {
+  margin: 0;
+}
+.testField.open .imageFrame {
+  width: 400px;
+  height: 400px;
+  background: #ffff05;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+}
+.testField.open .imageFrame span.imageFrameCorner {
+  position: absolute;
+  display: block;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  width: 5px;
+  height: 5px;
+  background: black;
+}
+.testField.open .imageFrame span.topLeft {
+  top: calc(0% - 2.5px);
+  left: calc(0% - 2.5px);
+}
+.testField.open .imageFrame span.topRight {
+  top: calc(0% - 2.5px);
+  left: calc(100% - 2.5px);
+}
+.testField.open .imageFrame span.bottomRight {
+  top: calc(100% - 2.5px);
+  left: calc(100% - 2.5px);
+  cursor: nwse-resize;
+}
+.testField.open .imageFrame span.bottomLeft {
+  top: calc(100% - 2.5px);
+  left: calc(0% - 2.5px);
 }
 
 .commentSubPanel {
@@ -141,19 +330,6 @@ body {
   height: 100vh;
   width: 25vw;
   background: white;
-}
-
-.layerController {
-  margin: 10px;
-}
-.layerController .layerView {
-  background: grey;
-  height: 150px;
-  overflow-y: scroll;
-}
-.layerController .layerControllerFunction {
-  background: lightblue;
-  height: 50px;
 }
 
 div.selectedObject {
@@ -206,6 +382,42 @@ circle.selectedObject {
 }
 .pkmContentContainerWrapper .container2 .pkmContentContainer2 .itemContainer {
   background: lightgreen;
+}
+
+.choiceController {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-wrap: wrap;
+  width: 90%;
+  margin: auto 10px;
+  min-height: 150px;
+  background: CornflowerBlue;
+}
+
+@media (max-width: 1025px) {
+  body {
+    width: 100vw;
+  }
+
+  .pageWrapper {
+    display: grid;
+    grid-template-columns: 1fr 6fr;
+  }
+  .pageWrapper .pageContentContainer {
+    width: 85.5vw;
+  }
+  .pageWrapper .pageContentContainer .divPage {
+    margin: 25px;
+  }
+  .pageWrapper .panelContainer {
+    width: 150px;
+    overflow-x: hidden;
+  }
+
+  .choiceController {
+    width: 150px;
+  }
 }
 
 /*# sourceMappingURL=automerge_board.css.map */

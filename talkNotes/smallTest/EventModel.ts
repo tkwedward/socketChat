@@ -1,4 +1,4 @@
-import * as GreatNoteSvgDataClass from "./GreatNoteSVGDataClass"
+import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSVGDataClass"
 
 export function addMovingEvent(htmlObject:HTMLElement|HTMLDivElement){
     let attributeX

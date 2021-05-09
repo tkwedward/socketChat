@@ -1,6 +1,7 @@
 import * as io from 'socket.io-client';
 import {mainController} from "./constructInitialCondition"
 export var socket
+import * as CommunicatorController from "./communicationFolder/communitcationController"
 import * as Automerge from 'automerge'
 
 socket = io.io()
@@ -11,22 +12,19 @@ socket.on("connect", ()=>{
     // socket.emit("initialDataRequest")
 })
 
-socket.on("message", (msg)=>{
-    console.log(msg)
+socket.on("serverSendSocketIdArray", data=>{
+    // emit to everybody
+    // console.log(1616, data)
+    // socket.emit("initialDataRequest")
 })
 
-socket.on("askRootUserForInitialData", data=>{
-  // sender: server ask the root user to get the initial data
-  // action: root user will save the automerge document and then send back to the server the required initial data
-  // why are there two calls for the save funciton?
-  data.initialData = mainController.saveMainDoc(false)
-  socket.emit("sendInitialDataToServer", data)
+socket.on("message", (msg)=>{
+    console.log(msg)
 })
 
 
 socket.on("saveDataToServer", data=>{
     console.log("receive save message from server")
-    console.log(data)
     mainController.saveMainDoc(true)
 })
 
@@ -34,48 +32,38 @@ socket.on("serverResponseToLoadMainDocRequest", data=>{
     mainController.loadMainDoc(data)
     mainController.buildInitialHTMLSkeleton()
     mainController.buildPageFromMainDoc()
-
 })
 
+function Decodeuint8arr(uint8array){
+    return new TextDecoder("utf-8").decode(uint8array);
+}
+import * as TestFunction from "./testFolder/testHelperFunction"
 socket.on("processInitialData", data=>{
-    if (data.initialData){
-        mainController.loadMainDoc(data.initialData)
-        mainController.buildInitialHTMLSkeleton()
-        mainController.buildPageFromMainDoc()
-    } else {
-        socket.emit("loadMainDoc")
+    let convertedData = Decodeuint8arr(data)
+    mainController.loadMainDoc(convertedData)
+    mainController.buildInitialHTMLSkeleton()
+    mainController.buildPageFromMainDoc()
+
+    // TestFunction.testFunction(mainController)
+})
+
+
+// socket.on("serverSendSocketIdArray", data=>{
+//     mainController.communitcationController = CommunicatorController.createCommunicationPanel(data)
+// })
+
+socket.on("socketConnectionUpdate", data=>{
+    // mainController.communitcationController.update(data)
+})
+
+socket.on("serverSendChangeFileToClient", changeDataArray=>{
+    if (changeDataArray.senderID != socket.id){
+        console.log(616161, "socket, serverSendChangeFileToClient")
+        mainController.mainDoc = Automerge.applyChanges(mainController.mainDoc, changeDataArray.changeData)
+        mainController.previousDoc = mainController.mainDoc
+
+        mainController.processChangeData(changeDataArray.changeData)
     }
-
-})
-
-
-socket.on("serverInitiatesSynchronization", ()=>{
-    // send back change data to the server
-    let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
-    mainController.previousDoc = mainController.mainDoc
-    console.log("56: the changes are: ", changes)
-    socket.emit("clientSendChangesToServer", {"changeData": changes})
-})
-
-socket.on("deliverSynchronizeDataFromServer", changeDataArray=>{
-    let changeToBeProcessedArray = new Set()
-
-
-
-    changeDataArray.forEach(change=>{
-        let senderID = change.id
-        if (senderID != socket.id){
-            mainController.mainDoc = Automerge.applyChanges(mainController.mainDoc, change.changeData)
-            change.changeData.forEach(p=>{
-                changeToBeProcessedArray.add(p.message)
-            })
-        }
-    })
-    mainController.processChangeData(changeToBeProcessedArray)
-    mainController.previousDoc = mainController.mainDoc
-    // let newChangeToBeProcessedArray = Array.from(changeToBeProcessedArray).map(p=>JSON.parse(p))
-    // let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
-    // console.log(52, changes)
 
 
 

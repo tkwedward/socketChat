@@ -1,6 +1,7 @@
 const express = require("express")
 const ejs = require("ejs")
 let router = express.Router();
+const { uuid } = require('uuidv4');
 
 
 router.get("/", (req, res) => {
@@ -27,6 +28,25 @@ router.post("/saveTalkNotes/", (req, res) => {
   })
 
   res.send("thingsGet.ejs")
+})
+
+router.post("/processImageBase64Format", (req, res) => {
+  let body = ""
+
+  req.on('data', chunk => {
+      body += chunk.toString(); // convert Buffer to string
+  });
+  req.on('end', ()=>{
+      var base64Data = body.replace(/^data:image\/png;base64,/, "");
+      console.log(base64Data)
+      let link = uuid()
+      let imageName = "talkNotes/noteImage/" + link + '.png'
+
+      require("fs").writeFile(imageName, base64Data, 'base64', function(){
+          res.end(JSON.stringify({"imgsrc": link}));
+      });
+
+  })
 })
 
 module.exports = router

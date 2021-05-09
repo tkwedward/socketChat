@@ -21,7 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage = exports.fillInSmallViewDataContent = exports.fillInNewPageDataContent = exports.createNewPage = exports.createSwitchViewModeButton = exports.functionButtonCreater = exports.createSubPanelItem = exports.createSubPanel = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
-var GreatNoteDataClass = __importStar(require("./GreatNoteDataClass"));
+var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
 var pageController_1 = require("./pageControllerFolder/pageController");
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 //@auto-fold here
@@ -29,7 +29,7 @@ function createSubPanel(name, first) {
     var subPanelTemplate = document.querySelector("#subPanelTemplate");
     var subPanel = document.importNode(subPanelTemplate.content, true);
     var subPanelNavbarTitle = subPanel.querySelector(".subPanelTitle");
-    subPanelNavbarTitle.innerHTML = name + "SubPanel";
+    subPanelNavbarTitle.innerHTML = "" + name;
     var subPanelContent = subPanel.querySelector(".subPanelContent");
     subPanelContent.parentNode.classList.add(name + "SubPanel");
     if (first) {
@@ -96,9 +96,11 @@ exports.createSwitchViewModeButton = createSwitchViewModeButton;
 function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
     var newPage = GreatNoteDataClass.GNContainerDiv({ name: "fullPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject" });
-    newPage.classList.add("divPage");
+    newPage.classList.add("divPage", "fullPage");
     newPage._dataStructure = ["innerText"];
     newPage._styleStructure = ["background", "width", "height"];
+    // newPage.style.width = `${pageController.fullPageSize[0]}px`
+    // newPage.style.height = `${pageController.fullPageSize[1]}px`
     var newPageAccesssPointer = saveToDatabase ? newPage.getAccessPointer() : false; // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
     var smallView = GreatNoteDataClass.GNContainerDiv({ name: "overviewPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject" });
     smallView.classList.add("divPageSmall");
@@ -132,7 +134,6 @@ function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPag
 exports.createNewPage = createNewPage;
 function fillInNewPageDataContent(newPage, fullPageData) {
     newPage.initializeHTMLObjectFromData(fullPageData);
-    console.log(227, fullPageData);
     newPage.innerText = fullPageData.data.innerText;
 }
 exports.fillInNewPageDataContent = fillInNewPageDataContent;
@@ -189,13 +190,13 @@ function clickEventOfSmallPage(currentStatus, smallPage) {
         for (var i = 1; i < currentStatus.pageArrayFullPage.length; i++) {
             if (i < clickedPageNumber) {
                 // pages before the clicked page
-                currentStatus.pageArrayFullPage[i].style.left = "-100vw";
+                currentStatus.pageArrayFullPage[i].style.left = "-200%";
             }
             else if (i == clickedPageNumber) {
                 currentStatus.pageArrayFullPage[i].style.left = "0";
             }
             else {
-                currentStatus.pageArrayFullPage[i].style.left = "+100vw";
+                currentStatus.pageArrayFullPage[i].style.left = "+200vw";
             }
         }
         // updatePageController(currentStatus, clickedPageNumber)
