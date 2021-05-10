@@ -47,10 +47,11 @@ export function createLayerController(mainController){
 
   layerControllerHTMLObject.addDivLayer = function (e){
       let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
-      let divLayer = GreatNoteDataClass.GNContainerDiv({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true, specialCreationMessage: "divLayer"})
-      divLayer.applyStyle({width: "100%", height: "100%", background:"lightblue", "position": "absolute", "left": "0px", "top": "0px"})
+
+      let divLayer = GreatNoteDataClass.GNContainerDiv({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true, specialCreationMessage: "divLayer", _classNameList: ["divLayer"]})
+      divLayer.applyStyle({width: "100%", height: "100%", "position": "absolute", "left": "0px", "top": "0px"})
       mainController.saveHTMLObjectToDatabase(divLayer)
-      divLayer.classList.add("divLayer")
+      // divLayer.classList.add("divLayer")
       divLayer.appendTo(currentPage)
       layerControllerHTMLObject.renderCurrentPageLayer()
   }
@@ -60,7 +61,7 @@ export function createLayerController(mainController){
       let svgLayer = GreatNoteSvgDataClass.GNSvg({name:"", arrayID: currentPage.getAccessPointer(), saveToDatabase: true})
       mainController.toolBox.registerSvg(svgLayer)
 
-      svgLayer.applyStyle({width: "100%", height: "100%", background:"gold", position: "absolute", left: "0px", top: "0px"})
+      svgLayer.applyStyle({width: "100%", height: "100%",  "background": "transparent", position: "absolute", left: "0px", top: "0px"})
       mainController.saveHTMLObjectToDatabase(svgLayer)
       svgLayer.classList.add("svgLayer")
       svgLayer.appendTo(currentPage)

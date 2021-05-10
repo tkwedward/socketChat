@@ -38,11 +38,17 @@ export async function processCreationDataHelper(mainController, creationData){
             if (objectData.GNType == "GNImageContainer"){
                 newHTMLObject =  mainController.createGNObjectThroughName(objectData.GNType, {name:"", arrayID:"", insertPosition:false, dataPointer: false, saveToDatabase: false, imgsrc: objectData["data"].src})
             } else {
-                newHTMLObject =  mainController.createGNObjectThroughName(objectData.GNType, {name:"", arrayID:"", insertPosition:false, dataPointer: false, saveToDatabase: false})
+                // console.log(41414141, creationData)
+                // console.log(41414141, )
+                let objectData = mainController.getObjectById(creationData.objectID)
+                newHTMLObject =  mainController.createGNObjectThroughName(objectData.GNType, {
+                  name:"",
+                  arrayID: creationData.parentHTMLObjectId,
+                  insertPosition:false,
+                  dataPointer: false, saveToDatabase: false,
+                  injectedData: objectData
+                })
             }
-
-
-            console.log(newHTMLObject)
 
             newHTMLObject.initializeHTMLObjectFromData(objectData)
             let parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId)
@@ -73,7 +79,6 @@ export async function processNewChangeData(mainController, generator, awaitmessa
         }
 
         if (changeData.action=="create"){
-          console.log(changeData)
             updateFinished = await processCreationDataHelper(mainController, changeData)
             // console.log("71717171========THis is await finished message", updateFinished)
             // console.log("81 -------------- creation event is finisheed")
@@ -84,13 +89,10 @@ export async function processNewChangeData(mainController, generator, awaitmessa
             // console.log("81 -------------- update event is processing")
             // console.log("82 here is the accessPointer: ", changeData.objectID)
             let _object =  document.querySelector(`*[accessPointer='${changeData.objectID}']`)
-            console.log("83 The html object is  ", _object)
-            console.log(457, _object, changeData.objectID)
 
             let objectData = mainController.getObjectById(changeData.objectID)
 
             if (_object){
-                console.log(939393, _object)
                 _object.reloadDataFromDatabase()
                 updateFinished = await objectData
                 // console.log("71717171========THis is await finished message", updateFinished)

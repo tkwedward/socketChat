@@ -1,13 +1,19 @@
 import * as ClipboardEvent from "./clipboardEvents"
 import * as CommunicatorController from "./communicationFolder/communitcationController"
 import * as EventModel from "./EventModel"
+
+// GMPnkects
+import {GNContainerDiv} from "./GreatNoteClass/GreatNoteDataClass"
+import {GNImageContainer} from "./GreatNoteClass/GNImageContainer"
+import {GNInputField} from "./GreatNoteClass/GNInputField"
 import * as GreatNoteSvgDataClass from "./GreatNoteClass/GreatNoteSvgDataClass"
-import * as GreatNoteDataClass from "./GreatNoteClass/GreatNoteDataClass"
+
+
 import {socket} from "./socketFunction"
 import * as GNCommentController from "./commentFolder/commentController"
 
 import * as LayerConroller from "./layerControllerFolder/layerController"
-import {MainControllerInterface} from "./constructInitialCondition"
+import {MainControllerInterface} from "./mainControllerFolder/mainControllerInterface"
 import * as pageController from "./pageControllerFolder/pageController"
 import * as pageViewHelperFunction from "./pageViewHelperFunction"
 import * as InitializeAttributeControllerFunction from "./attributeControllerFolder/initializeAttributeControllers"
@@ -130,7 +136,9 @@ export function buildPageControllerButtonArray(mainController){
   objectIDGetterSubmit.style.background = "gold"
 
   objectIDGetterSubmit.addEventListener("click", (e)=>{
-      console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector(`*[accessPointer='${objectIDGetter.value}']`))
+      console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector(`*[accessPointer='${objectIDGetter.value}']`));
+
+      window.selectedItem = document.querySelector(`*[accessPointer='${objectIDGetter.value}']`)
   })
 
 
@@ -170,6 +178,7 @@ export function buildPageController(mainController, bookmarkSubPanelContent, ful
   let createNewDivButton = pageViewHelperFunction.functionButtonCreater(
     "new Div", pageViewHelperFunction.createNewPageEvent(mainController.pageController, fullPageModeDiv, overviewModeDiv, pageContentContainer)
   )
+  createNewDivButton.classList.add("addNewPage")
 
   let deletePageButton = document.createElement("button")
   deletePageButton.innerHTML = "delete page"
@@ -215,18 +224,22 @@ export function buildInitialHTMLSkeleton(mainController: MainControllerInterface
       // add events: initalizeWindowObject, addPasteImageEvent, swipeDetection
       attachEvents(mainController, pageContentContainer)
 
+      pageViewHelperFunction.shortNotice("inital Value")
+
       socket.emit("clientAskServerForSocketData")
 
       panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel)
+
+      window.mainController = mainController
 
 }// buildInitialHTMLSkeleton
 
 
 export function buildInitialPage(mainController:MainControllerInterface, saveToDatabase=false){
     mainController.GNDataStructureMapping = {
-        GNInputField: GreatNoteDataClass.GNInputField,
-        GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-        GNImageContainer: GreatNoteDataClass.GNImageContainer,
+        GNInputField: GNInputField,
+        GNContainerDiv: GNContainerDiv,
+        GNImageContainer: GNImageContainer,
 
         // svg
         GNSvg: GreatNoteSvgDataClass.GNSvg,

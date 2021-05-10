@@ -2,6 +2,7 @@
 exports.__esModule = true;
 exports.addCommentController = exports.addEventToCommentContainer = exports.createCommentObject = exports.loadFromData = void 0;
 var GreatNoteDataClass_1 = require("../GreatNoteClass/GreatNoteDataClass");
+var GNDropdownList_1 = require("../GreatNoteClass/GNDropdownList");
 function loadFromData(_commentContainer, injectedData) {
     _commentContainer._identity = injectedData._identity;
     _commentContainer.setAttribute("accessPointer", injectedData._identity.accessPointer);
@@ -23,15 +24,38 @@ exports.loadFromData = loadFromData;
 function createCommentObject(_commentContainer, createData) {
     var arrayID = createData.arrayID, saveToDatabase = createData.saveToDatabase, injectedData = createData.injectedData;
     var _commentObject = GreatNoteDataClass_1.GNContainerDiv(createData);
-    console.log(323232, _commentObject, createData);
-    _commentObject.classList.add("commentField");
-    // _commentObject.classList.add("commentField")
-    // _commentObject.specialGNType = "GNCommentObject"
-    _commentObject.contentEditable = "true";
-    // when nit is not injectdData, then initialize the html
-    if (!injectedData) {
-        _commentObject.textContent = "create CommentDiv";
+    _commentObject.classList.add("commentObject");
+    _commentObject.specialGNType = "GNCommentObject";
+    // commentContent
+    var _commentContent = GreatNoteDataClass_1.GNContainerDiv({
+        name: "commentContent",
+        arrayID: _commentObject.getAccessPointer(), contentEditable: true,
+        saveToDatabase: saveToDatabase
+    });
+    _commentContent.contentEditable = "true";
+    _commentContent.classList.add("commentField");
+    // _commentType
+    var _commentType = GNDropdownList_1.GNDropdownList({
+        name: "commentType",
+        arrayID: _commentObject.getAccessPointer(),
+        statusList: ["reply", "comment"],
+        saveToDatabase: saveToDatabase
+    });
+    //
+    if (injectedData) {
+        console.log(45, "injected", injectedData["array"][1]);
+        _commentType.loadFromData(injectedData["array"][0]);
+        _commentContent.loadFromData(injectedData["array"][1]);
     }
+    _commentType.classList.add("commentType");
+    _commentType.style.display = "block";
+    console.log(636363, _commentContent, _commentType);
+    //   when nit is not injectdData, then initialize the html
+    if (!injectedData) {
+        // _commentObject.textContent = "creaaated by intiaal"
+    }
+    _commentObject.append(_commentType, _commentContent);
+    // _commentObject.append(_commentType, _commentContent)
     _commentObject.appendTo(_commentContainer);
     return _commentObject;
 }
@@ -52,7 +76,7 @@ function addCommentController(_commentContainer) {
     addCommentButton.classList.add("addCommentButton");
     addCommentButton.innerText = "add Comment";
     addCommentButton.addEventListener("click", function (e) {
-        var newCommentField = _commentContainer.createCommentObject({ "name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase: true });
+        var newCommentField = _commentContainer.createCommentObject({ "name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase: true, contentEditable: false });
         newCommentField.saveHTMLObjectToDatabase();
     });
     // delete comment button

@@ -66,6 +66,8 @@ export function superGNObject(_object, saveToDatabase:boolean, arrayID:string, i
         let dataPointer = _object.getDataPointer()
         let accessPointer = _object.getAccessPointer()
 
+
+
         let dataPointerObject = mainController.getObjectById(dataPointer)
 
         _object.loadFromData(dataPointerObject)

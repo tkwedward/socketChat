@@ -24,7 +24,6 @@ socket.on("message", (msg)=>{
 
 
 socket.on("saveDataToServer", data=>{
-    console.log("receive save message from server")
     mainController.saveMainDoc(true)
 })
 
@@ -58,7 +57,6 @@ socket.on("socketConnectionUpdate", data=>{
 
 socket.on("serverSendChangeFileToClient", changeDataArray=>{
     if (changeDataArray.senderID != socket.id){
-        console.log(616161, "socket, serverSendChangeFileToClient")
         mainController.mainDoc = Automerge.applyChanges(mainController.mainDoc, changeDataArray.changeData)
         mainController.previousDoc = mainController.mainDoc
 

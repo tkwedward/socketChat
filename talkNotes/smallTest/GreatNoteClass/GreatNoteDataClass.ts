@@ -5,7 +5,7 @@ import {superGNObject, createDummyData} from "./GreateNoteObjectHelperFunction"
 //@auto-fold here
 
 export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNContainerDivInterface {
-    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData} = createData
+    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, injectedData, contentEditable, _classNameList} = createData
     let _object = <GNContainerDivInterface> document.createElement("div");
     _object.childrenList = {}
 
@@ -13,6 +13,12 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
     _object.GNSpecialCreationMessage = specialCreationMessage || ""
     _object._dataStructure = ["textContent"]
     _object._styleStructure = ["background", "width", "height", "position", "left", "top"]
+
+    // add classname
+    _object._classNameList = _classNameList
+    _classNameList?.forEach(p=>{
+      _object.classList.add(p)
+    })
 
     // functions
     _object.appendElements = function(...childrenArray){
@@ -28,15 +34,18 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
 
          _object.specialGNType = data.specialGNType
 
-        if (data.classList) data.classList.forEach(p=>_object.classList.add(p))
+        if (data._classNameList) data._classNameList.forEach(p=>_object.classList.add(p))
 
         _object._identity = data._identity
 
-        console.log(256, data)
-        _object._dataStructure.forEach(key=>{
-            _object[key] = data["data"][key]
-        })
+        _object.setAttribute("accessPointer", data._identity.accessPointer)
+
+        if (contentEditable){
+          _object["textContent"] = data["data"]["textContent"]
+        }
     }
+
+    _object.extract = () => _object.createDataObject()
 
     _object.createDataObject = function(){
         let dataObject = createDummyData()
@@ -46,14 +55,13 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
         dataObject["specialGNType"] = _object.specialGNType || ""
 
         if (_object._identity) dataObject["_identity"] = _object._identity
-        dataObject["classList"] = Array.from(_object.classList)
+
+        dataObject["_classNameList"] = Array.from(_object.classList)
 
         // data structure
-        _object._dataStructure.forEach(p=>{
-          dataObject["data"][p] = _object[p]
-        })
-
-        dataObject["classList"] = Array.from(_object.classList)
+        if (contentEditable){
+            dataObject["data"]["textContent"] = _object["textContent"]
+        }
 
         // stylesheet data
         _object._styleStructure.forEach(p=>{
@@ -72,14 +80,13 @@ export function GNContainerDiv(createData: CreateGreatNoteObjectInterface) : GNC
     }
 
 
-    _object.extract = () => _object.createDataObject()
+
 
     // add extra funcitons to the object
 
     superGNObject(_object, saveToDatabase, arrayID, insertPosition, dataPointer, specialCreationMessage, injectedData)
 
     if (injectedData){
-      console.log(307, injectedData)
       _object.loadFromData(injectedData)
       _object.applyStyle(injectedData.stylesheet, false)  //
     }

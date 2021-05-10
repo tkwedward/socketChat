@@ -5,6 +5,28 @@ import {socket} from "./socketFunction"
 import {highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
 
+
+export function shortNotice(noticeText){
+    let shortNoticeDiv = document.createElement("div")
+    shortNoticeDiv.textContent = noticeText
+    shortNoticeDiv.style.position = "fixed"
+    shortNoticeDiv.style.width = "10%";
+    shortNoticeDiv.style.left = "45%"
+    shortNoticeDiv.style.top = "45%"
+    shortNoticeDiv.style.background = "wheat"
+    shortNoticeDiv.style.padding = "20px"
+    shortNoticeDiv.style.zIndex = "10000"
+
+    setTimeout(()=>{
+      shortNoticeDiv.remove()
+    }, 1500)
+
+
+    document.body.appendChild(shortNoticeDiv)
+
+}
+
+
 //@auto-fold here
 export function createSubPanel(name:string, first:boolean){
     let subPanelTemplate = <HTMLTemplateElement>document.querySelector("#subPanelTemplate")
@@ -82,18 +104,32 @@ export function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv){
 }
 
 export function createNewPage(pageController, fullPageModeDiv:HTMLDivElement, overviewModeDiv:HTMLDivElement, fullPageData?, overviewPageData?, saveToDatabase=true){
-    let newPage = GreatNoteDataClass.GNContainerDiv({name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject"})
+    let newPage = GreatNoteDataClass.GNContainerDiv({
+      name: "fullPage", arrayID: mainController.mainDocArray["mainArray_pageFull"], insertPosition: false,
+      dataPointer: false,
+      saveToDatabase: saveToDatabase,
+      specialCreationMessage: "createNewFullPageObject",
+      contentEditable: false
+    })
 
     newPage.classList.add("divPage", "fullPage")
-    newPage._dataStructure = ["innerText"]
+    newPage._dataStructure = []
     newPage._styleStructure = ["background", "width", "height"]
     // newPage.style.width = `${pageController.fullPageSize[0]}px`
     // newPage.style.height = `${pageController.fullPageSize[1]}px`
 
     let newPageAccesssPointer = saveToDatabase? newPage.getAccessPointer(): false // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
-    let smallView = GreatNoteDataClass.GNContainerDiv({name: "overviewPage", arrayID: mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject"})
+    let smallView = GreatNoteDataClass.GNContainerDiv({
+        name: "overviewPage",
+        arrayID: mainController.mainDocArray["mainArray_pageOverview"],
+        insertPosition: false,
+        dataPointer: newPageAccesssPointer,
+        saveToDatabase: saveToDatabase,
+        specialCreationMessage: "createNewOverviewPageObject",
+        contentEditable: false
+    })
     smallView.classList.add("divPageSmall")
-    smallView._dataStructure = ["innerText"]
+    smallView._dataStructure = []
     smallView._styleStructure = ["background", "width", "height"]
     smallView.style.background = "pink"
     smallView.style.width = `${pageController.overviewPageSize[0]}px`
@@ -119,20 +155,17 @@ export function createNewPage(pageController, fullPageModeDiv:HTMLDivElement, ov
     if (fullPageData && overviewPageData){
         fillInNewPageDataContent(newPage, fullPageData)
         fillInSmallViewDataContent(smallView, overviewPageData)
-        // fillInDataContent(fullPageData, overviewPageData)
-        // socket.emit("clientAskServerToInitiateSynchronization")
     }
+
     return [newPage, smallView]
 }
 
 export function fillInNewPageDataContent(newPage, fullPageData){
     newPage.initializeHTMLObjectFromData(fullPageData)
-    newPage.innerText = fullPageData.data.innerText
 }
 
 export function fillInSmallViewDataContent(smallView, overviewPageData){
     smallView.initializeHTMLObjectFromData(overviewPageData)
-    let smallViewDescription = smallView.querySelector(".smallViewDescription")
     // smallViewDescription.innerText = overviewPageData.data.innerText
 }
 
@@ -174,6 +207,11 @@ export function createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeD
     let clickEventAction = function (){
           let [newPage, smallView] = createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv)
           insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv)
+
+          let addDivLayereButton = <HTMLButtonElement> document.querySelector(".addDivLayerButton")
+          let addSvgLayerButton = <HTMLButtonElement> document.querySelector(".addSvgLayerButton")
+          addDivLayereButton.click()
+          addSvgLayerButton.click()
     }
 
     return clickEventAction

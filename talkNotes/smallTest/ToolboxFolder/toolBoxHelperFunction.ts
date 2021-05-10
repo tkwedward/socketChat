@@ -12,6 +12,12 @@ export function mousePositionRatioAdjustment(length, ratio){
   return length * 1/ratio
 }
 
+export function locationLog(logText:string){
+  let testInfo = document.querySelector(".testInfo")
+  testInfo.innerHTML = logText
+}
+
+
 
 export function changeItemPosition(p, originalPointArray, deltaX, deltaY){
     let newPointArray = originalPointArray.map(([x, y], i)=>[x + deltaX, y + deltaY])

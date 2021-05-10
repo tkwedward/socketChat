@@ -8,7 +8,7 @@ export interface GNObjectInterface {
     GNSpecialCreationMessage: any
     specialGNType?: string
     _name: string // a name to describe the object
-
+    _classNameList: string[]
     // these two are used for extracting data and create dataObject
     _dataStructure?: string[] // the data properties that you want to extract from the object
     _styleStructure?: string[] // the style that you want to extract from the object
@@ -17,7 +17,7 @@ export interface GNObjectInterface {
     _identity?: {
       "accessPointer": string,
       "dataPointer": string,
-      "linkArray": string
+      "linkArray": string[]
     } // the identity of the object
 
     loadFromData?(data)
@@ -78,6 +78,9 @@ export interface CreateGreatNoteObjectInterface {
     saveToDatabase?: boolean,
     injectedData?: any
     imgsrc?: string
+    contentEditable?: boolean
+    statusList?: string[]
+    _classNameList?: string[]
 }
 
 // GNButtonInterface

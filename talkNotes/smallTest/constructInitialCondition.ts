@@ -199,6 +199,7 @@ export class MainController implements MainControllerInterface{
         let dataPointer = htmlObject.getDataPointer()
         let accessPointer = htmlObject.getAccessPointer()
 
+        // console.log(2022020202, newData, htmlObject)
         let message = JSON.stringify({"action": "update", "objectID": accessPointer})
 
         this.mainDoc = Automerge.change(this.mainDoc, message,doc=>{
@@ -207,14 +208,17 @@ export class MainController implements MainControllerInterface{
 
             // update the data
             Object.entries(newData.data).forEach(([key, value], _)=>{
+              // console.log(211211, key, value)
                 dataPointerObejct["data"][key] = value
             })
 
+            if (newData._classNameList) dataPointerObejct["_classNameList"] = newData._classNameList
 
             // update the stylesheet
             if (accessPointer!=dataPointer){
                 // if it is a link object
                 Object.entries(newData.stylesheet).forEach(([key, value], _)=>{
+                  // console.log(211211, key, value)
                     accessPointerObject["stylesheet"][key] = value
                 })
             } else {
@@ -258,7 +262,7 @@ export class MainController implements MainControllerInterface{
     sendChangeToServer(){
       let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
       mainController.previousDoc = mainController.mainDoc
-      console.log("56: the changes are: ", changes)
+      // console.log("56: the changes are: ", changes)
       socket.emit("clientSendChangesToServer", {"changeData": changes})
     }
 
@@ -304,7 +308,7 @@ export class MainController implements MainControllerInterface{
         // cannot save any obeject to the data base here
         data["array"].forEach(p=>{
             if (p.GNType=="GNComment"){
-              console.log(404, p.GNType)
+              // console.log(404, p.GNType)
               newHTMLObject = this.createGNObjectThroughName("GNComment", {name: "", injectedData: p})
               arrayHTMLObject.appendChild(newHTMLObject)
 
@@ -327,12 +331,10 @@ export class MainController implements MainControllerInterface{
             }
 
             if (p.GNType=="GNContainerDiv"){
-                newHTMLObject =  this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p})
+                newHTMLObject =  this.GNDataStructureMapping[p.GNType]({name: "name", arrayID: arrayHTMLObject.getAccessPointer(),  saveToDatabase:false, injectedData: p, contentEditable: false})
                 newHTMLObject._identity = p._identity
 
                 let objectData =  newHTMLObject.getDataFromDataBase()
-
-
 
             }
 
@@ -342,7 +344,7 @@ export class MainController implements MainControllerInterface{
                 //
                 let newPolylineData = newHTMLObject.getDataFromDataBase()
 
-                newHTMLObject.loadFromData(newPolylineData["data"])
+                newHTMLObject.loadFromData(newPolylineData)
 
                 let stylesheet = newPolylineData["stylesheet"]
                 newHTMLObject.applyStyle({"stroke": stylesheet["stroke"], "stroke-width": stylesheet["stroke-width"], "fill": stylesheet["fill"]})
@@ -354,6 +356,7 @@ export class MainController implements MainControllerInterface{
 
                 newHTMLObject._identity = p._identity
 
+                newHTMLObject.loadFromData(p)
                 newHTMLObject.setImageSize({width:500})
                 newHTMLObject.setMovable()
             }
@@ -391,7 +394,6 @@ export class MainController implements MainControllerInterface{
       // to render the data ato HTML
 
       let rootArray = this.mainDoc["array"]
-      console.log(rootArray, this.mainDoc)
       rootArray.forEach(mainArray=>{
           // update the ID of the mainArray
           let arrayName = mainArray["data"]["name"]
@@ -404,14 +406,12 @@ export class MainController implements MainControllerInterface{
 
     processChangeData(changeDataArray){
     // processChangeData(changeDataArray:Set<string>){
-
-        // console.log(507, changeDataArray)//
         let jsonfiedChangeDataArray = Array.from(changeDataArray).map(p=>JSON.parse(p["message"]))
         // console.log(509, jsonfiedChangeDataArray)
         // if (changeDataArray.length == 1){
 
         jsonfiedChangeDataArray.forEach(p=>{
-
+            // console.log(414, p)
             let changeData = p
             if (changeData.action=="create"){
                 processCreationDataHelper(this, changeData)
@@ -419,9 +419,10 @@ export class MainController implements MainControllerInterface{
 
             if (changeData.action=="update"){
                 let _object = document.querySelector(`*[accessPointer='${changeData.objectID}']`)
+                // console.log(422422, _object, changeData.objectID)
                 if (_object){
                     let objectData = mainController.getObjectById(changeData.objectID)
-                    console.log(520520, _object)
+                    // console.log(520520, _object)
                     _object.reloadDataFromDatabase()
                 }
             }  // update

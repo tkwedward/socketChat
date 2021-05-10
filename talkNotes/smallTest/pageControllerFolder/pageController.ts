@@ -63,6 +63,7 @@ export function initializePageController(mainController){
         }
 
 
+
         pageController.updatePageNumber(alpha)
         pageController.totalPageNumber += 1
     }
@@ -96,13 +97,16 @@ export function initializePageController(mainController){
     pageController.goToPage = function(pageNumber, pageNumberInput?){
 
         let _targetPage = pageController.getPage(pageNumber)
-        console.log(86868686, _targetPage)
         _targetPage.fullPageHTMLObject.style.display = "block"
 
         // set the position of the page according to the position relative to the targetPage
+        pageController.currentPage.fullPageHTMLObject.classList.remove("currentPage")
         pageController.currentPage.fullPageHTMLObject.style.display = "none"
-        pageController.currentPage = _targetPage
 
+
+        // turn targetPage to current Page
+        pageController.currentPage = _targetPage
+        pageController.currentPage.fullPageHTMLObject.classList.add("currentPage")
 
 
         pageController.pagNumberInput.value = "" + pageNumber

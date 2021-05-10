@@ -1,9 +1,13 @@
-import * as GreatNoteDataClass from "./GreatNoteClass/GreatNoteDataClass"
+import {GNImageContainer}  from "./GreatNoteClass/GNImageContainer"
 
 export function addPasteImageEvent(mainController){
     document.onpaste = function (event) {
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
         console.log(JSON.stringify(items)); // might give you mime types
+        let currentPage = mainController.pageController.currentPage.fullPageHTMLObject
+        let targetDiv = currentPage.querySelector(".divLayer")
+
+
         for (var index in items) {
             var item = items[index];
             if (item.kind === 'file') {
@@ -16,13 +20,14 @@ export function addPasteImageEvent(mainController){
                       console.log("finish processing image")
                        console.log(this.responseText);
                        let responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "")
-                       let newImg = GreatNoteDataClass.GNImageContainer({"name": "", arrayID: mainController.toolBox.targetPage.getAccessPointer(), saveToDatabase:true, imgsrc: "/noteImage/" + responseImgSrc +".png"})
 
-                       mainController.toolBox.targetPage.appendChild(newImg)
+                       let newImg = GNImageContainer({"name": "", arrayID: targetDiv.getAccessPointer(), saveToDatabase:true, imgsrc: "/noteImage/" + responseImgSrc +".png"})
+
+                       targetDiv.appendChild(newImg)
                        newImg.setImageSize({width:500})
                        newImg.setMovable()
                        newImg.saveHTMLObjectToDatabase()
-                      mainController.toolBox.targetPage.appendChild(newImg)
+                       targetDiv.appendChild(newImg)
                     };
                     xhr.send(event.target.result);
                 };

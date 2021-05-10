@@ -75,7 +75,7 @@ var specialCreationMessageEnum;
 })(specialCreationMessageEnum = exports.specialCreationMessageEnum || (exports.specialCreationMessageEnum = {}));
 function processCreationDataHelper(mainController, creationData) {
     return __awaiter(this, void 0, void 0, function () {
-        var specialCreationMessage, objectData, newHTMLObject, newPageItemData, newSmallViewItemData, _newPageObjectData, _newSmallViewObjectData, fullPageModeDiv, overviewModeDiv, _a, newPage, smallView, parentHTMLObject;
+        var specialCreationMessage, objectData, newHTMLObject, newPageItemData, newSmallViewItemData, _newPageObjectData, _newSmallViewObjectData, fullPageModeDiv, overviewModeDiv, _a, newPage, smallView, objectData_1, parentHTMLObject;
         return __generator(this, function (_b) {
             specialCreationMessage = creationData.specialCreationMessage;
             objectData = mainController.getObjectById(creationData.objectID);
@@ -101,9 +101,15 @@ function processCreationDataHelper(mainController, creationData) {
                         newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false, imgsrc: objectData["data"].src });
                     }
                     else {
-                        newHTMLObject = mainController.createGNObjectThroughName(objectData.GNType, { name: "", arrayID: "", insertPosition: false, dataPointer: false, saveToDatabase: false });
+                        objectData_1 = mainController.getObjectById(creationData.objectID);
+                        newHTMLObject = mainController.createGNObjectThroughName(objectData_1.GNType, {
+                            name: "",
+                            arrayID: creationData.parentHTMLObjectId,
+                            insertPosition: false,
+                            dataPointer: false, saveToDatabase: false,
+                            injectedData: objectData_1
+                        });
                     }
-                    console.log(newHTMLObject);
                     newHTMLObject.initializeHTMLObjectFromData(objectData);
                     parentHTMLObject = mainController.getHtmlObjectByID(creationData.parentHTMLObjectId);
                     // console.log("action = create", creationData.objectID, parentHTMLObject, objectData, newHTMLObject)
@@ -143,7 +149,6 @@ function processNewChangeData(mainController, generator, awaitmessage) {
                         processNewChangeData(mainController, generator, updateFinished);
                     }
                     if (!(changeData.action == "create")) return [3 /*break*/, 2];
-                    console.log(changeData);
                     return [4 /*yield*/, processCreationDataHelper(mainController, changeData)
                         // console.log("71717171========THis is await finished message", updateFinished)
                         // console.log("81 -------------- creation event is finisheed")
@@ -157,11 +162,8 @@ function processNewChangeData(mainController, generator, awaitmessage) {
                 case 2:
                     if (!(changeData.action == "update")) return [3 /*break*/, 4];
                     _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
-                    console.log("83 The html object is  ", _object);
-                    console.log(457, _object, changeData.objectID);
                     objectData = mainController.getObjectById(changeData.objectID);
                     if (!_object) return [3 /*break*/, 4];
-                    console.log(939393, _object);
                     _object.reloadDataFromDatabase();
                     return [4 /*yield*/, objectData
                         // console.log("71717171========THis is await finished message", updateFinished)

@@ -17,7 +17,6 @@ export function detectCollision(svgBoard, eraser){
     })
 }
 
-
 export function eraserMouseDownFunction(e, mainController, svgBoard, moveEventName:string, upEventName:string){
     if (!mainController.toolBox.checkToolBoxItemStatus("eraserItemButton")){
         return
@@ -43,6 +42,11 @@ export function eraserMouseDownFunction(e, mainController, svgBoard, moveEventNa
             // t1 = t2
             // t2 = e.timeStamp
             let [offsetX, offsetY, touchIsPen] = ToolBoxHelperFunction.getOffSetXY(e)
+
+            let logTest = `offsetX = ${offsetX} <br>` + `offsetY = ${offsetY}`
+
+            ToolBoxHelperFunction.locationLog(logTest)
+
 
             eraser.style["cx"] = offsetX
             eraser.style["cy"] = offsetY

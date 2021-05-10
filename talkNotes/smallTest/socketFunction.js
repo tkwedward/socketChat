@@ -38,7 +38,6 @@ exports.socket.on("message", function (msg) {
     console.log(msg);
 });
 exports.socket.on("saveDataToServer", function (data) {
-    console.log("receive save message from server");
     constructInitialCondition_1.mainController.saveMainDoc(true);
 });
 exports.socket.on("serverResponseToLoadMainDocRequest", function (data) {
@@ -64,7 +63,6 @@ exports.socket.on("socketConnectionUpdate", function (data) {
 });
 exports.socket.on("serverSendChangeFileToClient", function (changeDataArray) {
     if (changeDataArray.senderID != exports.socket.id) {
-        console.log(616161, "socket, serverSendChangeFileToClient");
         constructInitialCondition_1.mainController.mainDoc = Automerge.applyChanges(constructInitialCondition_1.mainController.mainDoc, changeDataArray.changeData);
         constructInitialCondition_1.mainController.previousDoc = constructInitialCondition_1.mainController.mainDoc;
         constructInitialCondition_1.mainController.processChangeData(changeDataArray.changeData);

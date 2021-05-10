@@ -1,4 +1,5 @@
 import {GNContainerDiv} from "../GreatNoteClass/GreatNoteDataClass"
+import {GNDropdownList} from "../GreatNoteClass/GNDropdownList"
 import {GNObjectInterface, GNContainerDivInterface, CreateGreatNoteObjectInterface} from "../GreatNoteClass/GreatNoteObjectInterface"
 
 export interface CommentContainerInterface extends GNContainerDivInterface{
@@ -27,19 +28,45 @@ export function loadFromData(_commentContainer, injectedData){
 
 export function createCommentObject(_commentContainer, createData){
   let {arrayID, saveToDatabase, injectedData}  = createData
-
   let _commentObject = GNContainerDiv(createData)
-  console.log(323232, _commentObject, createData)
-  _commentObject.classList.add("commentField")
-  // _commentObject.classList.add("commentField")
-  // _commentObject.specialGNType = "GNCommentObject"
-  _commentObject.contentEditable = "true"
+  _commentObject.classList.add("commentObject")
+  _commentObject.specialGNType = "GNCommentObject"
 
-  // when nit is not injectdData, then initialize the html
-  if (!injectedData) {
-    _commentObject.textContent = "create CommentDiv"
+  // commentContent
+  let _commentContent = GNContainerDiv({
+      name: "commentContent",
+      arrayID: _commentObject.getAccessPointer(), contentEditable:true,
+      saveToDatabase: saveToDatabase
+  })
+  _commentContent.contentEditable = "true"
+  _commentContent.classList.add("commentField")
+
+  // _commentType
+  let _commentType = GNDropdownList({
+      name: "commentType",
+      arrayID: _commentObject.getAccessPointer(),
+      statusList: ["reply", "comment"],
+      saveToDatabase: saveToDatabase
+  })
+
+  //
+  if (injectedData){
+    console.log(45, "injected", injectedData["array"][1])
+    _commentType.loadFromData(injectedData["array"][0])
+    _commentContent.loadFromData(injectedData["array"][1])
+
   }
 
+  _commentType.classList.add("commentType")
+  _commentType.style.display = "block"
+
+  console.log(636363, _commentContent, _commentType)
+//   when nit is not injectdData, then initialize the html
+  if (!injectedData) {
+    // _commentObject.textContent = "creaaated by intiaal"
+  }
+  _commentObject.append(_commentType, _commentContent)
+  // _commentObject.append(_commentType, _commentContent)
   _commentObject.appendTo(_commentContainer)
   return _commentObject
 }
@@ -64,7 +91,7 @@ export function addCommentController(_commentContainer: CommentContainerInterfac
     addCommentButton.innerText = "add Comment"
 
     addCommentButton.addEventListener("click", (e)=>{
-        let newCommentField = _commentContainer.createCommentObject({"name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase:true})
+        let newCommentField = _commentContainer.createCommentObject({"name": "", arrayID: _commentContainer.getAccessPointer(), saveToDatabase:true, contentEditable: false})
         newCommentField.saveHTMLObjectToDatabase()
     })
 

@@ -12,6 +12,7 @@ export function GNComment(createData: CreateGreatNoteObjectInterface) : GNContai
     _commentContainer.GNType = GNComment.name
     _commentContainer.classList.add("_commentContainer")
 
+
     if (arrayID && saveToDatabase) {
       _commentContainer.addToDatabase(arrayID)
       _commentContainer.saveHTMLObjectToDatabase()
@@ -31,16 +32,13 @@ export function GNComment(createData: CreateGreatNoteObjectInterface) : GNContai
         // if there are data, loop each object and create
         console.log(323232, "inject data")
         _commentContainer.loadFromData(injectedData)
-
         // ****************************
         // render the comments inside
         // ****************************
         injectedData["array"].forEach(p=>{
-            let newObject = _commentContainer.createCommentObject({name: ""})
-            newObject.initializeHTMLObjectFromData(p)
-            newObject.contentEditable = "true"
+            let newObject = _commentContainer.createCommentObject({name: "", injectedData:p})
 
-            // _commentContainer.appendChild(newObject)
+            // newObject.initializeHTMLObjectFromData(p)
         })
 
     } else {

@@ -1,5 +1,5 @@
 import {calculateDistance, getScale, getTouchOffset} from "../ToolboxFolder/toolBoxHelperFunction"
-
+import * as PageViewHelperFunction from "../pageViewHelperFunction"
 
 
 export function swipeDetection(mainController, pageContentContainer){
@@ -110,7 +110,7 @@ function fingerPanPage(mainController, pageContentContainer,  mouseMoveFunction,
 function fingerTurnPage(mainController, pageContentContainer,  mouseMoveFunction, mouseUpFunction, deltaX:number, deltaX2:number, doubleFinger:boolean){
   pageContentContainer.removeEventListener("touchmove", mouseMoveFunction)
   pageContentContainer.removeEventListener("touchend", mouseUpFunction)
-
+  let addNewPageButton = <HTMLButtonElement> document.querySelector(".addNewPage")
   let currentPage = mainController.pageController.currentPage
 
   let pageMoveDirection = deltaX > 0 ? -1 : +1
@@ -121,7 +121,8 @@ function fingerTurnPage(mainController, pageContentContainer,  mouseMoveFunction
   if (Math.abs(deltaX) > turnPageBreakPoint || Math.abs(deltaX2) > turnPageBreakPoint ){  // if larager than the page Break Point
     if (pageMoveDirection > 0 ){
        if (currentPage.next.name=="endPage"){
-         console.log("create a new page")
+         addNewPageButton.click()
+         PageViewHelperFunction.shortNotice("newPage is added")
        } else { // not the end page
          mainController.pageController.goToPage(targetPageNumber)
          pageContentContainer.scrollTo(0, 0)

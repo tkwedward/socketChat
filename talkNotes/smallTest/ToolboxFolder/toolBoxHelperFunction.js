@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.getTouchOffset = exports.getScale = exports.getPageXY = exports.getOffSetXY = exports.changeItemPosition = exports.mousePositionRatioAdjustment = exports.calculateDistance = exports.clearUpEvent = void 0;
+exports.getTouchOffset = exports.getScale = exports.getPageXY = exports.getOffSetXY = exports.changeItemPosition = exports.locationLog = exports.mousePositionRatioAdjustment = exports.calculateDistance = exports.clearUpEvent = void 0;
 var Settings = __importStar(require("../settings"));
 function clearUpEvent(svgBoard, eventName, eventFunction) {
     svgBoard.removeEventListener(eventName, eventFunction);
@@ -33,6 +33,11 @@ function mousePositionRatioAdjustment(length, ratio) {
     return length * 1 / ratio;
 }
 exports.mousePositionRatioAdjustment = mousePositionRatioAdjustment;
+function locationLog(logText) {
+    var testInfo = document.querySelector(".testInfo");
+    testInfo.innerHTML = logText;
+}
+exports.locationLog = locationLog;
 function changeItemPosition(p, originalPointArray, deltaX, deltaY) {
     var newPointArray = originalPointArray.map(function (_a, i) {
         var x = _a[0], y = _a[1];

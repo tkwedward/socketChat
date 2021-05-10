@@ -17,18 +17,15 @@ function createDummyData() {
 }
 //@auto-fold here
 function GNSvg(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message;
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message, injectedData = createData.injectedData;
     var svgDivContainer = document.createElement("div");
     svgDivContainer.id = "testSvgDiv";
     var svgController = svg_js_1["default"](svgDivContainer);
-    svgController.width("800px");
-    svgController.height("300px");
     var svgBoard = svgController.node;
     svgBoard.svgController = svgController;
-    svgBoard.style.background = "gold";
     svgBoard.GNType = GNSvg.name;
     svgBoard._name = name;
-    svgBoard._dataStructure = ["innerHTML"];
+    svgBoard._dataStructure = [];
     svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
     // // functions
     // svgObject.loadFromData = (data)=>{ svgObject.value = data }
@@ -55,6 +52,15 @@ function GNSvg(createData) {
             dataObject["stylesheet"][p] = svgBoard["style"][p];
         });
         return dataObject;
+    };
+    svgBoard.loadFromData = function (data) {
+        svgBoard.GNSpecialCreationMessage = data.GNSpecialCreationMessage;
+        svgBoard.specialGNType = data.specialGNType;
+        if (data.classList)
+            data.classList.forEach(function (p) { return svgBoard.classList.add(p); });
+        svgBoard._identity = data._identity;
+        svgBoard.setAttribute("accessPointer", data._identity.accessPointer);
+        svgBoard.applyStyle(data.stylesheet);
     };
     //
     svgBoard.extract = function () { return svgBoard.createDataObject(); };
@@ -166,8 +172,8 @@ function GNSvgPolyLine(createData) {
     svgObject._dataStructure = ["points"];
     svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
     // functions
-    svgObject.loadFromData = function (data) {
-        svgObject.soul.plot(data["points"]);
+    svgObject.loadFromData = function (automergeData) {
+        svgObject.soul.plot(automergeData["data"]["points"]);
     };
     svgObject.createDataObject = function () {
         var dataObject = createDummyData();

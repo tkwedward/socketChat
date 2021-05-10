@@ -4,13 +4,17 @@ exports.GNImageContainer = void 0;
 var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
 //@auto-fold here
 function GNImageContainer(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage, imgsrc = createData.imgsrc;
+    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, specialCreationMessage = createData.specialCreationMessage, imgsrc = createData.imgsrc, _classNameList = createData._classNameList;
     var _object = document.createElement("div");
     _object.draggable = false;
     _object._name = name;
     _object.GNType = GNImageContainer.name;
     _object._dataStructure = ["src"];
-    _object._styleStructure = ["width", "height"];
+    _object._styleStructure = ["width", "height", "left", "top", "position"];
+    _object._classNameList = _classNameList || [];
+    if (_classNameList) {
+        _classNameList.forEach(function (p) { return _object.classList.add(p); });
+    }
     var image = document.createElement("img");
     image.src = imgsrc;
     image.style.width = "100%";
@@ -19,7 +23,12 @@ function GNImageContainer(createData) {
         _object.imageWidthToHeightRatio = image.width / image.height;
     };
     _object.appendChild(image);
-    _object.loadFromData = function (data) { data; };
+    _object.loadFromData = function (data) {
+        Object.entries(data.stylesheet).forEach(function (_a, _) {
+            var key = _a[0], value = _a[1];
+            _object.style[key] = value;
+        });
+    };
     _object.setMovable = function () {
         var eventName = "mousedown";
         var moveEventName = "mousemove";
@@ -56,6 +65,7 @@ function GNImageContainer(createData) {
             }
             _object.addEventListener("mouseup", function (e) {
                 endDragEvent(e);
+                _object.saveHTMLObjectToDatabase();
             }, false);
             _object.addEventListener("mouseout", function (e) {
                 endDragEvent(e);
@@ -71,9 +81,9 @@ function GNImageContainer(createData) {
         // data
         dataObject["data"]["src"] = imgsrc;
         // stylesheet data
-        // _object._styleStructure.forEach(p=>{
-        //   dataObject["stylesheet"][p] = _object["style"][p]
-        // })
+        _object._styleStructure.forEach(function (p) {
+            dataObject["stylesheet"][p] = _object["style"][p];
+        });
         return dataObject;
     };
     _object.extract = function () { return _object.createDataObject(); };

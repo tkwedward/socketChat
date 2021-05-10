@@ -17,20 +17,16 @@ function createDummyData(){
 
 //@auto-fold here
 export function GNSvg(createData: CreateGreatNoteObjectInterface) : GNSvgContainerInterface {
-    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, message} = createData
+    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, message, injectedData} = createData
     let svgDivContainer =  document.createElement("div")
     svgDivContainer.id = "testSvgDiv"
 
     let svgController = SVG(svgDivContainer)
-    svgController.width("800px")
-    svgController.height("300px")
-
     let svgBoard = <GNSvgContainerInterface> svgController.node
     svgBoard.svgController = svgController
-    svgBoard.style.background = "gold"
     svgBoard.GNType = GNSvg.name
     svgBoard._name = name
-    svgBoard._dataStructure = ["innerHTML"]
+    svgBoard._dataStructure = []
     svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"]
 
     // // functions
@@ -62,6 +58,20 @@ export function GNSvg(createData: CreateGreatNoteObjectInterface) : GNSvgContain
         })
 
         return dataObject
+    }
+
+    svgBoard.loadFromData = function(data){
+        svgBoard.GNSpecialCreationMessage = data.GNSpecialCreationMessage
+
+         svgBoard.specialGNType = data.specialGNType
+
+        if (data.classList) data.classList.forEach(p=>svgBoard.classList.add(p))
+
+        svgBoard._identity = data._identity
+
+        svgBoard.setAttribute("accessPointer", data._identity.accessPointer)
+
+        svgBoard.applyStyle(data.stylesheet)
     }
 
     //
@@ -205,8 +215,8 @@ export function GNSvgPolyLine(createData: CreateGreatNoteObjectInterface) : GNSv
     svgObject._styleStructure = ["stroke", "stroke-width", "fill"]
 
     // functions
-    svgObject.loadFromData = (data)=>{
-      svgObject.soul.plot(data["points"])
+    svgObject.loadFromData = (automergeData)=>{
+      svgObject.soul.plot(automergeData["data"]["points"])
     }
 
     svgObject.createDataObject = function(){

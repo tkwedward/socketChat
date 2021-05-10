@@ -19,11 +19,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage = exports.fillInSmallViewDataContent = exports.fillInNewPageDataContent = exports.createNewPage = exports.createSwitchViewModeButton = exports.functionButtonCreater = exports.createSubPanelItem = exports.createSubPanel = void 0;
+exports.createNewPageEvent = exports.insertNewPage = exports.addEventToNewPage = exports.fillInSmallViewDataContent = exports.fillInNewPageDataContent = exports.createNewPage = exports.createSwitchViewModeButton = exports.functionButtonCreater = exports.createSubPanelItem = exports.createSubPanel = exports.shortNotice = void 0;
 var constructInitialCondition_1 = require("./constructInitialCondition");
 var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
 var pageController_1 = require("./pageControllerFolder/pageController");
 // import {pageController, updatePageController, updatePageNumberInNewOrder, highlightCurrentPageInOverviewMode} from "./pageControllerFolder/pageController"
+function shortNotice(noticeText) {
+    var shortNoticeDiv = document.createElement("div");
+    shortNoticeDiv.textContent = noticeText;
+    shortNoticeDiv.style.position = "fixed";
+    shortNoticeDiv.style.width = "10%";
+    shortNoticeDiv.style.left = "45%";
+    shortNoticeDiv.style.top = "45%";
+    shortNoticeDiv.style.background = "wheat";
+    shortNoticeDiv.style.padding = "20px";
+    shortNoticeDiv.style.zIndex = "10000";
+    setTimeout(function () {
+        shortNoticeDiv.remove();
+    }, 1500);
+    document.body.appendChild(shortNoticeDiv);
+}
+exports.shortNotice = shortNotice;
 //@auto-fold here
 function createSubPanel(name, first) {
     var subPanelTemplate = document.querySelector("#subPanelTemplate");
@@ -95,16 +111,30 @@ function createSwitchViewModeButton(fullPageModeDiv, overviewModeDiv) {
 exports.createSwitchViewModeButton = createSwitchViewModeButton;
 function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPageData, overviewPageData, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var newPage = GreatNoteDataClass.GNContainerDiv({ name: "fullPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], insertPosition: false, dataPointer: false, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewFullPageObject" });
+    var newPage = GreatNoteDataClass.GNContainerDiv({
+        name: "fullPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageFull"], insertPosition: false,
+        dataPointer: false,
+        saveToDatabase: saveToDatabase,
+        specialCreationMessage: "createNewFullPageObject",
+        contentEditable: false
+    });
     newPage.classList.add("divPage", "fullPage");
-    newPage._dataStructure = ["innerText"];
+    newPage._dataStructure = [];
     newPage._styleStructure = ["background", "width", "height"];
     // newPage.style.width = `${pageController.fullPageSize[0]}px`
     // newPage.style.height = `${pageController.fullPageSize[1]}px`
     var newPageAccesssPointer = saveToDatabase ? newPage.getAccessPointer() : false; // to avoid error when saveToDatabase is false and you cannot get the accessPointer of the new pagge
-    var smallView = GreatNoteDataClass.GNContainerDiv({ name: "overviewPage", arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageOverview"], insertPosition: false, dataPointer: newPageAccesssPointer, saveToDatabase: saveToDatabase, specialCreationMessage: "createNewOverviewPageObject" });
+    var smallView = GreatNoteDataClass.GNContainerDiv({
+        name: "overviewPage",
+        arrayID: constructInitialCondition_1.mainController.mainDocArray["mainArray_pageOverview"],
+        insertPosition: false,
+        dataPointer: newPageAccesssPointer,
+        saveToDatabase: saveToDatabase,
+        specialCreationMessage: "createNewOverviewPageObject",
+        contentEditable: false
+    });
     smallView.classList.add("divPageSmall");
-    smallView._dataStructure = ["innerText"];
+    smallView._dataStructure = [];
     smallView._styleStructure = ["background", "width", "height"];
     smallView.style.background = "pink";
     smallView.style.width = pageController.overviewPageSize[0] + "px";
@@ -126,20 +156,16 @@ function createNewPage(pageController, fullPageModeDiv, overviewModeDiv, fullPag
     if (fullPageData && overviewPageData) {
         fillInNewPageDataContent(newPage, fullPageData);
         fillInSmallViewDataContent(smallView, overviewPageData);
-        // fillInDataContent(fullPageData, overviewPageData)
-        // socket.emit("clientAskServerToInitiateSynchronization")
     }
     return [newPage, smallView];
 }
 exports.createNewPage = createNewPage;
 function fillInNewPageDataContent(newPage, fullPageData) {
     newPage.initializeHTMLObjectFromData(fullPageData);
-    newPage.innerText = fullPageData.data.innerText;
 }
 exports.fillInNewPageDataContent = fillInNewPageDataContent;
 function fillInSmallViewDataContent(smallView, overviewPageData) {
     smallView.initializeHTMLObjectFromData(overviewPageData);
-    var smallViewDescription = smallView.querySelector(".smallViewDescription");
     // smallViewDescription.innerText = overviewPageData.data.innerText
 }
 exports.fillInSmallViewDataContent = fillInSmallViewDataContent;
@@ -176,6 +202,10 @@ function createNewPageEvent(currentStatus, fullPageModeDiv, overviewModeDiv, pag
     var clickEventAction = function () {
         var _a = createNewPage(currentStatus, fullPageModeDiv, overviewModeDiv), newPage = _a[0], smallView = _a[1];
         insertNewPage(currentStatus, newPage, smallView, fullPageModeDiv, overviewModeDiv);
+        var addDivLayereButton = document.querySelector(".addDivLayerButton");
+        var addSvgLayerButton = document.querySelector(".addSvgLayerButton");
+        addDivLayereButton.click();
+        addSvgLayerButton.click();
     };
     return clickEventAction;
 }

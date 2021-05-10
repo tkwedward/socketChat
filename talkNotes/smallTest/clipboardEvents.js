@@ -1,30 +1,13 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 exports.__esModule = true;
 exports.mousePositionTrackFunction = exports.triggerTargetObjectMovingFunction = exports.getObjectOrigianlDataArray = exports.setTargetObject = exports.createMouseTrackingController = exports.mouseResizeFunction = exports.addPasteImageEvent = void 0;
-var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
+var GNImageContainer_1 = require("./GreatNoteClass/GNImageContainer");
 function addPasteImageEvent(mainController) {
     document.onpaste = function (event) {
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
         console.log(JSON.stringify(items)); // might give you mime types
+        var currentPage = mainController.pageController.currentPage.fullPageHTMLObject;
+        var targetDiv = currentPage.querySelector(".divLayer");
         for (var index in items) {
             var item = items[index];
             if (item.kind === 'file') {
@@ -37,12 +20,12 @@ function addPasteImageEvent(mainController) {
                         console.log("finish processing image");
                         console.log(this.responseText);
                         var responseImgSrc = JSON.parse(this.responseText).imgsrc.replace("talkNotes/", "");
-                        var newImg = GreatNoteDataClass.GNImageContainer({ "name": "", arrayID: mainController.toolBox.targetPage.getAccessPointer(), saveToDatabase: true, imgsrc: "/noteImage/" + responseImgSrc + ".png" });
-                        mainController.toolBox.targetPage.appendChild(newImg);
+                        var newImg = GNImageContainer_1.GNImageContainer({ "name": "", arrayID: targetDiv.getAccessPointer(), saveToDatabase: true, imgsrc: "/noteImage/" + responseImgSrc + ".png" });
+                        targetDiv.appendChild(newImg);
                         newImg.setImageSize({ width: 500 });
                         newImg.setMovable();
                         newImg.saveHTMLObjectToDatabase();
-                        mainController.toolBox.targetPage.appendChild(newImg);
+                        targetDiv.appendChild(newImg);
                     };
                     xhr.send(event.target.result);
                 };

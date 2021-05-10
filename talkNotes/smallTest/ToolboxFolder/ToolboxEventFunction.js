@@ -23,7 +23,6 @@ exports.polylineMouseUpFunction = exports.polylineMouseMoveFunction = exports.po
 var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
 var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
 function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName) {
-    console.log(mainController);
     if (!mainController.toolBox.checkToolBoxItemStatus("polylineItemButton")) {
         return;
     }
@@ -36,7 +35,6 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
         ratio = rect.width / originalWidth;
         offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
         offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
-        console.log(e);
         touchIsPen = e.targetTouches[0].radiusX > 10 ? false : true;
     }
     if (e.type == "mousedown") {
@@ -44,7 +42,7 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
         offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
         // testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`
     }
-    touchIsPen = true;
+    // touchIsPen = true
     if (e.type == "mousedown" || touchIsPen) {
         e.preventDefault();
         var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
@@ -90,7 +88,6 @@ function polylineMouseMoveFunction(e, polyline, ratio) {
 }
 exports.polylineMouseMoveFunction = polylineMouseMoveFunction;
 function polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName) {
-    console.log(145, "save to database", new Date());
     polyline.saveHTMLObjectToDatabase();
     svgBoard.removeEventListener(moveEventName, mouseMoveFunctionToBeRemoved);
     svgBoard.removeEventListener(upEventName, mouseUpFunctionToBeRemoved);

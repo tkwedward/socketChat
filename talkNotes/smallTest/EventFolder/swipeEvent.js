@@ -1,7 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 exports.__esModule = true;
 exports.swipeDetection = void 0;
 var toolBoxHelperFunction_1 = require("../ToolboxFolder/toolBoxHelperFunction");
+var PageViewHelperFunction = __importStar(require("../pageViewHelperFunction"));
 function swipeDetection(mainController, pageContentContainer) {
     pageContentContainer.addEventListener("touchstart", function (e) {
         var _a, _b;
@@ -82,6 +102,7 @@ function fingerPanPage(mainController, pageContentContainer, mouseMoveFunction, 
 function fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction, mouseUpFunction, deltaX, deltaX2, doubleFinger) {
     pageContentContainer.removeEventListener("touchmove", mouseMoveFunction);
     pageContentContainer.removeEventListener("touchend", mouseUpFunction);
+    var addNewPageButton = document.querySelector(".addNewPage");
     var currentPage = mainController.pageController.currentPage;
     var pageMoveDirection = deltaX > 0 ? -1 : +1;
     var targetPageNumber = currentPage.pageNumber + pageMoveDirection;
@@ -91,7 +112,8 @@ function fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction,
     if (Math.abs(deltaX) > turnPageBreakPoint || Math.abs(deltaX2) > turnPageBreakPoint) { // if larager than the page Break Point
         if (pageMoveDirection > 0) {
             if (currentPage.next.name == "endPage") {
-                console.log("create a new page");
+                addNewPageButton.click();
+                PageViewHelperFunction.shortNotice("newPage is added");
             }
             else { // not the end page
                 mainController.pageController.goToPage(targetPageNumber);

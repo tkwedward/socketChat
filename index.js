@@ -88,10 +88,10 @@ io.on("connection", socket=>{
       let saveData = Automerge.save(mainDoc)
 
 
-      console.log(91, data)
+      // console.log(91, data)
       data["senderID"] = socket.id
       await fs.writeFileSync(jsonFileLocation, saveData);
-      console.log("finish Saving")
+      // console.log("finish Saving")
       io.emit("message", "finish saving")
       io.emit("serverSendChangeFileToClient", data)
   })
@@ -103,7 +103,7 @@ io.on("connection", socket=>{
   })
 
   socket.on("saveNotebookUsingClientData",async data => {
-    console.log(data)
+    // console.log(data)
     Automerge.load(data)
       await fs.writeFileSync(jsonFileLocation, data);
   }) // saveMainDocToDisk

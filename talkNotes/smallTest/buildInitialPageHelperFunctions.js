@@ -21,8 +21,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 exports.attachEvents = exports.buildInitialPage = exports.buildInitialHTMLSkeleton = exports.buildPageController = exports.buildToolBoxHtmlObject = exports.buildPageControllerButtonArray = exports.getDivFromHTML = void 0;
 var ClipboardEvent = __importStar(require("./clipboardEvents"));
+// GMPnkects
+var GreatNoteDataClass_1 = require("./GreatNoteClass/GreatNoteDataClass");
+var GNImageContainer_1 = require("./GreatNoteClass/GNImageContainer");
+var GNInputField_1 = require("./GreatNoteClass/GNInputField");
 var GreatNoteSvgDataClass = __importStar(require("./GreatNoteClass/GreatNoteSvgDataClass"));
-var GreatNoteDataClass = __importStar(require("./GreatNoteClass/GreatNoteDataClass"));
 var socketFunction_1 = require("./socketFunction");
 var GNCommentController = __importStar(require("./commentFolder/commentController"));
 var LayerConroller = __importStar(require("./layerControllerFolder/layerController"));
@@ -120,6 +123,7 @@ function buildPageControllerButtonArray(mainController) {
     objectIDGetterSubmit.style.background = "gold";
     objectIDGetterSubmit.addEventListener("click", function (e) {
         console.log(mainController.getObjectById(objectIDGetter.value), document.querySelector("*[accessPointer='" + objectIDGetter.value + "']"));
+        window.selectedItem = document.querySelector("*[accessPointer='" + objectIDGetter.value + "']");
     });
     editorController.append(objectIDGetter, objectIDGetterSubmit, testFieldButton, showMainDocButton, resetButton);
     // toolBoxObject
@@ -144,6 +148,7 @@ function buildPageController(mainController, bookmarkSubPanelContent, fullPageMo
     // To create a page Controller to navigate previous and nex page
     pageController.pageControllerHTMLObject(mainController.pageController, bookmarkSubPanelContent);
     var createNewDivButton = pageViewHelperFunction.functionButtonCreater("new Div", pageViewHelperFunction.createNewPageEvent(mainController.pageController, fullPageModeDiv, overviewModeDiv, pageContentContainer));
+    createNewDivButton.classList.add("addNewPage");
     var deletePageButton = document.createElement("button");
     deletePageButton.innerHTML = "delete page";
     deletePageButton.addEventListener("click", function () {
@@ -174,16 +179,18 @@ function buildInitialHTMLSkeleton(mainController) {
     var commentSubPanel = pageViewHelperFunction.createSubPanel("comment", false);
     // add events: initalizeWindowObject, addPasteImageEvent, swipeDetection
     attachEvents(mainController, pageContentContainer);
+    pageViewHelperFunction.shortNotice("inital Value");
     socketFunction_1.socket.emit("clientAskServerForSocketData");
     panelContainer.append(pageControllerSubPanel, bookmarkSubPanel, commentSubPanel);
+    window.mainController = mainController;
 } // buildInitialHTMLSkeleton
 exports.buildInitialHTMLSkeleton = buildInitialHTMLSkeleton;
 function buildInitialPage(mainController, saveToDatabase) {
     if (saveToDatabase === void 0) { saveToDatabase = false; }
     mainController.GNDataStructureMapping = {
-        GNInputField: GreatNoteDataClass.GNInputField,
-        GNContainerDiv: GreatNoteDataClass.GNContainerDiv,
-        GNImageContainer: GreatNoteDataClass.GNImageContainer,
+        GNInputField: GNInputField_1.GNInputField,
+        GNContainerDiv: GreatNoteDataClass_1.GNContainerDiv,
+        GNImageContainer: GNImageContainer_1.GNImageContainer,
         // svg
         GNSvg: GreatNoteSvgDataClass.GNSvg,
         GNSvgCircle: GreatNoteSvgDataClass.GNSvgCircle,

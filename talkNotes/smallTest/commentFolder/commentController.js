@@ -48,10 +48,8 @@ function GNComment(createData) {
         // render the comments inside
         // ****************************
         injectedData["array"].forEach(function (p) {
-            var newObject = _commentContainer.createCommentObject({ name: "" });
-            newObject.initializeHTMLObjectFromData(p);
-            newObject.contentEditable = "true";
-            // _commentContainer.appendChild(newObject)
+            var newObject = _commentContainer.createCommentObject({ name: "", injectedData: p });
+            // newObject.initializeHTMLObjectFromData(p)
         });
     }
     else {

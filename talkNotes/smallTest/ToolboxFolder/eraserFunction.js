@@ -61,6 +61,8 @@ function eraserMouseDownFunction(e, mainController, svgBoard, moveEventName, upE
             // t1 = t2
             // t2 = e.timeStamp
             var _a = ToolBoxHelperFunction.getOffSetXY(e), offsetX = _a[0], offsetY = _a[1], touchIsPen = _a[2];
+            var logTest = "offsetX = " + offsetX + " <br>" + ("offsetY = " + offsetY);
+            ToolBoxHelperFunction.locationLog(logTest);
             eraser_1.style["cx"] = offsetX;
             eraser_1.style["cy"] = offsetY;
             detectCollision(svgBoard, eraser_1);

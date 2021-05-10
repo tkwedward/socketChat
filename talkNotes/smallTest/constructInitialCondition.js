@@ -184,6 +184,7 @@ var MainController = /** @class */ (function () {
         var newData = htmlObject.extract();
         var dataPointer = htmlObject.getDataPointer();
         var accessPointer = htmlObject.getAccessPointer();
+        // console.log(2022020202, newData, htmlObject)
         var message = JSON.stringify({ "action": "update", "objectID": accessPointer });
         this.mainDoc = Automerge.change(this.mainDoc, message, function (doc) {
             var dataPointerObejct = Automerge.getObjectById(doc, dataPointer);
@@ -191,13 +192,17 @@ var MainController = /** @class */ (function () {
             // update the data
             Object.entries(newData.data).forEach(function (_a, _) {
                 var key = _a[0], value = _a[1];
+                // console.log(211211, key, value)
                 dataPointerObejct["data"][key] = value;
             });
+            if (newData._classNameList)
+                dataPointerObejct["_classNameList"] = newData._classNameList;
             // update the stylesheet
             if (accessPointer != dataPointer) {
                 // if it is a link object
                 Object.entries(newData.stylesheet).forEach(function (_a, _) {
                     var key = _a[0], value = _a[1];
+                    // console.log(211211, key, value)
                     accessPointerObject["stylesheet"][key] = value;
                 });
             }
@@ -238,7 +243,7 @@ var MainController = /** @class */ (function () {
     MainController.prototype.sendChangeToServer = function () {
         var changes = Automerge.getChanges(exports.mainController.previousDoc, exports.mainController.mainDoc);
         exports.mainController.previousDoc = exports.mainController.mainDoc;
-        console.log("56: the changes are: ", changes);
+        // console.log("56: the changes are: ", changes)
         socketFunction_1.socket.emit("clientSendChangesToServer", { "changeData": changes });
     };
     // ******************************************
@@ -277,7 +282,7 @@ var MainController = /** @class */ (function () {
         // cannot save any obeject to the data base here
         data["array"].forEach(function (p) {
             if (p.GNType == "GNComment") {
-                console.log(404, p.GNType);
+                // console.log(404, p.GNType)
                 newHTMLObject = _this.createGNObjectThroughName("GNComment", { name: "", injectedData: p });
                 arrayHTMLObject.appendChild(newHTMLObject);
                 return;
@@ -293,7 +298,7 @@ var MainController = /** @class */ (function () {
                 });
             }
             if (p.GNType == "GNContainerDiv") {
-                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, injectedData: p });
+                newHTMLObject = _this.GNDataStructureMapping[p.GNType]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, injectedData: p, contentEditable: false });
                 newHTMLObject._identity = p._identity;
                 var objectData = newHTMLObject.getDataFromDataBase();
             }
@@ -302,13 +307,14 @@ var MainController = /** @class */ (function () {
                 newHTMLObject._identity = p._identity;
                 //
                 var newPolylineData = newHTMLObject.getDataFromDataBase();
-                newHTMLObject.loadFromData(newPolylineData["data"]);
+                newHTMLObject.loadFromData(newPolylineData);
                 var stylesheet = newPolylineData["stylesheet"];
                 newHTMLObject.applyStyle({ "stroke": stylesheet["stroke"], "stroke-width": stylesheet["stroke-width"], "fill": stylesheet["fill"] });
             }
             if (p.GNType == "GNImageContainer") {
                 newHTMLObject = _this.GNDataStructureMapping["GNImageContainer"]({ name: "name", arrayID: arrayHTMLObject.getAccessPointer(), saveToDatabase: false, imgsrc: p["data"]["src"] });
                 newHTMLObject._identity = p._identity;
+                newHTMLObject.loadFromData(p);
                 newHTMLObject.setImageSize({ width: 500 });
                 newHTMLObject.setMovable();
             }
@@ -342,7 +348,6 @@ var MainController = /** @class */ (function () {
         this.previousDoc = this.mainDoc;
         // to render the data ato HTML
         var rootArray = this.mainDoc["array"];
-        console.log(rootArray, this.mainDoc);
         rootArray.forEach(function (mainArray) {
             // update the ID of the mainArray
             var arrayName = mainArray["data"]["name"];
@@ -351,22 +356,23 @@ var MainController = /** @class */ (function () {
         });
     }; // loadMain
     MainController.prototype.processChangeData = function (changeDataArray) {
-        // processChangeData(changeDataArray:Set<string>){
         var _this = this;
-        // console.log(507, changeDataArray)//
+        // processChangeData(changeDataArray:Set<string>){
         var jsonfiedChangeDataArray = Array.from(changeDataArray).map(function (p) { return JSON.parse(p["message"]); });
         // console.log(509, jsonfiedChangeDataArray)
         // if (changeDataArray.length == 1){
         jsonfiedChangeDataArray.forEach(function (p) {
+            // console.log(414, p)
             var changeData = p;
             if (changeData.action == "create") {
                 databaseHelperFunction_1.processCreationDataHelper(_this, changeData);
             } // create
             if (changeData.action == "update") {
                 var _object = document.querySelector("*[accessPointer='" + changeData.objectID + "']");
+                // console.log(422422, _object, changeData.objectID)
                 if (_object) {
                     var objectData = exports.mainController.getObjectById(changeData.objectID);
-                    console.log(520520, _object);
+                    // console.log(520520, _object)
                     _object.reloadDataFromDatabase();
                 }
             } // update

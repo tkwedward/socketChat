@@ -1,17 +1,31 @@
 import {superGNObjectInterface, CreateGreatNoteObjectInterface, GNImageContainerInterface} from "./GreatNoteObjectInterface"
 import {superGNObject, createDummyData} from "./GreateNoteObjectHelperFunction"
 
+interface AutomergeDataStructureInterface {
+  GNType: string
+  array: any[]
+  classList: string[]
+  data: any
+  specialGNType: string
+  stylesheet: any
+  _identity: {"accessPointer": string, "dataPointer": string, linkArray: string[]}
+}
+
 //@auto-fold here
 export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNImageContainerInterface{
-    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, imgsrc} = createData
+    let {name, arrayID, insertPosition, dataPointer, saveToDatabase, specialCreationMessage, imgsrc, _classNameList} = createData
 
     let _object = <GNImageContainerInterface> document.createElement("div");
     _object.draggable = false
     _object._name = name
     _object.GNType = GNImageContainer.name
     _object._dataStructure = ["src"]
-    _object._styleStructure = ["width", "height"]
+    _object._styleStructure = ["width", "height", "left", "top", "position"]
 
+    _object._classNameList = _classNameList || []
+    if (_classNameList){
+        _classNameList.forEach(p=> _object.classList.add(p))
+    }
 
     let image = document.createElement("img")
     image.src = imgsrc
@@ -23,7 +37,11 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
     _object.appendChild(image)
 
 
-    _object.loadFromData = (data) => {data}
+    _object.loadFromData = (data:AutomergeDataStructureInterface) => {
+        Object.entries(data.stylesheet).forEach(([key, value], _)=>{
+            _object.style[key] = value
+        })
+    }
 
     _object.setMovable = function(){
         let eventName = "mousedown"
@@ -67,6 +85,7 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
 
            _object.addEventListener("mouseup", (e)=>{
                endDragEvent(e)
+               _object.saveHTMLObjectToDatabase()
            }, false)
            _object.addEventListener("mouseout", (e)=>{
                endDragEvent(e)
@@ -85,9 +104,9 @@ export function GNImageContainer(createData: CreateGreatNoteObjectInterface):GNI
         dataObject["data"]["src"] = imgsrc
 
         // stylesheet data
-        // _object._styleStructure.forEach(p=>{
-        //   dataObject["stylesheet"][p] = _object["style"][p]
-        // })
+        _object._styleStructure.forEach(p=>{
+          dataObject["stylesheet"][p] = _object["style"][p]
+        })
 
         return dataObject
     }

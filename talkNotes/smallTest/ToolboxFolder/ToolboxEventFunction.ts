@@ -2,7 +2,6 @@ import * as GreatNoteSvgDataClass from "../GreatNoteClass/GreatNoteSvgDataClass"
 import {mousePositionRatioAdjustment} from "./toolBoxHelperFunction"
 
 export function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName:string, upEventName:string){
-    console.log(mainController)
     if (!mainController.toolBox.checkToolBoxItemStatus("polylineItemButton")){
         return
     }
@@ -17,7 +16,6 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
         ratio =  rect.width / originalWidth
         offsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio) ;
         offsetY = mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
-        console.log(e)
         touchIsPen = e.targetTouches[0].radiusX > 10? false: true
     }
 
@@ -29,7 +27,7 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
        // testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`
 
    }
-   touchIsPen = true
+   // touchIsPen = true
    if (e.type=="mousedown" || touchIsPen){
         e.preventDefault()
        let [strokeColor, strokeWidth]:[string, string] = polylineController.extract()
@@ -80,7 +78,6 @@ export function polylineMouseMoveFunction(e, polyline, ratio){
 }
 
 export function polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName){
-  console.log(145, "save to database", new Date())
   polyline.saveHTMLObjectToDatabase()
   svgBoard.removeEventListener(moveEventName, mouseMoveFunctionToBeRemoved)
   svgBoard.removeEventListener(upEventName, mouseUpFunctionToBeRemoved)
