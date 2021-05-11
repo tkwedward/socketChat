@@ -225,6 +225,9 @@ export interface GNSvgPolyLineInterface extends GNSvgObjectInterface, SVG.Linked
 export interface GNSvgPolyLineData{
     points?: number[]
     attribute?: {"stroke"?: string, "width"?: number, "fill"?:string, "stroke-width"?: string}
+    stroke?: string
+    "stroke-width": string
+    fill :string
 }
 
 

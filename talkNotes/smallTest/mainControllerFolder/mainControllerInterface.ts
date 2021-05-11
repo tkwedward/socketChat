@@ -92,4 +92,5 @@ export interface MainControllerInterface {
     getMainDocChange()
     getLoadDataFromSocket()
     processChangeData(changeDataArray:Set<string>)
+    sendChangeToServer()
 }

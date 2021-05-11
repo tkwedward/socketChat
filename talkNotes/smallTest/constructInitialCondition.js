@@ -237,14 +237,14 @@ var MainController = /** @class */ (function () {
                 // delete databaseObject
             });
             htmlObject.remove();
-            this.sendChangeToServer();
         }
     }; // deleteFromDataBase
     MainController.prototype.sendChangeToServer = function () {
         var changes = Automerge.getChanges(exports.mainController.previousDoc, exports.mainController.mainDoc);
-        exports.mainController.previousDoc = exports.mainController.mainDoc;
-        // console.log("56: the changes are: ", changes)
-        socketFunction_1.socket.emit("clientSendChangesToServer", { "changeData": changes });
+        if (changes.length > 0) {
+            exports.mainController.previousDoc = exports.mainController.mainDoc;
+            socketFunction_1.socket.emit("clientSendChangesToServer", { "changeData": changes });
+        }
     };
     // ******************************************
     // *     C. Access data in the database     *

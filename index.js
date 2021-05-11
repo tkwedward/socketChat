@@ -39,6 +39,11 @@ let jsonFileLocation = path.join(__dirname, "./talkNotes/data/automergeData.txt"
 let data = fs.readFileSync(jsonFileLocation)
 mainDoc = Automerge.load(data)
 
+setInterval(async function(){
+  let saveData = Automerge.save(mainDoc)
+  await fs.writeFileSync(jsonFileLocation, saveData);
+}, 10000)
+
 io.on("connection", socket=>{
     // socketArray.push(socket)
 
@@ -61,13 +66,6 @@ io.on("connection", socket=>{
       socket.emit("serverSendSocketIdArray", socketData)
     })
 
-    // setInterval(function(){
-    //   io.sockets.to(socketArray[0].id).emit("saveDataToServer", "periodical save")
-    // }, 30000)
-    // begin: server receives request from a particular client to synchronize data among all the clients.
-    // action: server sends request to all clients to give him all the changes. Wait for clients to send back all the changes and then send back the collection of changes to the clients.
-    // message to ask all clients to send back changes
-
   socket.on("initialDataRequest", ()=>{
       let mainDocCopy = fs.readFileSync(jsonFileLocation)
 
@@ -85,15 +83,10 @@ io.on("connection", socket=>{
 
   socket.on("clientSendChangesToServer",async  data=>{
       mainDoc = Automerge.applyChanges(mainDoc, data.changeData)
-      let saveData = Automerge.save(mainDoc)
-
-
-      // console.log(91, data)
       data["senderID"] = socket.id
-      await fs.writeFileSync(jsonFileLocation, saveData);
-      // console.log("finish Saving")
-      io.emit("message", "finish saving")
-      io.emit("serverSendChangeFileToClient", data)
+
+      // io.emit("message", "finish saving")
+      io.broadcast.emit("serverSendChangeFileToClient", data)
   })
 
 

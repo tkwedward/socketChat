@@ -17315,7 +17315,7 @@ class WS extends Transport {
 module.exports = WS;
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":91,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
+},{"../transport":8,"../util":15,"./websocket-constructor":13,"buffer":93,"debug":17,"engine.io-parser":23,"parseqs":25,"yeast":43}],15:[function(require,module,exports){
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
     if (obj.hasOwnProperty(k)) {
@@ -17640,7 +17640,7 @@ formatters.j = function (v) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./common":18,"_process":93}],18:[function(require,module,exports){
+},{"./common":18,"_process":95}],18:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -19437,7 +19437,7 @@ exports.url = url;
 
 },{"debug":33,"parseuri":26}],33:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":34,"_process":93,"dup":17}],34:[function(require,module,exports){
+},{"./common":34,"_process":95,"dup":17}],34:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":35}],35:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -19864,7 +19864,7 @@ exports.hasBinary = hasBinary;
 
 },{}],39:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./common":40,"_process":93,"dup":17}],40:[function(require,module,exports){
+},{"./common":40,"_process":95,"dup":17}],40:[function(require,module,exports){
 arguments[4][18][0].apply(exports,arguments)
 },{"dup":18,"ms":41}],41:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
@@ -25582,13 +25582,14 @@ function attachEventListenerToSvgBoard(mainController, svgBoard) {
         }
     };
     var selectionStatusObject = {
-        mode: "selectionMode",
-        polyline: null
+        mode: "phaseOne",
+        polyline: null,
+        counter: 0
     };
     var selectionToolMouseDownFunction = {
         eventNameList: ["touchstart"],
         eventFunction: function (e) {
-            SelectionToolFunction.selectionToolMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
+            SelectionToolFunction.overallMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
         }
     };
     var eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction];
@@ -25854,7 +25855,7 @@ function fingerTurnPage(mainController, pageContentContainer, mouseMoveFunction,
     } // if (Math.abs(deltaX) > turnPageBreakPoint){
 }
 
-},{"../ToolboxFolder/toolBoxHelperFunction":65,"../pageViewHelperFunction":85}],48:[function(require,module,exports){
+},{"../ToolboxFolder/toolBoxHelperFunction":67,"../pageViewHelperFunction":87}],48:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.addMovingEvent = void 0;
@@ -26682,247 +26683,6 @@ function GNSvgPolyLine(createData) {
     svgObject._dataStructure = ["points"];
     svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
     // functions
-    svgObject.loadFromData = function (data) {
-        svgObject.soul.plot(data["points"]);
-    };
-    svgObject.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = svgObject.GNType;
-        if (svgObject._identity)
-            dataObject["_identity"] = svgObject._identity;
-        dataObject["data"]["points"] = svgObject.soul.array().value.toString();
-        // stylesheet data
-        dataObject["stylesheet"]["stroke"] = svgObject["style"]["stroke"];
-        dataObject["stylesheet"]["stroke-width"] = svgObject["style"]["stroke-width"];
-        dataObject["stylesheet"]["fill"] = svgObject["style"]["fill"];
-        return dataObject;
-    };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject._styleStructure.forEach(function (p) {
-            if (p == "fill") {
-                svgObject["style"]["fill"] = attrList["fill"] || "none";
-            }
-            else {
-                svgObject["style"][p] = attrList[p];
-            }
-        });
-    };
-    // to share same data function
-    GreateNoteObjectHelperFunction_1.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    // add extra funcitons to the object
-    return svgObject;
-} //GNSvgPolyLine
-exports.GNSvgPolyLine = GNSvgPolyLine;
-//@auto-fold here
-function GNSvgImage(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = svg_js_1["default"](document.createElement("image")).image();
-    svgObject.setImgSrc = function (src) {
-        svgObject.load(src);
-    };
-    svgObject.GNType = GNSvgImage.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["value"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject.attr(attrList["attribute"]);
-    };
-    // add extra funcitons to the object
-    // superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgImage = GNSvgImage;
-function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    svgObject.appendTo = function (parentSVGContainer) {
-        svgObject.soul.addTo(parentSVGContainer.svgController);
-    };
-    //
-    // svgObject.applyStyle = function (attributeSheet){
-    //
-}
-
-},{"./GreateNoteObjectHelperFunction":58,"svg.js":42}],57:[function(require,module,exports){
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-exports.__esModule = true;
-exports.GNSvgImage = exports.GNSvgPolyLine = exports.GNSvgLine = exports.GNSvgRect = exports.GNSvgCircle = exports.GNSvg = void 0;
-var svg_js_1 = __importDefault(require("svg.js"));
-var GreateNoteObjectHelperFunction_1 = require("./GreateNoteObjectHelperFunction");
-function createDummyData() {
-    return {
-        "data": {},
-        "array": [],
-        "GNType": "",
-        "_identity": { "dataPointer": "", "accessPointer": "", "linkArray": [] },
-        "stylesheet": {}
-    };
-}
-//@auto-fold here
-function GNSvg(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase, message = createData.message, injectedData = createData.injectedData;
-    var svgDivContainer = document.createElement("div");
-    svgDivContainer.id = "testSvgDiv";
-    var svgController = svg_js_1["default"](svgDivContainer);
-    var svgBoard = svgController.node;
-    svgBoard.svgController = svgController;
-    svgBoard.GNType = GNSvg.name;
-    svgBoard._name = name;
-    svgBoard._dataStructure = [];
-    svgBoard._styleStructure = ["width", "height", "background", "position", "left", "top"];
-    // // functions
-    // svgObject.loadFromData = (data)=>{ svgObject.value = data }
-    svgBoard.appendToContainer = function (parent) {
-        parent.appendChild(svgDivContainer);
-    };
-    svgBoard.applyStyle = function (stylesheet) {
-        Object.entries(stylesheet).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            svgBoard["style"][key] = value;
-        });
-    };
-    svgBoard.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = svgBoard.GNType;
-        if (svgBoard._identity)
-            dataObject["_identity"] = svgBoard._identity;
-        svgBoard._dataStructure.forEach(function (p) {
-            dataObject["data"][p] = svgBoard[p];
-        });
-        // stylesheet data
-        svgBoard._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = svgBoard["style"][p];
-        });
-        return dataObject;
-    };
-    svgBoard.loadFromData = function (data) {
-        svgBoard.GNSpecialCreationMessage = data.GNSpecialCreationMessage;
-        svgBoard.specialGNType = data.specialGNType;
-        if (data.classList)
-            data.classList.forEach(function (p) { return svgBoard.classList.add(p); });
-        svgBoard._identity = data._identity;
-        svgBoard.setAttribute("accessPointer", data._identity.accessPointer);
-        svgBoard.applyStyle(data.stylesheet);
-    };
-    //
-    svgBoard.extract = function () { return svgBoard.createDataObject(); };
-    // add extra funcitons to the object
-    GreateNoteObjectHelperFunction_1.superGNObject(svgBoard, saveToDatabase, arrayID, insertPosition, dataPointer);
-    return svgBoard;
-}
-exports.GNSvg = GNSvg;
-//@auto-fold here
-function GNSvgCircle(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
-    var svgObjectSoul = new svg_js_1["default"].Circle();
-    svgObjectSoul.radius(75);
-    svgObjectSoul.fill("red");
-    var svgObject = svgObjectSoul.node;
-    svgObject.soul = svgObjectSoul;
-    svgObject.GNType = GNSvgCircle.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["cx", "cy", "r"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (_GNData) {
-        svgObject.style["cx"] = parseInt(_GNData["data"]["cx"]) + 200;
-        svgObject.style["cy"] = parseInt(_GNData["data"]["cy"]);
-        svgObject.style["r"] = parseInt(_GNData["data"]["r"]);
-    };
-    svgObject.createDataObject = function () {
-        var dataObject = createDummyData();
-        // data structure
-        dataObject["GNType"] = svgObject.GNType;
-        if (svgObject["_identity"])
-            dataObject["_identity"] = svgObject["_identity"];
-        dataObject["data"]["cx"] = svgObject.style["cx"];
-        dataObject["data"]["cy"] = svgObject.style["cy"];
-        dataObject["data"]["r"] = svgObject.style["r"];
-        // stylesheet data
-        svgObject._styleStructure.forEach(function (p) {
-            dataObject["stylesheet"][p] = svgObject["style"][p];
-        });
-        return dataObject;
-    };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObjectSoul.attr(attrList);
-    };
-    svgObject.appendTo = function (parentSVGContainer) {
-        //self.targetPage.svgNode.appendChild(eraser.node)
-        parentSVGContainer.svgNode.appendChild(svgObject.node);
-    };
-    // add extra funcitons to the object
-    GreateNoteObjectHelperFunction_1.superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer);
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgCircle = GNSvgCircle;
-// ==============
-//@auto-fold here
-function GNSvgRect(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = new svg_js_1["default"].Rect();
-    svgObject.GNType = GNSvgRect.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["value"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        Object.entries(attrList).forEach(function (_a, _) {
-            var key = _a[0], value = _a[1];
-            svgObject.node.style[key] = value;
-        });
-    };
-    // add extra funcitons to the object
-    // superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgRect = GNSvgRect;
-//@auto-fold here
-function GNSvgLine(name, arrayID, insertPosition, dataPointer, saveToDatabase) {
-    if (saveToDatabase === void 0) { saveToDatabase = true; }
-    var svgObject = new svg_js_1["default"].Line();
-    svgObject.GNType = GNSvgLine.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["value"];
-    svgObject._styleStructure = [];
-    // functions
-    svgObject.loadFromData = function (data) { svgObject = data; };
-    svgObject.extract = function () { return svgObject.createDataObject(); };
-    svgObject.applyStyle = function (attrList) {
-        svgObject.plot(attrList["points"]);
-        svgObject.attr(attrList["attribute"]);
-    };
-    // add extra funcitons to the object
-    // superGNObject(svgObject, saveToDatabase, arrayID, insertPosition, dataPointer)
-    SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabase);
-    return svgObject;
-}
-exports.GNSvgLine = GNSvgLine;
-//@auto-fold here
-function GNSvgPolyLine(createData) {
-    var name = createData.name, arrayID = createData.arrayID, insertPosition = createData.insertPosition, dataPointer = createData.dataPointer, saveToDatabase = createData.saveToDatabase;
-    var svgObjectSoul = svg_js_1["default"](document.createElement("polyline")).polyline([0, 0, 0, 0]);
-    var svgObject = svgObjectSoul.node;
-    svgObject.soul = svgObjectSoul;
-    svgObject.GNType = GNSvgPolyLine.name;
-    svgObject._name = name;
-    svgObject._dataStructure = ["points"];
-    svgObject._styleStructure = ["stroke", "stroke-width", "fill"];
-    // functions
     svgObject.loadFromData = function (automergeData) {
         svgObject.soul.plot(automergeData["data"]["points"]);
     };
@@ -26989,7 +26749,9 @@ function SuperSVG(svgObject, arrayID, insertPosition, dataPointer, saveToDatabas
     //
 }
 
-},{"./GreateNoteObjectHelperFunction":58,"svg.js":42}],58:[function(require,module,exports){
+},{"./GreateNoteObjectHelperFunction":58,"svg.js":42}],57:[function(require,module,exports){
+arguments[4][56][0].apply(exports,arguments)
+},{"./GreateNoteObjectHelperFunction":58,"dup":56,"svg.js":42}],58:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27135,7 +26897,7 @@ function attachEventListenerToLayer(mainController, arrayID, _object, injectedDa
     }
 }
 
-},{"../EventFolder/attachToolBoxEventsToLayers":44,"../constructInitialCondition":77}],59:[function(require,module,exports){
+},{"../EventFolder/attachToolBoxEventsToLayers":44,"../constructInitialCondition":79}],59:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.getAttributeController = exports.ToolBoxClass = void 0;
@@ -27312,7 +27074,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.polylineMouseUpFunction = exports.polylineMouseMoveFunction = exports.polylineMouseDownFunction = void 0;
+exports.polylineMouseDownFunction = void 0;
 var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
 var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
 function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName) {
@@ -27322,7 +27084,6 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
     var polylineController = mainController.attributeControllerMapping.polylineController;
     var offsetX, offsetY, touchIsPen, ratio;
     var originalWidth = mainController.pageCurrentStatus.fullPageSize[0];
-    var testInfo = document.querySelector(".testInfo");
     if (e.type == "touchstart") {
         var rect = e.target.getBoundingClientRect();
         ratio = rect.width / originalWidth;
@@ -27333,7 +27094,7 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
     if (e.type == "mousedown") {
         offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
         offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
-        // testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`
+        // testInfo.innerHTML = `dist
     }
     // touchIsPen = true
     if (e.type == "mousedown" || touchIsPen) {
@@ -27341,53 +27102,43 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
         var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
         var polyline_1 = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
         polyline_1.style.pointerEvents = "none";
+        var pointArray_1 = [[offsetX, offsetY]];
         //
-        polyline_1.soul.plot([[offsetX, offsetY]]);
+        polyline_1.soul.plot(pointArray_1);
         polyline_1.appendTo(svgBoard);
         polyline_1.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
         //
         // define the mouse move event
         var mouseMoveFunction_1 = function (e) {
             e.preventDefault();
-            testInfo.innerHTML = "offsetX = " + offsetX * 1 / ratio + " <br>" + ("offsetY = " + offsetY * 1 / ratio + " <br> ratio = " + ratio);
-            polylineMouseMoveFunction(e, polyline_1, ratio);
+            var newOffsetX, newOffsetY;
+            if (e.type == "touchmove") {
+                var rect = e.target.getBoundingClientRect();
+                newOffsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+                newOffsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
+            }
+            if (e.type == "mousemove") {
+                newOffsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
+                newOffsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
+            }
+            pointArray_1.push([newOffsetX, newOffsetY]);
+            polyline_1.soul.plot(pointArray_1);
         };
         svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
         //
         // define the mouse move function
         var mouseUpFunction_1 = function (e) {
             e.preventDefault();
-            polylineMouseUpFunction(e, svgBoard, polyline_1, mouseMoveFunction_1, mouseUpFunction_1, moveEventName, upEventName);
+            polyline_1.saveHTMLObjectToDatabase();
+            svgBoard.removeEventListener(moveEventName, mouseMoveFunction_1);
+            svgBoard.removeEventListener(upEventName, mouseUpFunction_1);
         };
         svgBoard.addEventListener(upEventName, mouseUpFunction_1);
     }
 }
 exports.polylineMouseDownFunction = polylineMouseDownFunction;
-function polylineMouseMoveFunction(e, polyline, ratio) {
-    var offsetX;
-    var offsetY;
-    if (e.type == "touchmove") {
-        var rect = e.target.getBoundingClientRect();
-        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
-        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
-    }
-    if (e.type == "mousemove") {
-        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
-        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
-    }
-    var newPoint = polyline.soul.array().value;
-    newPoint.push([offsetX, offsetY]);
-    polyline.soul.plot(newPoint);
-}
-exports.polylineMouseMoveFunction = polylineMouseMoveFunction;
-function polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName) {
-    polyline.saveHTMLObjectToDatabase();
-    svgBoard.removeEventListener(moveEventName, mouseMoveFunctionToBeRemoved);
-    svgBoard.removeEventListener(upEventName, mouseUpFunctionToBeRemoved);
-}
-exports.polylineMouseUpFunction = polylineMouseUpFunction;
 
-},{"../GreatNoteClass/GreatNoteSvgDataClass":57,"./toolBoxHelperFunction":65}],61:[function(require,module,exports){
+},{"../GreatNoteClass/GreatNoteSvgDataClass":57,"./toolBoxHelperFunction":67}],61:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27425,7 +27176,7 @@ function addCommentMouseDownFunction(e, mainController, divLayer, moveEventName,
 }
 exports.addCommentMouseDownFunction = addCommentMouseDownFunction;
 
-},{"../commentFolder/commentController":74}],62:[function(require,module,exports){
+},{"../commentFolder/commentController":76}],62:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27507,7 +27258,7 @@ function eraserMouseDownFunction(e, mainController, svgBoard, moveEventName, upE
 } // eraserMouseDownFunction
 exports.eraserMouseDownFunction = eraserMouseDownFunction;
 
-},{"../GreatNoteClass/GreatNoteSVGDataClass":56,"./toolBoxHelperFunction":65}],63:[function(require,module,exports){
+},{"../GreatNoteClass/GreatNoteSVGDataClass":56,"./toolBoxHelperFunction":67}],63:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27591,7 +27342,33 @@ function moveEventFunction(e, divSelctionObjectStatus, originalObjectPosition, c
 function objectTranslateWithMouse(object, left, top) {
 }
 
-},{"../settings":86,"./toolBoxHelperFunction":65}],64:[function(require,module,exports){
+},{"../settings":88,"./toolBoxHelperFunction":67}],64:[function(require,module,exports){
+"use strict";
+exports.__esModule = true;
+exports.overallMouseDownFunction = void 0;
+var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
+var selectionToolPhaseOne_1 = require("./selectionToolPhaseOne");
+var selectionToolPhaseTwo_1 = require("./selectionToolPhaseTwo");
+function overallMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
+    var _a;
+    if (!mainController.toolBox.checkToolBoxItemStatus("selectionToolItemButton"))
+        return;
+    var offsetX, offstY, touchIsPen;
+    _a = toolBoxHelperFunction_1.getOffSetXY(e), offsetX = _a[0], offstY = _a[1], touchIsPen = _a[2];
+    if (!touchIsPen)
+        return;
+    e.preventDefault();
+    if (selectionStatusObject.mode == "phaseOne") {
+        selectionToolPhaseOne_1.selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject);
+        selectionStatusObject.mode = "phaseTwo";
+    }
+    else if (selectionStatusObject.mode == "phaseTwo") {
+        selectionToolPhaseTwo_1.selectionToolPhaseTwoMouseDownEvent(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject);
+    }
+} // overallMouseDownFunction
+exports.overallMouseDownFunction = overallMouseDownFunction;
+
+},{"./selectionToolPhaseOne":65,"./selectionToolPhaseTwo":66,"./toolBoxHelperFunction":67}],65:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27613,16 +27390,69 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.selectionToolMouseDownFunction = exports.selectionToolMouseUpFunction = exports.selectionToolMouseMoveFunction = exports.markObjectInsideSelectionArea = void 0;
-var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
+exports.markObjectInsideSelectionArea = exports.selectionToolPhaseOneMouseDownFunction = void 0;
 var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
+var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
 var Settings = __importStar(require("../settings"));
+var strokeColor = "blue";
+var strokeWidth = "2px";
+function selectionToolPhaseOneMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
+    if (selectionStatusObject.mode == "phaseTwo") {
+        return;
+    }
+    var _a = toolBoxHelperFunction_1.getOffSetXY(e), originalPositionX = _a[0], originalPositionY = _a[1], touchIsPen = _a[2];
+    var _b = [originalPositionX, originalPositionY], offsetX = _b[0], offsetY = _b[1];
+    touchIsPen = true;
+    if (e.type == "mousedown" || touchIsPen) {
+        selectionStatusObject.selectedObjectArray = [];
+        selectionStatusObject.counter += 1;
+        var polyline_1 = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", saveToDatabase: false });
+        polyline_1.style.pointerEvents = "none";
+        polyline_1.soul.plot([[offsetX, offsetY]]);
+        polyline_1.appendTo(svgBoard);
+        polyline_1.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
+        polyline_1.style["stroke-dasharray"] = "5";
+        selectionStatusObject.polyline = polyline_1;
+        var polylineArray_1 = polyline_1.soul.array().value;
+        // calculate the ratio
+        var rect = e.target.getBoundingClientRect();
+        var ratio_1 = rect.width / Settings.pageSizeInfo.fullPageSize[0];
+        var mouseMoveFunction_1 = function (e) {
+            var _a;
+            e.preventDefault();
+            var offsetX, offsetY;
+            if (e.type == "touchmove") {
+                var rect_1 = e.target.getBoundingClientRect();
+                offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect_1.left, ratio_1);
+                offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect_1.top, ratio_1);
+            }
+            else if (e.type == "mousemove") {
+                _a = [e.offsetX, e.offsetY], offsetX = _a[0], offsetY = _a[1];
+            }
+            polylineArray_1.push([offsetX, offsetY]);
+            polyline_1.soul.plot(polylineArray_1);
+        };
+        var mouseUpFunction_1 = function (e) {
+            e.preventDefault();
+            // cleaan up
+            polylineArray_1.push([originalPositionX, originalPositionY]);
+            polyline_1.soul.plot(polylineArray_1);
+            // cleaan up
+            toolBoxHelperFunction_1.clearUpEvent(svgBoard, moveEventName, mouseMoveFunction_1);
+            toolBoxHelperFunction_1.clearUpEvent(svgBoard, upEventName, mouseUpFunction_1);
+            markObjectInsideSelectionArea(svgBoard, selectionStatusObject);
+        };
+        // define the mouse move event
+        svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
+        svgBoard.addEventListener(upEventName, mouseUpFunction_1);
+    } // if touch is pen
+} // mouseDownEventBeforeSelection
+exports.selectionToolPhaseOneMouseDownFunction = selectionToolPhaseOneMouseDownFunction;
 function markObjectInsideSelectionArea(svgBoard, selectionStatusObject) {
     var selectionObjectSet = new Set();
     var polyline = selectionStatusObject.polyline;
     var newPoint = svgBoard.createSVGPoint();
     svgBoard.childNodes.forEach(function (object) {
-        // console.log(121210002, object!=polyline, object.id, svgBoard.childNodes, selectionStatusObject)
         // the object cannot  be the polyline
         if (object != polyline && object.soul) {
             var lineArray = object.soul.array().value;
@@ -27642,104 +27472,54 @@ function markObjectInsideSelectionArea(svgBoard, selectionStatusObject) {
     // selectionStatusObject.selectedObjectArray.push(polyline)
 }
 exports.markObjectInsideSelectionArea = markObjectInsideSelectionArea;
-function selectionToolMouseMoveFunction(e, selectionStatusObject, ratio) {
-    var offsetX;
-    var offsetY;
-    if (e.type == "touchmove") {
-        var rect = e.target.getBoundingClientRect();
-        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
-        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
-    }
-    if (e.type == "mousemove") {
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-    }
-    var newPoint = selectionStatusObject.polyline.soul.array().value;
-    // console.log(newPoint)
-    newPoint.push([offsetX, offsetY]);
-    selectionStatusObject.polyline.soul.plot(newPoint);
-}
-exports.selectionToolMouseMoveFunction = selectionToolMouseMoveFunction;
-function selectionToolMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName) {
-    // connect the last point with the first point
-    var newPoint = polyline.soul.array().value;
-    newPoint.push(newPoint[0]);
-    polyline.soul.plot(newPoint);
-    // cleaan up
-    toolBoxHelperFunction_1.clearUpEvent(svgBoard, moveEventName, mouseMoveFunctionToBeRemoved);
-    toolBoxHelperFunction_1.clearUpEvent(svgBoard, upEventName, mouseUpFunctionToBeRemoved);
-}
-exports.selectionToolMouseUpFunction = selectionToolMouseUpFunction;
-function selectionToolMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
-    if (!mainController.toolBox.checkToolBoxItemStatus("selectionToolItemButton")) {
+
+},{"../GreatNoteClass/GreatNoteSvgDataClass":57,"../settings":88,"./toolBoxHelperFunction":67}],66:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+exports.__esModule = true;
+exports.selectionToolPhaseTwoMouseDownEvent = void 0;
+var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
+var PopUpBoxManager = __importStar(require("../pageControllerFolder/PopUpBoxFunction"));
+function selectionToolPhaseTwoMouseDownEvent(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
+    var _a;
+    if (selectionStatusObject.mode != "phaseTwo") {
         return;
     }
-    var _a = toolBoxHelperFunction_1.getOffSetXY(e), originalPositionX = _a[0], originalPositionY = _a[1], touchIsPen = _a[2];
-    var _b = [originalPositionX, originalPositionY], offsetX = _b[0], offsetY = _b[1];
-    touchIsPen = true;
-    // if (!touchIsPen) return
-    e.preventDefault();
-    if (selectionStatusObject.mode == "selectionMode") {
-        mouseDownEventBeforeSelection(e, mainController, svgBoard, moveEventName, upEventName, originalPositionX, originalPositionY, offsetX, offsetY, touchIsPen, selectionStatusObject);
-        selectionStatusObject.mode = "selectedMode";
-    }
-    else if (selectionStatusObject.mode == "selectedMode") {
-        mouseDownEventAfterSelection(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject);
-    }
-} // selectionToolMouseDownFunction
-exports.selectionToolMouseDownFunction = selectionToolMouseDownFunction;
-function mouseDownEventBeforeSelection(e, mainController, svgBoard, moveEventName, upEventName, originalPositionX, originalPositionY, offsetX, offsetY, touchIsPen, selectionStatusObject) {
-    if (e.type == "mousedown" || touchIsPen) {
-        selectionStatusObject.selectedObjectArray = [];
-        var strokeColor = "blue";
-        var strokeWidth = "2px";
-        var polyline = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", saveToDatabase: false });
-        polyline.style.pointerEvents = "none";
-        polyline.soul.plot([[offsetX, offsetY]]);
-        polyline.appendTo(svgBoard);
-        polyline.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
-        polyline.style["stroke-dasharray"] = "5";
-        selectionStatusObject.polyline = polyline;
-        var rect = e.target.getBoundingClientRect();
-        var ratio_1 = rect.width / Settings.pageSizeInfo.fullPageSize[0];
-        var mouseMoveFunction_1 = function (e) {
-            e.preventDefault();
-            var _a = toolBoxHelperFunction_1.getOffSetXY(e), newX = _a[0], newY = _a[1], _ = _a.slice(2);
-            var distance = toolBoxHelperFunction_1.calculateDistance(newX, newY, offsetX, offsetY);
-            // console.log(112112, selectionStatusObject.polyline.soul.array().value.length, newX, newY, distance)
-            console.log("----------------");
-            selectionToolMouseMoveFunction(e, selectionStatusObject, ratio_1);
-        };
-        var mouseUpFunction_1 = function (e) {
-            e.preventDefault();
-            // cleaan up
-            selectionToolMouseUpFunction(e, svgBoard, selectionStatusObject.polyline, mouseMoveFunction_1, mouseUpFunction_1, moveEventName, upEventName);
-            markObjectInsideSelectionArea(svgBoard, selectionStatusObject);
-        };
-        // define the mouse move event
-        svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
-        svgBoard.addEventListener(upEventName, mouseUpFunction_1);
-    }
-} // mouseDownEventBeforeSelection
-function mouseDownEventAfterSelection(e, mainController, svgBoard, moveEventName, upEventName, selectionStatusObject) {
-    var _a;
     var clickedPoint = svgBoard.createSVGPoint();
     var touchIsPen;
     _a = toolBoxHelperFunction_1.getOffSetXY(e), clickedPoint.x = _a[0], clickedPoint.y = _a[1], touchIsPen = _a[2];
-    if (!touchIsPen) {
-        // return
-    }
+    if (!touchIsPen)
+        return;
     e.preventDefault();
-    // let targetObjectOriginalDataArray = selectionStatusObject.selectedObjectArray.map(p=>p.soul.array().value);
-    // console.log(144, "lenght of targetObjectOriginalDataArray", targetObjectOriginalDataArray.length)
+    var targetObjectOriginalDataArray = selectionStatusObject.selectedObjectArray.map(function (p) { return p.soul.array().value; });
     var selectionPolylineOriginalData = selectionStatusObject.polyline.soul.array().value;
     // if the clicked point is outside the area, then just delete the selected circle and then go back to selection Mode
     if (!selectionStatusObject.polyline.isPointInFill(clickedPoint)) {
         selectionStatusObject.polyline.remove();
         selectionStatusObject.polyline = null;
-        selectionStatusObject.mode = "selectionMode";
+        selectionStatusObject.mode = "phaseOne";
+        selectionStatusObject.selectedObjectArray = [];
         return;
     }
+    //
     selectionStatusObject.triggerFlag = true;
     setTimeout(function () {
         if (selectionStatusObject.triggerFlag) {
@@ -27755,33 +27535,18 @@ function mouseDownEventAfterSelection(e, mainController, svgBoard, moveEventName
         e.preventDefault();
         if (!selectionStatusObject.polyline)
             return;
-        // console.log(selectionStatusObject.polyline)
-        // return
-        // if (blockEvent) return
-        // blockEvent = true
-        // setTimeout(()=>{blockEvent = false}, 100)
+        if (blockEvent)
+            return;
+        blockEvent = true;
+        setTimeout(function () { blockEvent = false; }, 100);
         var _a = toolBoxHelperFunction_1.getOffSetXY(e), newX = _a[0], newY = _a[1], _ = _a.slice(2);
         var _b = [newX - clickedPoint.x, newY - clickedPoint.y], deltaX = _b[0], deltaY = _b[1];
-        console.log(179, "newX, newY", newX, newY, "deltaX, Y; ", deltaX, deltaY);
-        // selectionStatusObject.polyline.soul.plot(selectionStatusObject.polyline.soul.array().value.map(p=> [p[0] + deltaX, p[1] + deltaY]))
         toolBoxHelperFunction_1.changeItemPosition(selectionStatusObject.polyline, selectionPolylineOriginalData, deltaX, deltaY);
-        // selectionStatusObject.selectedObjectArray.forEach((p, i)=>{
-        //   if (p.soul){
-        //       changeItemPosition(p, targetObjectOriginalDataArray[i], deltaX, deltaY)
-        //   }
-        //
-        //   // try {
-        //   //     // p is the pint arrays
-        //   //     // targetObjectOriginalDataArray is the original positionss of the points of the polylines
-        //   //
-        //   // } catch {
-        //   //     // console.log("some error", targetf12ObjectOriginalDataArray)
-        //   //     return
-        //   // }
-        //
-        //
-        //
-        // })
+        selectionStatusObject.selectedObjectArray.forEach(function (p, i) {
+            if (p.soul) {
+                toolBoxHelperFunction_1.changeItemPosition(p, targetObjectOriginalDataArray[i], deltaX, deltaY);
+            }
+        });
         var distance = toolBoxHelperFunction_1.calculateDistance(newX, newY, clickedPoint.x, clickedPoint.y);
         if (distance > 0.5)
             selectionStatusObject.triggerFlag = false;
@@ -27789,30 +27554,32 @@ function mouseDownEventAfterSelection(e, mainController, svgBoard, moveEventName
     var mouseUpFunction = function (e) {
         e.preventDefault();
         selectionStatusObject.triggerFlag = false;
-        selectionToolMouseUpFunction(e, svgBoard, selectionStatusObject.polyline, mouseMoveFunction, mouseUpFunction, moveEventName, upEventName);
-        svgBoard.removeEventListener(mouseMoveFunction, mouseMoveFunction);
+        console.log(selectionStatusObject);
+        selectionStatusObject.selectedObjectArray.forEach(function (p) { return p.saveHTMLObjectToDatabase(); });
+        svgBoard.removeEventListener(moveEventName, mouseMoveFunction);
+        svgBoard.removeEventListener(upEventName, mouseMoveFunction);
     };
     // define the mouse move event
     svgBoard.addEventListener(moveEventName, mouseMoveFunction);
-    // svgBoard.addEventListener(upEventName, mouseUpFunction)
+    svgBoard.addEventListener(upEventName, mouseUpFunction);
 }
+exports.selectionToolPhaseTwoMouseDownEvent = selectionToolPhaseTwoMouseDownEvent;
 // a popup box comes out
 function addHoldTouchAction(e, svgBoard, selectionStatusObject) {
-    // let popUpBox = PopUpBoxManager.createPopUpBox()
-    // let [pageX, pageY, ..._] = getPageXY(e)
-    // svgBoard.parentNode.appendChild(popUpBox)
-    // popUpBox.style.left = (pageX + 10) + "px"
-    // popUpBox.style.top = (pageY + 10) + "px"
-    //
-    // PopUpBoxManager.addItemToCreatePopUpBox(popUpBox, "deleteAll", function(){
-    //     selectionStatusObject.selectedObjectArray.forEach(p=>{
-    //         p.remove()
-    //     })
-    //     popUpBox.remove()
-    // })
+    var popUpBox = PopUpBoxManager.createPopUpBox();
+    var _a = toolBoxHelperFunction_1.getPageXY(e), pageX = _a[0], pageY = _a[1], _ = _a.slice(2);
+    svgBoard.parentNode.appendChild(popUpBox);
+    popUpBox.style.left = (pageX + 10) + "px";
+    popUpBox.style.top = (pageY + 10) + "px";
+    PopUpBoxManager.addItemToCreatePopUpBox(popUpBox, "deleteAll", function () {
+        selectionStatusObject.selectedObjectArray.forEach(function (p) {
+            p.remove();
+        });
+        popUpBox.remove();
+    });
 }
 
-},{"../GreatNoteClass/GreatNoteSvgDataClass":57,"../settings":86,"./toolBoxHelperFunction":65}],65:[function(require,module,exports){
+},{"../pageControllerFolder/PopUpBoxFunction":84,"./toolBoxHelperFunction":67}],67:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27854,6 +27621,8 @@ function locationLog(logText) {
 }
 exports.locationLog = locationLog;
 function changeItemPosition(p, originalPointArray, deltaX, deltaY) {
+    if (!p || !originalPointArray)
+        return;
     var newPointArray = originalPointArray.map(function (_a, i) {
         var x = _a[0], y = _a[1];
         return [x + deltaX, y + deltaY];
@@ -27909,9 +27678,9 @@ function getTouchOffset(e, touchPointIndex) {
 }
 exports.getTouchOffset = getTouchOffset;
 
-},{"../settings":86}],66:[function(require,module,exports){
+},{"../settings":88}],68:[function(require,module,exports){
 arguments[4][59][0].apply(exports,arguments)
-},{"dup":59}],67:[function(require,module,exports){
+},{"dup":59}],69:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.universalControllerCreater = exports.superController = exports.initializeContainerAndControllerEvent = void 0;
@@ -27971,9 +27740,9 @@ function universalControllerCreater(name, controllerOptions) {
 }
 exports.universalControllerCreater = universalControllerCreater;
 
-},{"./basicControllerType":69}],68:[function(require,module,exports){
+},{"./basicControllerType":71}],70:[function(require,module,exports){
 arguments[4][55][0].apply(exports,arguments)
-},{"dup":55}],69:[function(require,module,exports){
+},{"dup":55}],71:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.choiceController = exports.dropdownListController = exports.inputFieldAndDropdownListController = void 0;
@@ -28094,7 +27863,7 @@ function choiceController(attribute, choiceList, prototype) {
 } // choiceController
 exports.choiceController = choiceController;
 
-},{}],70:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.createSvgCircleControllerContainer = exports.createDivControllerContainer = exports.createPolylineController = void 0;
@@ -28191,7 +27960,7 @@ function createSvgCircleControllerContainer() {
 } // createSvgCircleControllerContainer
 exports.createSvgCircleControllerContainer = createSvgCircleControllerContainer;
 
-},{"./attributeControllerHelperFunction":67,"./basicControllerType":69}],71:[function(require,module,exports){
+},{"./attributeControllerHelperFunction":69,"./basicControllerType":71}],73:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -28224,7 +27993,7 @@ function initializeMainControllerAttributeControllerMapping(mainController) {
 }
 exports.initializeMainControllerAttributeControllerMapping = initializeMainControllerAttributeControllerMapping;
 
-},{"./highLevelController":70}],72:[function(require,module,exports){
+},{"./highLevelController":72}],74:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -28287,7 +28056,6 @@ function buildPageControllerButtonArray(mainController) {
     pageControllerSubPanelContent.appendChild(testValuePanel);
     var editorControllerTemplate = document.querySelector("#editControllerTemplate");
     var editorController = editorControllerTemplate.content.cloneNode(true);
-    console.log(484848, editorController);
     // attribute controller
     var attributePanel = editorController.querySelector(".attributePanel");
     InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(mainController);
@@ -28438,6 +28206,10 @@ function buildInitialPage(mainController, saveToDatabase) {
     }
     mainController.layerController.renderCurrentPageLayer();
     TestHelper.testFunction(mainController);
+    var updateEvent = setInterval(function () {
+        console.log("send changes to server");
+        mainController.sendChangeToServer();
+    }, 4000);
 } // buildInitialPage
 exports.buildInitialPage = buildInitialPage;
 function attachEvents(mainController, pageContentContainer) {
@@ -28449,7 +28221,7 @@ function attachEvents(mainController, pageContentContainer) {
 }
 exports.attachEvents = attachEvents;
 
-},{"./EventFolder/specialWindowObject":46,"./EventFolder/swipeEvent":47,"./GreatNoteClass/GNImageContainer":51,"./GreatNoteClass/GNInputField":52,"./GreatNoteClass/GreatNoteDataClass":54,"./GreatNoteClass/GreatNoteSvgDataClass":57,"./attributeControllerFolder/initializeAttributeControllers":71,"./clipboardEvents":73,"./commentFolder/commentController":74,"./layerControllerFolder/layerController":79,"./pageControllerFolder/pageController":83,"./pageViewHelperFunction":85,"./socketFunction":87,"./testFolder/testHelperFunction":88}],73:[function(require,module,exports){
+},{"./EventFolder/specialWindowObject":46,"./EventFolder/swipeEvent":47,"./GreatNoteClass/GNImageContainer":51,"./GreatNoteClass/GNInputField":52,"./GreatNoteClass/GreatNoteDataClass":54,"./GreatNoteClass/GreatNoteSvgDataClass":57,"./attributeControllerFolder/initializeAttributeControllers":73,"./clipboardEvents":75,"./commentFolder/commentController":76,"./layerControllerFolder/layerController":81,"./pageControllerFolder/pageController":85,"./pageViewHelperFunction":87,"./socketFunction":89,"./testFolder/testHelperFunction":90}],75:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.mousePositionTrackFunction = exports.triggerTargetObjectMovingFunction = exports.getObjectOrigianlDataArray = exports.setTargetObject = exports.createMouseTrackingController = exports.mouseResizeFunction = exports.addPasteImageEvent = void 0;
@@ -28664,7 +28436,7 @@ function mousePositionTrackFunction(mouseInfoDiv, parentDiv) {
 }
 exports.mousePositionTrackFunction = mousePositionTrackFunction;
 
-},{"./GreatNoteClass/GNImageContainer":51}],74:[function(require,module,exports){
+},{"./GreatNoteClass/GNImageContainer":51}],76:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -28729,7 +28501,7 @@ function GNComment(createData) {
 }
 exports.GNComment = GNComment;
 
-},{"../GreatNoteClass/GreatNoteDataClass":54,"./commentControllerHelperFunction":75}],75:[function(require,module,exports){
+},{"../GreatNoteClass/GreatNoteDataClass":54,"./commentControllerHelperFunction":77}],77:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.addCommentController = exports.addEventToCommentContainer = exports.createCommentObject = exports.loadFromData = void 0;
@@ -28824,7 +28596,7 @@ function addCommentController(_commentContainer) {
 }
 exports.addCommentController = addCommentController;
 
-},{"../GreatNoteClass/GNDropdownList":50,"../GreatNoteClass/GreatNoteDataClass":54}],76:[function(require,module,exports){
+},{"../GreatNoteClass/GNDropdownList":50,"../GreatNoteClass/GreatNoteDataClass":54}],78:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.createCommunicationPanel = void 0;
@@ -28869,7 +28641,7 @@ function createCommunicationPanel(socketData) {
 }
 exports.createCommunicationPanel = createCommunicationPanel;
 
-},{}],77:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -29109,14 +28881,14 @@ var MainController = /** @class */ (function () {
                 // delete databaseObject
             });
             htmlObject.remove();
-            this.sendChangeToServer();
         }
     }; // deleteFromDataBase
     MainController.prototype.sendChangeToServer = function () {
         var changes = Automerge.getChanges(exports.mainController.previousDoc, exports.mainController.mainDoc);
-        exports.mainController.previousDoc = exports.mainController.mainDoc;
-        // console.log("56: the changes are: ", changes)
-        socketFunction_1.socket.emit("clientSendChangesToServer", { "changeData": changes });
+        if (changes.length > 0) {
+            exports.mainController.previousDoc = exports.mainController.mainDoc;
+            socketFunction_1.socket.emit("clientSendChangesToServer", { "changeData": changes });
+        }
     };
     // ******************************************
     // *     C. Access data in the database     *
@@ -29266,7 +29038,7 @@ exports.mainController.toolBox = new ToolBoxModel.ToolBoxClass();
 // to create the attributeControllers
 socketFunction_1.socket.emit("initialDataRequest"); // processInitialData
 
-},{"./ToolboxModel":66,"./buildInitialPageHelperFunctions":72,"./databaseHelperFunction":78,"./mainControllerFolder/mainControllerHelperFunction":80,"./mainControllerFolder/mainControllerInterface":81,"./pageControllerFolder/pageController":83,"./settings":86,"./socketFunction":87,"automerge":1}],78:[function(require,module,exports){
+},{"./ToolboxModel":68,"./buildInitialPageHelperFunctions":74,"./databaseHelperFunction":80,"./mainControllerFolder/mainControllerHelperFunction":82,"./mainControllerFolder/mainControllerInterface":83,"./pageControllerFolder/pageController":85,"./settings":88,"./socketFunction":89,"automerge":1}],80:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -29449,7 +29221,7 @@ function processNewChangeData(mainController, generator, awaitmessage) {
 }
 exports.processNewChangeData = processNewChangeData;
 
-},{"./pageViewHelperFunction":85}],79:[function(require,module,exports){
+},{"./pageViewHelperFunction":87}],81:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -29604,7 +29376,7 @@ function addItemRowFunction(layerView, itemRow) {
     });
 }
 
-},{"../GreatNoteClass/GreatNoteDataClass":54,"../GreatNoteClass/GreatNoteSvgDataClass":57}],80:[function(require,module,exports){
+},{"../GreatNoteClass/GreatNoteDataClass":54,"../GreatNoteClass/GreatNoteSvgDataClass":57}],82:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.createDummyData = void 0;
@@ -29623,7 +29395,7 @@ function createDummyData(data) {
 }
 exports.createDummyData = createDummyData;
 
-},{}],81:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.MainDocArrayEnum = exports.mainArrayData = void 0;
@@ -29653,7 +29425,7 @@ var MainDocArrayEnum;
     MainDocArrayEnum["mainArray_pokemon"] = "mainArray_pokemon";
 })(MainDocArrayEnum = exports.MainDocArrayEnum || (exports.MainDocArrayEnum = {}));
 
-},{}],82:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.addItemToCreatePopUpBox = exports.createPopUpBox = void 0;
@@ -29678,7 +29450,7 @@ function addItemToCreatePopUpBox(popUpBox, name, buttonFunction) {
 }
 exports.addItemToCreatePopUpBox = addItemToCreatePopUpBox;
 
-},{}],83:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.highlightCurrentPageInOverviewMode = exports.pageControllerHTMLObject = exports.initializePageController = void 0;
@@ -29827,7 +29599,7 @@ function highlightCurrentPageInOverviewMode(smallPageView, currentPageNumber, cu
 }
 exports.highlightCurrentPageInOverviewMode = highlightCurrentPageInOverviewMode;
 
-},{}],84:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.buildToolBoxDiv = void 0;
@@ -29835,7 +29607,7 @@ function buildToolBoxDiv(mainController) {
 }
 exports.buildToolBoxDiv = buildToolBoxDiv;
 
-},{}],85:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -30073,7 +29845,7 @@ function clickEventOfSmallPage(currentStatus, smallPage) {
 // extract and create data object do not directly save object to the database.
 // What is saved to the database is controlled by the saveHTMLOBjectTODatabase function in the mainController file
 
-},{"./GreatNoteClass/GreatNoteDataClass":54,"./constructInitialCondition":77,"./pageControllerFolder/pageController":83}],86:[function(require,module,exports){
+},{"./GreatNoteClass/GreatNoteDataClass":54,"./constructInitialCondition":79,"./pageControllerFolder/pageController":85}],88:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.pageSizeInfo = exports.ClassNameCollection = void 0;
@@ -30085,7 +29857,7 @@ exports.pageSizeInfo = {
     overviewPageSize: [237.4, 144]
 };
 
-},{}],87:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -30157,7 +29929,7 @@ exports.socket.on("serverSendChangeFileToClient", function (changeDataArray) {
     }
 });
 
-},{"./constructInitialCondition":77,"automerge":1,"socket.io-client":27}],88:[function(require,module,exports){
+},{"./constructInitialCondition":79,"automerge":1,"socket.io-client":27}],90:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 exports.testFunction = void 0;
@@ -30232,7 +30004,7 @@ function testFunction(mainController) {
 }
 exports.testFunction = testFunction;
 
-},{}],89:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var divTest = false;
@@ -30568,7 +30340,7 @@ var fillController;
 // //
 // // }
 
-},{}],90:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -30720,7 +30492,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],91:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -32501,7 +32273,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":90,"buffer":91,"ieee754":92}],92:[function(require,module,exports){
+},{"base64-js":92,"buffer":93,"ieee754":94}],94:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -32588,7 +32360,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],93:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -32774,4 +32546,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[48,59,72,73,77,78,85,86,87,89,44,45,46,47,49,50,51,52,53,54,55,57,58,60,61,62,63,64,65,67,68,69,70,71,74,75,76,79,80,81,82,83,84,88]);
+},{}]},{},[48,59,74,75,79,80,87,88,89,91,44,45,46,47,49,50,51,52,53,54,55,57,58,60,61,62,63,64,65,66,67,69,70,71,72,73,76,77,78,81,82,83,84,85,86,90]);

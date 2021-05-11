@@ -39,13 +39,14 @@ function attachEventListenerToSvgBoard(mainController, svgBoard) {
         }
     };
     var selectionStatusObject = {
-        mode: "selectionMode",
-        polyline: null
+        mode: "phaseOne",
+        polyline: null,
+        counter: 0
     };
     var selectionToolMouseDownFunction = {
         eventNameList: ["touchstart"],
         eventFunction: function (e) {
-            SelectionToolFunction.selectionToolMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
+            SelectionToolFunction.overallMouseDownFunction(e, mainController, svgBoard, "touchmove", "touchend", selectionStatusObject);
         }
     };
     var eventArray = [polylineMouseDown, eraserMouseDownFunction, selectionToolMouseDownFunction];

@@ -39,6 +39,8 @@ function locationLog(logText) {
 }
 exports.locationLog = locationLog;
 function changeItemPosition(p, originalPointArray, deltaX, deltaY) {
+    if (!p || !originalPointArray)
+        return;
     var newPointArray = originalPointArray.map(function (_a, i) {
         var x = _a[0], y = _a[1];
         return [x + deltaX, y + deltaY];

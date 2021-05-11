@@ -255,15 +255,18 @@ export class MainController implements MainControllerInterface{
               // delete databaseObject
           })
           htmlObject.remove()
-          this.sendChangeToServer()
         }
     } // deleteFromDataBase
 
     sendChangeToServer(){
       let changes = Automerge.getChanges(mainController.previousDoc, mainController.mainDoc)
-      mainController.previousDoc = mainController.mainDoc
-      // console.log("56: the changes are: ", changes)
-      socket.emit("clientSendChangesToServer", {"changeData": changes})
+
+      if (changes.length > 0){
+        mainController.previousDoc = mainController.mainDoc
+
+        socket.emit("clientSendChangesToServer", {"changeData": changes})
+      }
+
     }
 
 

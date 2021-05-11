@@ -60,7 +60,6 @@ function buildPageControllerButtonArray(mainController) {
     pageControllerSubPanelContent.appendChild(testValuePanel);
     var editorControllerTemplate = document.querySelector("#editControllerTemplate");
     var editorController = editorControllerTemplate.content.cloneNode(true);
-    console.log(484848, editorController);
     // attribute controller
     var attributePanel = editorController.querySelector(".attributePanel");
     InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(mainController);
@@ -211,6 +210,10 @@ function buildInitialPage(mainController, saveToDatabase) {
     }
     mainController.layerController.renderCurrentPageLayer();
     TestHelper.testFunction(mainController);
+    var updateEvent = setInterval(function () {
+        console.log("send changes to server");
+        mainController.sendChangeToServer();
+    }, 4000);
 } // buildInitialPage
 exports.buildInitialPage = buildInitialPage;
 function attachEvents(mainController, pageContentContainer) {

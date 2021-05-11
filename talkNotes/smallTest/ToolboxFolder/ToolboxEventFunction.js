@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-exports.polylineMouseUpFunction = exports.polylineMouseMoveFunction = exports.polylineMouseDownFunction = void 0;
+exports.polylineMouseDownFunction = void 0;
 var GreatNoteSvgDataClass = __importStar(require("../GreatNoteClass/GreatNoteSvgDataClass"));
 var toolBoxHelperFunction_1 = require("./toolBoxHelperFunction");
 function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, upEventName) {
@@ -29,7 +29,6 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
     var polylineController = mainController.attributeControllerMapping.polylineController;
     var offsetX, offsetY, touchIsPen, ratio;
     var originalWidth = mainController.pageCurrentStatus.fullPageSize[0];
-    var testInfo = document.querySelector(".testInfo");
     if (e.type == "touchstart") {
         var rect = e.target.getBoundingClientRect();
         ratio = rect.width / originalWidth;
@@ -40,7 +39,7 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
     if (e.type == "mousedown") {
         offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
         offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
-        // testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`
+        // testInfo.innerHTML = `dist
     }
     // touchIsPen = true
     if (e.type == "mousedown" || touchIsPen) {
@@ -48,48 +47,38 @@ function polylineMouseDownFunction(e, mainController, svgBoard, moveEventName, u
         var _a = polylineController.extract(), strokeColor = _a[0], strokeWidth = _a[1];
         var polyline_1 = GreatNoteSvgDataClass.GNSvgPolyLine({ name: "", arrayID: svgBoard.getAccessPointer(), insertPosition: false, dataPointer: false, saveToDatabase: true, specialCreationMessage: "polylineCreated" });
         polyline_1.style.pointerEvents = "none";
+        var pointArray_1 = [[offsetX, offsetY]];
         //
-        polyline_1.soul.plot([[offsetX, offsetY]]);
+        polyline_1.soul.plot(pointArray_1);
         polyline_1.appendTo(svgBoard);
         polyline_1.applyStyle({ "stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none" });
         //
         // define the mouse move event
         var mouseMoveFunction_1 = function (e) {
             e.preventDefault();
-            testInfo.innerHTML = "offsetX = " + offsetX * 1 / ratio + " <br>" + ("offsetY = " + offsetY * 1 / ratio + " <br> ratio = " + ratio);
-            polylineMouseMoveFunction(e, polyline_1, ratio);
+            var newOffsetX, newOffsetY;
+            if (e.type == "touchmove") {
+                var rect = e.target.getBoundingClientRect();
+                newOffsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+                newOffsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
+            }
+            if (e.type == "mousemove") {
+                newOffsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
+                newOffsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
+            }
+            pointArray_1.push([newOffsetX, newOffsetY]);
+            polyline_1.soul.plot(pointArray_1);
         };
         svgBoard.addEventListener(moveEventName, mouseMoveFunction_1);
         //
         // define the mouse move function
         var mouseUpFunction_1 = function (e) {
             e.preventDefault();
-            polylineMouseUpFunction(e, svgBoard, polyline_1, mouseMoveFunction_1, mouseUpFunction_1, moveEventName, upEventName);
+            polyline_1.saveHTMLObjectToDatabase();
+            svgBoard.removeEventListener(moveEventName, mouseMoveFunction_1);
+            svgBoard.removeEventListener(upEventName, mouseUpFunction_1);
         };
         svgBoard.addEventListener(upEventName, mouseUpFunction_1);
     }
 }
 exports.polylineMouseDownFunction = polylineMouseDownFunction;
-function polylineMouseMoveFunction(e, polyline, ratio) {
-    var offsetX;
-    var offsetY;
-    if (e.type == "touchmove") {
-        var rect = e.target.getBoundingClientRect();
-        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
-        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
-    }
-    if (e.type == "mousemove") {
-        offsetX = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetX, ratio);
-        offsetY = toolBoxHelperFunction_1.mousePositionRatioAdjustment(e.offsetY, ratio);
-    }
-    var newPoint = polyline.soul.array().value;
-    newPoint.push([offsetX, offsetY]);
-    polyline.soul.plot(newPoint);
-}
-exports.polylineMouseMoveFunction = polylineMouseMoveFunction;
-function polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName) {
-    polyline.saveHTMLObjectToDatabase();
-    svgBoard.removeEventListener(moveEventName, mouseMoveFunctionToBeRemoved);
-    svgBoard.removeEventListener(upEventName, mouseUpFunctionToBeRemoved);
-}
-exports.polylineMouseUpFunction = polylineMouseUpFunction;

@@ -20,8 +20,10 @@ export function locationLog(logText:string){
 
 
 export function changeItemPosition(p, originalPointArray, deltaX, deltaY){
+    if (!p || !originalPointArray) return 
+
     let newPointArray = originalPointArray.map(([x, y], i)=>[x + deltaX, y + deltaY])
-    p.soul.plot(newPointArray)
+     p.soul.plot(newPointArray)
 }
 
 export function getOffSetXY(e): [number, number, boolean]{

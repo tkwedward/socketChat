@@ -58,7 +58,6 @@ export function buildPageControllerButtonArray(mainController){
 
   let editorControllerTemplate = document.querySelector("#editControllerTemplate")
   var editorController = editorControllerTemplate.content.cloneNode(true);
-  console.log(484848, editorController)
   // attribute controller
   let attributePanel = editorController.querySelector(".attributePanel")
   InitializeAttributeControllerFunction.initializeMainControllerAttributeControllerMapping(mainController)
@@ -267,6 +266,12 @@ export function buildInitialPage(mainController:MainControllerInterface, saveToD
      mainController.layerController.renderCurrentPageLayer()
 
      TestHelper.testFunction(mainController)
+
+     let updateEvent = setInterval(() =>{
+       console.log("send changes to server")
+       mainController.sendChangeToServer()
+     }, 4000)
+
 }// buildInitialPage
 
 export function attachEvents(mainController, pageContentContainer){

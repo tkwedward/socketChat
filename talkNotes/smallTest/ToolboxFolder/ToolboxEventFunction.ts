@@ -10,7 +10,6 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
 
     let offsetX, offsetY, touchIsPen, ratio
     let originalWidth = mainController.pageCurrentStatus.fullPageSize[0]
-    let testInfo = document.querySelector(".testInfo")
     if (e.type=="touchstart"){
         let rect = e.target.getBoundingClientRect();
         ratio =  rect.width / originalWidth
@@ -24,8 +23,7 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
        offsetY = mousePositionRatioAdjustment(e.offsetY, ratio)
 
 
-       // testInfo.innerHTML = `distance_1 = ${distance1} <br>` + `distance_2 = ${distance2} <br>` + `totalDistance = ${distance1 + distance2}, scale = ${scale}, scale = ${scale + scaleDirection * deltaScale}, direction = ${scaleDirection}, finalX = ${finalPointX}, finalY = ${finalPointY}, finalX2 = ${finalPointX2}, finalY2 = ${finalPointY2}, width ${e.target.getBoundingClientRect().width}`
-
+       // testInfo.innerHTML = `dist
    }
    // touchIsPen = true
    if (e.type=="mousedown" || touchIsPen){
@@ -34,51 +32,40 @@ export function polylineMouseDownFunction(e, mainController, svgBoard, moveEvent
        let polyline = GreatNoteSvgDataClass.GNSvgPolyLine({name:"", arrayID: svgBoard.getAccessPointer(), insertPosition:false, dataPointer:false, saveToDatabase:true, specialCreationMessage:"polylineCreated"})
        polyline.style.pointerEvents = "none"
 
-
+       let pointArray = [[offsetX, offsetY]]
        //
-       polyline.soul.plot([[offsetX, offsetY]])
+       polyline.soul.plot(pointArray)
        polyline.appendTo(svgBoard)
        polyline.applyStyle({"stroke": strokeColor, "stroke-width": strokeWidth, "fill": "none"})
        //
        // define the mouse move event
        let mouseMoveFunction = (e)=>{
          e.preventDefault()
-         testInfo.innerHTML = `offsetX = ${offsetX * 1/ratio} <br>` + `offsetY = ${offsetY * 1/ratio} <br> ratio = ${ratio}`
-         polylineMouseMoveFunction(e, polyline, ratio)
+         let newOffsetX, newOffsetY
+
+         if (e.type=="touchmove"){
+             let rect = e.target.getBoundingClientRect();
+             newOffsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
+             newOffsetY = mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
+         }
+          if (e.type=="mousemove"){
+             newOffsetX = mousePositionRatioAdjustment(e.offsetX, ratio)
+             newOffsetY = mousePositionRatioAdjustment(e.offsetY, ratio)
+         }
+
+         pointArray.push([newOffsetX, newOffsetY])
+         polyline.soul.plot(pointArray)
        }
        svgBoard.addEventListener(moveEventName, mouseMoveFunction)
        //
        // define the mouse move function
        let mouseUpFunction = (e)=>{
          e.preventDefault()
-         polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunction, mouseUpFunction, moveEventName, upEventName)
+         polyline.saveHTMLObjectToDatabase()
+         svgBoard.removeEventListener(moveEventName, mouseMoveFunction)
+         svgBoard.removeEventListener(upEventName, mouseUpFunction)
        }
 
        svgBoard.addEventListener(upEventName, mouseUpFunction)
    }
-
-}
-
-export function polylineMouseMoveFunction(e, polyline, ratio){
-  let offsetX
-  let offsetY
-  if (e.type=="touchmove"){
-      let rect = e.target.getBoundingClientRect();
-      offsetX = mousePositionRatioAdjustment(e.targetTouches[0].pageX - rect.left, ratio);
-      offsetY = mousePositionRatioAdjustment(e.targetTouches[0].pageY - rect.top, ratio);
-  }
-   if (e.type=="mousemove"){
-      offsetX = mousePositionRatioAdjustment(e.offsetX, ratio)
-      offsetY = mousePositionRatioAdjustment(e.offsetY, ratio)
-  }
-
-  let newPoint = polyline.soul.array().value
-  newPoint.push([offsetX, offsetY])
-  polyline.soul.plot(newPoint)
-}
-
-export function polylineMouseUpFunction(e, svgBoard, polyline, mouseMoveFunctionToBeRemoved, mouseUpFunctionToBeRemoved, moveEventName, upEventName){
-  polyline.saveHTMLObjectToDatabase()
-  svgBoard.removeEventListener(moveEventName, mouseMoveFunctionToBeRemoved)
-  svgBoard.removeEventListener(upEventName, mouseUpFunctionToBeRemoved)
 }

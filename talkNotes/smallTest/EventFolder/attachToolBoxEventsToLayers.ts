@@ -24,14 +24,15 @@ export function attachEventListenerToSvgBoard(mainController, svgBoard){
 
 
     let selectionStatusObject = {
-      mode: "selectionMode",
-      polyline: null
+      mode: "phaseOne",
+      polyline: null,
+      counter: 0
     }
 
     let selectionToolMouseDownFunction = {
       eventNameList: ["touchstart"],
       eventFunction: (e)=>{
-        SelectionToolFunction.selectionToolMouseDownFunction(e,  mainController, svgBoard, "touchmove", "touchend", selectionStatusObject)
+        SelectionToolFunction.overallMouseDownFunction(e,  mainController, svgBoard, "touchmove", "touchend", selectionStatusObject)
       }
     }
 
